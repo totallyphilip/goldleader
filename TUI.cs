@@ -26,6 +26,18 @@ public class TUI {
 
 #endregion
 
+#region " Screen Manipulation "
+
+
+    public static void ConsoleSetup() {
+        Console.Clear();
+        Console.CursorVisible = false;
+        Console.WriteLine("Set your console size, then press any key to begin...");
+        Console.ReadKey(); 
+        Console.Clear();  
+    }
+
+#endregion
     public static string StringRepeat(int n, char c) {
         return new String(c, n);
     }
