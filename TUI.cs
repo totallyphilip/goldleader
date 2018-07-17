@@ -28,13 +28,37 @@ public class TUI {
 
 #region " Screen Manipulation "
 
+    public static void FailSafeSetWindowSize(int cols, int rows) {
 
-    public static void ConsoleSetup() {
-        Console.Clear();
-        Console.CursorVisible = false;
-        Console.WriteLine("Set your console size, then press any key to begin...");
-        Console.ReadKey(); 
-        Console.Clear();  
+        try {
+            Console.SetWindowSize(rows,cols);
+        }
+        catch {
+
+           while ((Console.WindowWidth != cols || Console.WindowHeight != rows) && (! Console.KeyAvailable)) {
+
+                Console.Clear();
+                Console.SetCursorPosition(0,0);
+                Console.WriteLine("can't resize window.");
+                Console.WriteLine("please adjust manually.");
+                Console.WriteLine();
+
+                Console.Write("adjust width: ");
+                if (Console.WindowWidth > cols) { Console.WriteLine(StringRepeat(Console.WindowWidth - cols, '\x2190')); }
+                else if (Console.WindowWidth < cols) { Console.WriteLine(StringRepeat(cols - Console.WindowWidth, '\x2192')); }
+                else { Console.WriteLine("Perfect!"); }
+
+                Console.Write("adjust height: ");
+                if (Console.WindowHeight > rows) { Console.Write(StringRepeat(Console.WindowHeight - rows, '\x2191')); }
+                else if (Console.WindowHeight < rows) { Console.Write(StringRepeat(rows - Console.WindowHeight, '\x2193')); }
+                else { Console.Write("Perfect!"); }
+
+                System.Threading.Thread.Sleep(100); // good enough so the CPU doesn't go crazy
+                
+            }
+
+        }
+
     }
 
 #endregion

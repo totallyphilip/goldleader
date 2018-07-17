@@ -10,7 +10,8 @@ namespace TieInvaders
         static void Main(string[] args)
         {
 
-            TUI.ConsoleSetup();
+            TUI.FailSafeSetWindowSize(50,35);
+            Console.Clear();
 
     
         
