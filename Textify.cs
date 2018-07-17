@@ -36,15 +36,20 @@ public class Textify
 
     public static bool SetWindowSizeSafely(int setwidth, int setheight)
     {
+        return SetWindowSizeSafely(setwidth, setheight, true);
+    }
+
+    public static bool SetWindowSizeSafely(int setwidth, int setheight, bool manualadjust)
+    {
 
         try
         {
-            Console.SetWindowSize(setwidth,setheight);
+            Console.SetWindowSize(setwidth, setheight);
         }
         catch
         {
 
-            while ((Console.WindowWidth != setwidth || Console.WindowHeight != setheight) && (!Console.KeyAvailable))
+            while ((Console.WindowWidth != setwidth || Console.WindowHeight != setheight) && (!Console.KeyAvailable) && manualadjust)
             {
 
                 Console.Clear();
@@ -69,7 +74,7 @@ public class Textify
 
         }
 
-        Console.SetBufferSize(setwidth,setheight);
+        Console.SetBufferSize(setwidth, setheight);
 
         return (Console.WindowHeight == setheight && Console.WindowWidth == setwidth);
 
@@ -81,7 +86,8 @@ public class Textify
         return new String(c, n);
     }
 
-    public static void WaitPrompt(string s) {
+    public static void WaitPrompt(string s)
+    {
         Console.Write(s);
         Console.ReadKey(true);
     }
