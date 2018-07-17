@@ -12,7 +12,9 @@ public class TieFight
 
         if (Textify.SetWindowSizeSafely(50, 35))
         {
+            Console.CursorVisible = false;
             this.Play();
+            Console.CursorVisible = true;
         }
         else
         {
@@ -31,7 +33,8 @@ public class TieFight
         int MaxEnemies = 10;
 
         var enemies = new List<Enemy>();
-        var stars = new StarField();
+        StarField stars = new StarField();
+        EnemyFleet fleet = new EnemyFleet();
 
         // Main loop
 
@@ -77,7 +80,5 @@ public class TieFight
 
         } while (!Console.KeyAvailable);
 
-        Console.SetCursorPosition(0, Textify.BottomEdge);
-        Console.CursorVisible = true;
     }
 }
