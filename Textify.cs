@@ -1,6 +1,6 @@
 using System;
 
-public class TextMagic
+public class Textify
 {
 
     #region " Properties "
@@ -22,7 +22,7 @@ public class TextMagic
 
     public static bool PastEdge(int X, int Offset, string Ascii)
     {
-        return X + Offset < TextMagic.LeftEdge || X + Offset > TextMagic.RightEdge - Ascii.Length;
+        return X + Offset < Textify.LeftEdge || X + Offset > Textify.RightEdge - Ascii.Length;
     }
 
     public static bool PastEdge(int X, string Ascii)
@@ -39,7 +39,7 @@ public class TextMagic
 
         try
         {
-            Console.SetWindowSize(setheight, setwidth);
+            Console.SetWindowSize(setwidth,setheight);
         }
         catch
         {
@@ -69,6 +69,8 @@ public class TextMagic
 
         }
 
+        Console.SetBufferSize(setwidth,setheight);
+
         return (Console.WindowHeight == setheight && Console.WindowWidth == setwidth);
 
     }
@@ -77,6 +79,11 @@ public class TextMagic
     public static string StringRepeat(int n, char c)
     {
         return new String(c, n);
+    }
+
+    public static void WaitPrompt(string s) {
+        Console.Write(s);
+        Console.ReadKey(true);
     }
 
 }

@@ -54,7 +54,7 @@ namespace TieInvaders
 
 
                 // Scrolling bug indicator (for debugging only)
-                Console.SetCursorPosition(TextMagic.LeftEdge + 10, TextMagic.BottomEdge); Console.Write("-");
+                Console.SetCursorPosition(Textify.LeftEdge + 10, Textify.BottomEdge); Console.Write("-");
 
                 Thread.Sleep(100);
 
@@ -62,16 +62,18 @@ namespace TieInvaders
 
             } while (!Console.KeyAvailable);
 
-            Console.SetCursorPosition(0, TextMagic.BottomEdge);
+            Console.SetCursorPosition(0, Textify.BottomEdge);
             Console.CursorVisible = true;
         }
 
         static void Main(string[] args)
         {
-
-            if (TextMagic.SetWindowSizeSafely(50, 35))
+            if (Textify.SetWindowSizeSafely(50, 35))
             {
-                Play();
+                  Play();
+            }
+            else {
+                Textify.WaitPrompt("something went horribly wrong");
             }
         }
     }

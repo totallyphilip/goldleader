@@ -18,7 +18,7 @@ public class StarField
 
         public bool OffScreen
         {
-            get { return _Y < 0 || _Y > TextMagic.BottomEdge; }
+            get { return _Y < 0 || _Y > Textify.BottomEdge; }
         }
 
         #endregion
@@ -28,7 +28,7 @@ public class StarField
         public Star(int Y)
         {
             Random r = new Random();
-            _X = r.Next(TextMagic.LeftEdge, TextMagic.RightEdge);
+            _X = r.Next(Textify.LeftEdge, Textify.RightEdge);
             _Y = Y;
             if (r.Next(2) == 0)
             {
@@ -92,7 +92,7 @@ public class StarField
 
     public StarField()
     {
-        for (int y = 0; y < TextMagic.BottomEdge; y++) { starfield.Add(new Star(y)); }
+        for (int y = 0; y < Textify.BottomEdge; y++) { starfield.Add(new Star(y)); }
     }
 
     #endregion
@@ -106,7 +106,7 @@ public class StarField
         {
             starfield.Remove(starfield.Find(x => x.OffScreen));
         }
-        while (starfield.Count < TextMagic.BottomEdge)
+        while (starfield.Count < Textify.BottomEdge)
         {
             starfield.Add(new Star());
         }

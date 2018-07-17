@@ -22,7 +22,7 @@ class Enemy
 
     public void Show()
     {
-        if (!(this.FellOffTheScreen || TextMagic.PastEdge(_X, _Ascii)))
+        if (!(this.FellOffTheScreen || Textify.PastEdge(_X, _Ascii)))
         {
             Console.SetCursorPosition(_X, _Y);
             Console.Write(_Ascii);
@@ -31,16 +31,16 @@ class Enemy
 
     public void Hide()
     {
-        if (!(this.FellOffTheScreen || TextMagic.PastEdge(_X, _Ascii)))
+        if (!(this.FellOffTheScreen || Textify.PastEdge(_X, _Ascii)))
         {
             Console.SetCursorPosition(_X, _Y);
-            Console.Write(TextMagic.StringRepeat(_Ascii.Length, ' '));
+            Console.Write(Textify.StringRepeat(_Ascii.Length, ' '));
         }
     }
 
     public bool FellOffTheScreen
     {
-        get { return _Y > TextMagic.BottomEdge || _Y < 0; }
+        get { return _Y > Textify.BottomEdge || _Y < 0; }
     }
 
     public void Descend()
@@ -52,14 +52,14 @@ class Enemy
     {
         this.Hide();
         Random r = new Random();
-        if (TextMagic.PastEdge(_X, _Drift, _Ascii))
+        if (Textify.PastEdge(_X, _Drift, _Ascii))
         {
             _Drift *= -1; // reverse direction
             _Y += _Gravity; // lower altitude
         }
         else
         {
-            if (r.Next(TextMagic.BottomEdge - this._Y) == 0) { this.Descend(); }
+            if (r.Next(Textify.BottomEdge - this._Y) == 0) { this.Descend(); }
         }
         if (_Y < _TopBounceLine) { _Gravity = 1; }
         if (_Y > _BottomBounceLine) { _Gravity = -1; }
@@ -81,18 +81,18 @@ class Enemy
                 _Ascii = "|-o-|";
                 _HP = 1;
                 _TopBounceLine = 0;
-                _BottomBounceLine = TextMagic.BottomEdge + 1; // never bounce
+                _BottomBounceLine = Textify.BottomEdge + 1; // never bounce
                 break;
             case 1:
                 _Ascii = "[-0-]";
                 _HP = 3;
-                _TopBounceLine = TextMagic.BottomEdge / 2;
-                _BottomBounceLine = TextMagic.BottomEdge - 1;
+                _TopBounceLine = Textify.BottomEdge / 2;
+                _BottomBounceLine = Textify.BottomEdge - 1;
                 break;
             case 2:
                 _Ascii = "[-0-o-]";
                 _HP = 2;
-                _TopBounceLine = TextMagic.BottomEdge / 2;
+                _TopBounceLine = Textify.BottomEdge / 2;
                 _BottomBounceLine = _TopBounceLine + _TopBounceLine / 2;
                 break;
         }
@@ -100,7 +100,7 @@ class Enemy
         _Y = 0;
         _Gravity = 1;
         _Reward = _HP;
-        _X = r.Next(TextMagic.LeftEdge + 5, TextMagic.RightEdge - 5);
+        _X = r.Next(Textify.LeftEdge + 5, Textify.RightEdge - 5);
         if (r.Next(2) == 0)
         {
             _Drift = 1;
