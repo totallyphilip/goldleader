@@ -59,7 +59,7 @@ public class Ship
     {
 
         bool turnedaround = false;
-        AsciiEngine.TryWrite(this._X, this._Y, new String('X', this._Ascii.Length));  // hide it
+        AsciiEngine.TryWrite(this._X, this._Y, new String(' ', this._Ascii.Length));  // hide it
 
         if (this._X <= this._flyzone.Left) { this._XDirection = 1; turnedaround = true; }
         if (this._X + this.Width >= this._flyzone.Right) { this._XDirection = -1; turnedaround = true; }

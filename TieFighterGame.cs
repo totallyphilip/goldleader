@@ -39,6 +39,8 @@ public class TieFighterGame
         // Make baddies
         Armada badguys = new Armada(1);
 
+        AsciiEngine.Beach sand = new AsciiEngine.Beach();
+
         // Main loop
         int FPS = 10;
         bool UserQuit = false;
@@ -54,7 +56,7 @@ public class TieFighterGame
 
             badguys.Spawn();
             badguys.Animate();
-
+            sand.Animate();
 
             if (debug)
             {
@@ -81,6 +83,9 @@ public class TieFighterGame
                         break;
                     case ConsoleKey.D:
                         debug = !debug;
+                        break;
+                    case ConsoleKey.X:
+                        sand.AddSand('#', AsciiEngine.Width / 2, AsciiEngine.Height / 2, 5);
                         break;
                 }
                 while (Console.KeyAvailable) { Console.ReadKey(true); } // eat keys

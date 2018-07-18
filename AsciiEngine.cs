@@ -1,7 +1,95 @@
 using System;
-
+using System.Collections.Generic;
 public class AsciiEngine
 {
+
+    #region " Classes "
+
+    public class Sand
+    {
+
+        double _OriginalX;
+        double _OriginalY;
+        double _X;
+        double _Y;
+        double _IncrementX;
+        double _IncrementY;
+        char _Ascii;
+        double _Range;
+
+        public bool Expired
+        {
+            get { return Math.Sqrt(Math.Pow(this._X - this._OriginalX, 2) + Math.Pow(this._Y - this._OriginalY, 2)) >= this._Range; }
+        }
+
+        public void Hide()
+        {
+            AsciiEngine.TryWrite(AsciiEngine.RoundNumber(this._X), AsciiEngine.RoundNumber(this._Y), ' ');
+        }
+
+        public void Animate()
+        {
+            this.Hide();
+            this._X += this._IncrementX;
+            this._Y += this._IncrementY;
+            AsciiEngine.TryWrite(AsciiEngine.RoundNumber(this._X), AsciiEngine.RoundNumber(this._Y), this._Ascii);
+        }
+
+        public Sand(char c, double x, double y, double range) : this(c, x, y, -1, -1, range) { } // random increments
+
+        public Sand(char c, double x, double y, double incx, double incy, double range)
+        {
+            this._Ascii = c;
+            this._OriginalX = x;
+            this._OriginalY = y;
+            this._X = x;
+            this._Y = y;
+            this._Range = range;
+
+            if (incx == -1 && incy == -1)
+            {
+                Random r = new Random();
+                // add a fraction to make sure it's not zero
+                this._IncrementX = r.NextDouble() + .1;
+                this._IncrementY = r.NextDouble() + .1;
+                if (r.NextDouble() < .5) { this._IncrementX *= -1; }
+                if (r.NextDouble() < .5) { this._IncrementY *= -1; }
+
+            }
+            else
+            {
+                this._IncrementX = incx;
+                this._IncrementY = incy;
+
+            }
+
+        }
+
+    }
+
+    public class Beach
+    {
+
+        List<Sand> sands = new List<Sand>();
+
+        public void AddSand(char c, double x, double y, double range)
+        {
+            sands.Add(new Sand(c, x, y, range));
+        }
+
+        public void Animate()
+        {
+            foreach (Sand s in this.sands.FindAll(x => x.Expired)) { s.Hide(); }
+            sands.RemoveAll(x => x.Expired);
+            foreach (Sand s in this.sands) { s.Animate(); }
+        }
+
+        public Beach() { }
+
+    }
+
+
+    #endregion
 
     #region " Static Properties "
 
@@ -20,6 +108,11 @@ public class AsciiEngine
     #endregion
 
     #region " Screen Manipulation "
+
+    public static int RoundNumber(double d)
+    {
+        return Convert.ToInt32(Math.Round(d, MidpointRounding.AwayFromZero));
+    }
 
     public static bool TrySetWindowSize(int setwidth, int setheight)
     {
