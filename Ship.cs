@@ -14,7 +14,6 @@ public class Ship
         int _BottomOffset;
         int _LeftOffset;
         int _RightOffset;
-        bool _Bouncy;
 
         public int Top { get { return this._TopOffset; } }
         public int Bottom { get { return Textify.BottomEdge - this._BottomOffset; } }
@@ -23,17 +22,12 @@ public class Ship
 
         #region " Constructor "
 
-        public FlyZone() : this(0, 0, 0, 0, false) { }
-
-        public FlyZone(double toff, double boff, bool bouncy) : this(toff, boff, 0, 0, bouncy) { }
-
-        public FlyZone(double toff, double boff, double loff, double roff, bool bouncy)
+        public FlyZone(double toff, double boff, double loff, double roff)
         {
             this._TopOffset = Convert.ToInt32(Math.Round(toff, MidpointRounding.AwayFromZero));
             this._BottomOffset = Convert.ToInt32(Math.Round(boff, MidpointRounding.AwayFromZero));
             this._LeftOffset = Convert.ToInt32(Math.Round(loff, MidpointRounding.AwayFromZero)); ;
             this._RightOffset = Convert.ToInt32(Math.Round(roff, MidpointRounding.AwayFromZero)); ;
-            this._Bouncy = bouncy;
         }
 
         #endregion
@@ -82,8 +76,8 @@ public class Ship
 
         bool _XReverse = false;
         this.Hide();
-        if (this._X < this._flyzone.Left - 2) { this._XDirection = 1; _XReverse = true; }
-        if (this._X + this.Width > this._flyzone.Right + 2) { this._XDirection = -1; _XReverse = true; }
+        if (this._X <= this._flyzone.Left) { this._XDirection = 1; _XReverse = true; }
+        if (this._X + this.Width >= this._flyzone.Right) { this._XDirection = -1; _XReverse = true; }
         if (_XReverse) { this._Y = this._Y + _YDirection; }
         if (this._Y <= this._flyzone.Top) { this._YDirection = 1; }
         if (this._Y >= this._flyzone.Bottom) { this._YDirection = -1; }
@@ -106,15 +100,15 @@ public class Ship
         {
             case eShipType.Bomber:
                 this._Ascii = "{—o-o—}".ToCharArray();
-                this._flyzone = new FlyZone(Textify.Height / 2, Textify.Height / 4, true); // lower 1/4 screen
+                this._flyzone = new FlyZone(Textify.Height / 2, Textify.Height / 4, -15, -15); // lower 1/4 screen
                 break;
             case eShipType.Fighter:
                 this._Ascii = "|—o—|".ToCharArray();
-                this._flyzone = new FlyZone(); // full screen
+                this._flyzone = new FlyZone(0, 0, 0, 0); // full screen
                 break;
             case eShipType.Vader:
                 this._Ascii = "[—o—]".ToCharArray();
-                this._flyzone = new FlyZone(Textify.Height * .66, 0, true); // lower 1/3g screen
+                this._flyzone = new FlyZone(Textify.Height * .66, 0, 10, 10); // lower 1/3g screen
                 break;
         }
 
