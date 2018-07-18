@@ -11,7 +11,7 @@ public class TieFighterGame
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
 
-        if (Textify.SetWindowSizeSafely(80, 25))
+        if (AsciiEngine.TrySetWindowSize(80, 25))
         {
             Console.CursorVisible = false;
             this.Play();
@@ -19,10 +19,10 @@ public class TieFighterGame
         }
         else
         {
-            Textify.WaitPrompt("something went horribly wrong");
+            AsciiEngine.CharPrompt("something went horribly wrong");
         }
 
-        Textify.SetWindowSizeSafely(oldwidth, oldheight, false);
+        AsciiEngine.TrySetWindowSize(oldwidth, oldheight, false);
 
     }
 
@@ -33,8 +33,8 @@ public class TieFighterGame
 
         // Make stars
         List<Starfield> backgroundstars = new List<Starfield>();
-        backgroundstars.Add(new Starfield(10, Textify.Height / 2, '.')); // slow background
-        backgroundstars.Add(new Starfield(0, Textify.Height / 5, '.')); // fast foreground
+        backgroundstars.Add(new Starfield(10, AsciiEngine.Height / 2, '.')); // slow background
+        backgroundstars.Add(new Starfield(0, AsciiEngine.Height / 5, '.')); // fast foreground
 
         // Make baddies
         Armada badguys = new Armada(1);
@@ -58,8 +58,8 @@ public class TieFighterGame
 
             if (debug)
             {
-                Console.SetCursorPosition(Textify.LeftEdge + 2, Textify.BottomEdge - 2); Console.Write('-'); // scroll bug watcher
-                Console.SetCursorPosition(Textify.LeftEdge + 2, Textify.BottomEdge - 1); Console.Write(FPS + " "); // fps display
+                Console.SetCursorPosition(AsciiEngine.LeftEdge + 2, AsciiEngine.BottomEdge - 2); Console.Write('-'); // scroll bug watcher
+                Console.SetCursorPosition(AsciiEngine.LeftEdge + 2, AsciiEngine.BottomEdge - 1); Console.Write(FPS + " "); // fps display
             }
 
             Thread.Sleep(1000 / FPS);

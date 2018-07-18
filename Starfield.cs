@@ -19,7 +19,7 @@ public class Starfield
 
         public bool OffScreen
         {
-            get { return _Y < 0 || _Y > Textify.BottomEdge; }
+            get { return _Y < AsciiEngine.TopEdge || _Y > AsciiEngine.BottomEdge; }
         }
 
         #endregion
@@ -29,7 +29,7 @@ public class Starfield
         public Star(int Y, int skipframes, char ascii)
         {
             Random r = new Random();
-            this._X = r.Next(Textify.LeftEdge + 1, Textify.RightEdge - 1);
+            this._X = r.Next(AsciiEngine.LeftEdge, AsciiEngine.Width);
             this._Y = Y;
             this._SkipFrames = skipframes;
             this._FrameCount = this._SkipFrames;
@@ -42,32 +42,14 @@ public class Starfield
 
         #region " Animation "
 
-        void Hide()
-        {
-            if (!this.OffScreen)
-            {
-                Console.SetCursorPosition(_X, _Y);
-                Console.Write(' ');
-            }
-        }
-
-        void Show()
-        {
-            if (!this.OffScreen)
-            {
-                Console.SetCursorPosition(_X, _Y);
-                Console.Write(this._Ascii);
-            }
-        }
-
         public void Move()
         {
             if (this._FrameCount >= this._SkipFrames)
             {
-                this.Hide();
+                AsciiEngine.TryWrite(this._X, this._Y, ' '); // hide
                 _Y++;
                 _FrameCount = 0;
-                this.Show();
+                AsciiEngine.TryWrite(this._X, this._Y, this._Ascii); // show
             }
             _FrameCount++;
         }
@@ -125,7 +107,7 @@ public class Starfield
         this._Ascii = ascii;
         for (int count = 0; count < maximum; count++)
         {
-            starfield.Add(new Star(r.Next(0, Textify.Height), skipframes, this._Ascii));
+            starfield.Add(new Star(r.Next(0, AsciiEngine.Height), skipframes, this._Ascii));
         }
     }
 
