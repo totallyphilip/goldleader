@@ -17,8 +17,8 @@ public class TieFight
             Console.CursorVisible = true;
         }
         else
-        {
             Textify.WaitPrompt("something went horribly wrong");
+        {
         }
 
         Textify.SetWindowSizeSafely(oldwidth, oldheight, false);
@@ -30,55 +30,61 @@ public class TieFight
 
         Console.Clear();
 
-        int MaxEnemies = 10;
+        // Make stars
+        List<StarField> starlayer = new List<StarField>();
+        starlayer.Add(new StarField(10, Textify.Height / 2, '.')); // slow background
+        starlayer.Add(new StarField(0, Textify.Height / 5, '.')); // fast foreground
 
-        var enemies = new List<Enemy>();
-        StarField stars = new StarField();
-        EnemyFleet fleet = new EnemyFleet();
+        // Make baddies
+        EnemyFleet fleet = new EnemyFleet(1);
 
         // Main loop
+        int FPS = 10;
+        bool UserQuit = false;
+        bool debug = false;
 
         do
         {
 
-            stars.Animate();
-
-            // Zap one out-of-bounds enemy
-
-            if (enemies.FindAll(x => x.FellOffTheScreen).Count > 0)
+            foreach (StarField stars in starlayer)
             {
-                enemies.Remove(enemies.Find(x => x.FellOffTheScreen));
+                stars.Execute();
+            }
+            fleet.Spawn();
+
+
+            if (debug)
+            {
+                Console.SetCursorPosition(Textify.LeftEdge + 2, Textify.BottomEdge - 2); Console.Write('-'); // scroll bug watcher
+                Console.SetCursorPosition(Textify.LeftEdge + 2, Textify.BottomEdge - 1); Console.Write(FPS + " "); // fps display
             }
 
-            foreach (var e in enemies)
+            Thread.Sleep(1000 / FPS);
+
+            if (Console.KeyAvailable)
             {
-                e.Move();
+
+                ConsoleKeyInfo k = Console.ReadKey(true);
+                switch (k.Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        FPS++;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        if (FPS - 1 > 0) { FPS--; }
+                        break;
+                    case ConsoleKey.Escape:
+                        UserQuit = true;
+                        break;
+                    case ConsoleKey.D:
+                        debug = !debug;
+                        break;
+                }
+                while (Console.KeyAvailable) { Console.ReadKey(true); } // eat keys
+
             }
 
-
-            // Spawn enemies
-
-            while (MaxEnemies > enemies.Count)
-            {
-                enemies.Add(new Enemy());
-            }
-
-            // Move enemies
-            foreach (var e in enemies)
-            {
-                e.Move();
-
-            }
-
-
-            // Scrolling bug indicator (for debugging only)
-            Console.SetCursorPosition(Textify.LeftEdge + 10, Textify.BottomEdge); Console.Write("-");
-
-            Thread.Sleep(100);
-
-
-
-        } while (!Console.KeyAvailable);
+        } while (!UserQuit);
 
     }
 }

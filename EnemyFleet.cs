@@ -4,32 +4,41 @@ using System.Collections.Generic;
 public class EnemyFleet
 {
 
-    #region " Sub Classes "
+    #region " Enum "
+
+    public enum eFighterType { Fighter, Vader, Bomber };
+
+    #endregion
+
+    #region " Fighter Class "
 
     class Fighter
     {
 
-        #region " Sub Classes "
+        #region " Fly Zone Class "
 
         class FlyZone
         {
 
-            int _Top;
-            int _Bottom;
-            int _Left;
-            int _Right;
+            int _TopOffset;
+            int _BottomOffset;
+            int _LeftOffset;
+            int _RightOffset;
+            bool _Bouncy;
 
             #region " Constructor "
 
-            public FlyZone(int top, int bottom) : this(top, bottom, Textify.LeftEdge, Textify.RightEdge) { }
+            public FlyZone() : this(0, 0, 0, 0, false) { }
 
-            public FlyZone(int top, int bottom, int left, int right)
+            public FlyZone(double toff, double boff, bool bouncy) : this(toff, boff, 0, 0, bouncy) { }
+
+            public FlyZone(double toff, double boff, double loff, double roff, bool bouncy)
             {
-                _Top = top;
-                _Left = left;
-                _Bottom = bottom;
-                _Right = right;
-
+                this._TopOffset = Convert.ToInt32(Math.Round(toff, MidpointRounding.AwayFromZero));
+                this._BottomOffset = Convert.ToInt32(Math.Round(boff, MidpointRounding.AwayFromZero));
+                this._LeftOffset = Convert.ToInt32(Math.Round(loff, MidpointRounding.AwayFromZero)); ;
+                this._RightOffset = Convert.ToInt32(Math.Round(roff, MidpointRounding.AwayFromZero)); ;
+                this._Bouncy = bouncy;
             }
 
             #endregion
@@ -38,24 +47,18 @@ public class EnemyFleet
 
         #endregion
 
-        #region " Enum "
-
-        enum eFighter { Fighter, Vader, Bomber };
-
-        #endregion
-
         #region " Properties "
 
         int _X;
-        int _Y;
-        string _Ascii;
+        int _Y = 0;
+        char[] _Ascii;
         int _HP;
 
-        FlyZone flyzone;
+        FlyZone _flyzone;
 
         int Width
         {
-            get { return _Ascii.Length; }
+            get { return this._Ascii.Length; }
         }
 
         #endregion
@@ -64,20 +67,36 @@ public class EnemyFleet
 
         void MoveTo(int x, int y)
         {
-            _X = x;
-            _Y = y;
+            this._X = x;
+            this._Y = y;
         }
 
         #endregion
 
         #region " Constructor "
 
-        public Fighter()
+        public Fighter(eFighterType fightertype)
         {
+            switch (fightertype)
+            {
+                case eFighterType.Bomber:
+                    this._Ascii = "{—o-o—}".ToCharArray();
+                    this._flyzone = new FlyZone(Textify.Height / 2, Textify.Height / 4, true); // lower 1/4 screen
+                    break;
+                case eFighterType.Fighter:
+                    this._Ascii = "|—o—|".ToCharArray();
+                    this._flyzone = new FlyZone(); // full screen
+                    break;
+                case eFighterType.Vader:
+                    this._Ascii = "[—o—]".ToCharArray();
+                    this._flyzone = new FlyZone(Textify.Height * .66, 0, true); // lower 1/3g screen
+                    break;
+            }
+
             Random r = new Random();
-            if (r.Next(2) == 0) { this.MoveTo(Textify.LeftEdge - this.Width, -1); }
-            flyzone = new FlyZone(0, Textify.BottomEdge);
+            this._X = r.Next(0 - this.Width, Textify.RightEdge + this.Width);
         }
+
         #endregion
 
     }
@@ -86,14 +105,30 @@ public class EnemyFleet
 
     #region " Properties "
 
+    int _MaxFighters;
+
     List<Fighter> fighters = new List<Fighter>();
 
     #endregion
 
-    #region " Constructor "
-    public EnemyFleet()
-    {
+    #region " Methods "
 
+    void RaiseFighterLimit() { this._MaxFighters++; }
+
+    public void Spawn()
+    {
+        while (fighters.Count < this._MaxFighters)
+        {
+            fighters.Add(new Fighter(eFighterType.Vader));
+        }
+    }
+
+    #endregion
+
+    #region " Constructor "
+    public EnemyFleet(int maxfighters)
+    {
+        this._MaxFighters = maxfighters;
     }
 
     #endregion

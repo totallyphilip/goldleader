@@ -4,17 +4,18 @@ using System.Collections.Generic;
 public class StarField
 {
 
-    #region Sub Classes 
+    #region " Sub Classes "
 
     class Star
     {
 
-        #region " Vars / Properties" 
+        #region " Properties " 
 
         int _X;
         int _Y;
-        int _Delay;
-        int _Parallax;
+        int _FrameCount;
+        int _SkipFrames;
+        char _Ascii;
 
         public bool OffScreen
         {
@@ -23,25 +24,19 @@ public class StarField
 
         #endregion
 
-        #region " Init "
+        #region " Constructor "
 
-        public Star(int Y)
+        public Star(int Y, int skipframes, char ascii)
         {
             Random r = new Random();
-            _X = r.Next(Textify.LeftEdge, Textify.RightEdge);
-            _Y = Y;
-            if (r.Next(2) == 0)
-            {
-                _Parallax = 2;
-            }
-            else
-            {
-                _Parallax = 10;
-            }
-            _Delay = 0;
+            this._X = r.Next(Textify.LeftEdge + 1, Textify.RightEdge - 1);
+            this._Y = Y;
+            this._SkipFrames = skipframes;
+            this._FrameCount = this._SkipFrames;
+            this._Ascii = ascii;
         }
 
-        public Star() : this(-1) { }
+        public Star(int skipframes, char ascii) : this(-1, skipframes, ascii) { }
 
         #endregion
 
@@ -61,20 +56,20 @@ public class StarField
             if (!this.OffScreen)
             {
                 Console.SetCursorPosition(_X, _Y);
-                Console.Write('.');
+                Console.Write(this._Ascii);
             }
         }
 
         public void Move()
         {
-            if (_Delay == 0)
+            if (this._FrameCount >= this._SkipFrames)
             {
                 this.Hide();
                 _Y++;
-                _Delay = _Parallax;
+                _FrameCount = 0;
                 this.Show();
             }
-            _Delay--;
+            _FrameCount++;
         }
 
         #endregion
@@ -82,39 +77,56 @@ public class StarField
 
     #endregion
 
-    #region Vars / Properties
+    #region " Properties "
 
     List<Star> starfield = new List<Star>();
+    int _SkipFrames;
+    int _MaxStars;
+    char _Ascii;
 
     #endregion
 
-    #region Init
+    #region " Methods "
 
-    public StarField()
+    public void Execute()
     {
-        for (int y = 0; y < Textify.BottomEdge; y++) { starfield.Add(new Star(y)); }
+        this.Sweep();
+        this.Spawn();
+        this.Animate();
+    }
+
+    void Sweep()
+    {
+        starfield.Remove(starfield.Find(x => x.OffScreen));
+    }
+
+    void Spawn()
+    {
+        while (starfield.Count < this._MaxStars)
+        {
+            starfield.Add(new Star(this._SkipFrames, this._Ascii));
+        }
+    }
+
+    void Animate()
+    {
+        foreach (var s in starfield) { s.Move(); }
     }
 
     #endregion
 
-    #region Animate
+    #region " Constructor "
 
-    public void Animate()
+    public StarField(int skipframes, int maximum, char ascii)
     {
-
-        if (starfield.FindAll(x => x.OffScreen).Count > 0)
+        Random r = new Random();
+        this._SkipFrames = skipframes;
+        this._MaxStars = maximum;
+        this._Ascii = ascii;
+        for (int count = 0; count < maximum; count++)
         {
-            starfield.Remove(starfield.Find(x => x.OffScreen));
+            starfield.Add(new Star(r.Next(0, Textify.Height), skipframes, this._Ascii));
         }
-        while (starfield.Count < Textify.BottomEdge)
-        {
-            starfield.Add(new Star());
-        }
-        foreach (var s in starfield)
-        {
-            s.Move();
-        }
-
     }
 
     #endregion

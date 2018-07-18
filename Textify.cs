@@ -20,6 +20,11 @@ public class Textify
         get { return Console.WindowHeight - 1; }
     }
 
+    public static int Height
+    {
+        get { return Console.WindowHeight; }
+    }
+
     public static bool PastEdge(int X, int Offset, string Ascii)
     {
         return X + Offset < Textify.LeftEdge || X + Offset > Textify.RightEdge - Ascii.Length;
