@@ -50,6 +50,7 @@ public class Textify
         try
         {
             Console.SetWindowSize(setwidth, setheight);
+            Console.SetBufferSize(setwidth, setheight);
         }
         catch
         {
@@ -78,8 +79,6 @@ public class Textify
             }
 
         }
-
-        Console.SetBufferSize(setwidth, setheight);
 
         return (Console.WindowHeight == setheight && Console.WindowWidth == setwidth);
 

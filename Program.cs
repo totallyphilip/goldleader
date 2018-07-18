@@ -1,6 +1,4 @@
-﻿//using System;
-
-namespace MyProgram
+﻿namespace MyProgram
 {
     class Program
     {
@@ -9,7 +7,7 @@ namespace MyProgram
 
             TieFight game = new TieFight();
             game.TryPlay();
-
+            System.Environment.Exit(0);
 
         }
     }

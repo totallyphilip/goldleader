@@ -17,8 +17,8 @@ public class TieFight
             Console.CursorVisible = true;
         }
         else
-            Textify.WaitPrompt("something went horribly wrong");
         {
+            Textify.WaitPrompt("something went horribly wrong");
         }
 
         Textify.SetWindowSizeSafely(oldwidth, oldheight, false);
