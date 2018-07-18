@@ -6,7 +6,7 @@ public class Armada
 
     #region " Properties "
 
-    int _MaxFighters;
+    int _MaxShips;
 
     List<Ship> _ships = new List<Ship>();
     AsciiEngine.SpriteField _explosions = new AsciiEngine.SpriteField();
@@ -15,20 +15,32 @@ public class Armada
 
     #region " Ship Creation "
 
-    void RaiseFighterLimit() { this._MaxFighters++; }
+    void IncreaseShipLimit() { this._MaxShips++; }
 
     public void Spawn()
     {
-        while (_ships.Count < this._MaxFighters)
+        while (_ships.Count < this._MaxShips)
         {
-            _ships.Add(new Ship(Ship.eShipType.Fighter));
-            _ships.Add(new Ship(Ship.eShipType.Fighter));
-            _ships.Add(new Ship(Ship.eShipType.Fighter));
-            _ships.Add(new Ship(Ship.eShipType.Bomber));
-            _ships.Add(new Ship(Ship.eShipType.Bomber));
-            _ships.Add(new Ship(Ship.eShipType.Vader));
-            _ships.Add(new Ship(Ship.eShipType.Squadron));
-            _ships.Add(new Ship(Ship.eShipType.Interceptor));
+            Random r = new Random();
+            switch (r.Next(5))
+            {
+                case 0:
+                    _ships.Add(new Ship(Ship.eShipType.Fighter));
+                    break;
+                case 1:
+                    _ships.Add(new Ship(Ship.eShipType.Bomber));
+                    break;
+                case 2:
+                    _ships.Add(new Ship(Ship.eShipType.Interceptor));
+                    break;
+                case 3:
+                    _ships.Add(new Ship(Ship.eShipType.Vader));
+                    break;
+                case 4:
+                    _ships.Add(new Ship(Ship.eShipType.Squadron));
+                    break;
+
+            }
         }
     }
 
@@ -36,10 +48,36 @@ public class Armada
 
     #region " Movement and Drawing "
 
+    #region " Ship Damage "
+
+    void Sweep()
+    {
+        foreach (Ship s in this._ships.FindAll(x => !x.Alive))
+        {
+            s.Hide();
+            this._explosions.Sprites.AddRange(s.Debris);
+            this._ships.Remove(s);
+
+            Random r = new Random();
+            if (r.NextDouble() < .25) { this.IncreaseShipLimit(); }
+        }
+    }
+
+    void HurtShip(Ship s, int hp)
+    {
+        s.Hurt(hp);
+        this._explosions.Sprites.AddRange(s.Sparks);
+    }
+
+    #endregion
+
+
     public void Animate()
     {
-        foreach (Ship ship in _ships) { ship.Animate(); }
-        this._explosions.Animate();
+        foreach (Ship ship in _ships) { ship.Animate(); } // move ships
+        this._explosions.Animate(); // move explosions
+        this.Sweep(); // remove dead ships
+
     }
 
     #endregion
@@ -47,7 +85,7 @@ public class Armada
     #region " Constructor "
     public Armada(int maxfighters)
     {
-        this._MaxFighters = maxfighters;
+        this._MaxShips = maxfighters;
     }
 
     #endregion
@@ -56,23 +94,7 @@ public class Armada
 
     public void test()
     {
-        foreach (Ship s in this._ships)
-        {
-            s.Hurt();
-        }
-
-        foreach (Ship s in this._ships.FindAll(x => !x.Alive))
-        {
-            s.Hide();
-            foreach (AsciiEngine.Sprite exp in s.Debris)
-            {
-                this._explosions.Sprites.Add(exp);
-            }
-            this._ships.Remove(s);
-        }
-
-
-
+        foreach (Ship s in this._ships) { this.HurtShip(s, 1); }
     }
     #endregion
 

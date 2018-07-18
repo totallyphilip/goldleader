@@ -36,7 +36,6 @@ public class TieFighterGame
         starfields.Add(new Starfield(.1, .75)); // slow
         starfields.Add(new Starfield(1, .2)); // fast
 
-
         // Make baddies
         Armada badguys = new Armada(1);
 
@@ -52,6 +51,7 @@ public class TieFighterGame
 
             badguys.Spawn();
             badguys.Animate();
+
 
             if (debug)
             {

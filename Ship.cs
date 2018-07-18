@@ -5,7 +5,7 @@ public class Ship
 {
     public enum eShipType { Fighter, Vader, Bomber, Squadron, Interceptor };
 
-    #region " Fly Zone Class "
+    #region " Fly Zone "
 
     class FlyZone
     {
@@ -49,21 +49,31 @@ public class Ship
     int Width { get { return this._Ascii.Length; } }
     public bool Alive { get { return this._HP > 0; } }
 
+    #endregion
+
+    #region " Explody Properties "
+
+    public List<AsciiEngine.Sprite> Sparks
+    {
+        get
+        {
+            List<AsciiEngine.Sprite> sprites = new List<AsciiEngine.Sprite>();
+            for (int splat = 0; splat < 2; splat++) { sprites.Add(new AsciiEngine.Sprite('\x00d7', this._X + this.Width / 2, this._Y, 2)); }
+            return sprites;
+        }
+    }
+
     public List<AsciiEngine.Sprite> Debris
     {
         get
         {
             List<AsciiEngine.Sprite> sprites = new List<AsciiEngine.Sprite>();
-
             char[] chars = this._Ascii.ToCharArray();
             for (int c = 0; c < chars.Length; c++)
             {
                 sprites.Add(new AsciiEngine.Sprite(chars[c], this._X + c, this._Y, 4));
             }
-
-            for (int splat = 0; splat < 2; splat++) { sprites.Add(new AsciiEngine.Sprite('\x00d7', this._X + this.Width / 2, this._Y, 3)); }
-            for (int splat = 0; splat < 2; splat++) { sprites.Add(new AsciiEngine.Sprite('\'', this._X + this.Width / 2, this._Y, 6)); }
-
+            for (int splat = 0; splat < 2; splat++) { sprites.Add(new AsciiEngine.Sprite('*', this._X + this.Width / 2, this._Y, 6)); }
             return sprites;
         }
     }
@@ -79,12 +89,12 @@ public class Ship
     {
         AsciiEngine.TryWrite(this._X, this._Y, new String(' ', this._Ascii.Length));
     }
+
     public void Animate()
     {
 
         bool turnedaround = false;
         this.Hide();
-        //AsciiEngine.TryWrite(this._X, this._Y, new String(' ', this._Ascii.Length));  // hide it
 
         if (this._X <= this._flyzone.Left) { this._XDirection = 1; turnedaround = true; }
         if (this._X + this.Width >= this._flyzone.Right) { this._XDirection = -1; turnedaround = true; }
