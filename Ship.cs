@@ -54,13 +54,7 @@ public class Ship
 
     #endregion
 
-    #region " Methods "
-
-    void MoveTo(int x, int y)
-    {
-        this._X = x;
-        this._Y = y;
-    }
+    #region " Animation "
 
     public void Hide()
     {
@@ -76,17 +70,16 @@ public class Ship
 
         bool _XReverse = false;
         this.Hide();
+
         if (this._X <= this._flyzone.Left) { this._XDirection = 1; _XReverse = true; }
         if (this._X + this.Width >= this._flyzone.Right) { this._XDirection = -1; _XReverse = true; }
+        this._X = this._X + this._XDirection;
+
         if (_XReverse) { this._Y = this._Y + _YDirection; }
         if (this._Y <= this._flyzone.Top) { this._YDirection = 1; }
         if (this._Y >= this._flyzone.Bottom) { this._YDirection = -1; }
-        this._X = this._X + this._XDirection;
 
         this.Show();
-
-
-
 
     }
 
