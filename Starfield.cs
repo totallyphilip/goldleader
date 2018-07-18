@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class StarField
+public class Starfield
 {
 
     #region " Sub Classes "
@@ -117,7 +117,7 @@ public class StarField
 
     #region " Constructor "
 
-    public StarField(int skipframes, int maximum, char ascii)
+    public Starfield(int skipframes, int maximum, char ascii)
     {
         Random r = new Random();
         this._SkipFrames = skipframes;

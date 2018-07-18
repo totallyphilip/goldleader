@@ -31,12 +31,12 @@ public class TieFight
         Console.Clear();
 
         // Make stars
-        List<StarField> starlayer = new List<StarField>();
-        starlayer.Add(new StarField(10, Textify.Height / 2, '.')); // slow background
-        starlayer.Add(new StarField(0, Textify.Height / 5, '.')); // fast foreground
+        List<Starfield> starlayer = new List<Starfield>();
+        starlayer.Add(new Starfield(10, Textify.Height / 2, '.')); // slow background
+        starlayer.Add(new Starfield(0, Textify.Height / 5, '.')); // fast foreground
 
         // Make baddies
-        EnemyFleet fleet = new EnemyFleet(1);
+        Armada fleet = new Armada(1);
 
         // Main loop
         int FPS = 10;
@@ -46,7 +46,7 @@ public class TieFight
         do
         {
 
-            foreach (StarField stars in starlayer)
+            foreach (Starfield stars in starlayer)
             {
                 stars.Execute();
             }
