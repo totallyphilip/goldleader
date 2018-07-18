@@ -40,8 +40,6 @@ public class TieFighterGame
         // Make baddies
         Armada badguys = new Armada(1);
 
-        AsciiEngine.SpriteField explodytest = new AsciiEngine.SpriteField();
-
         // Main loop
         int FPS = 10;
         bool UserQuit = false;
@@ -54,7 +52,6 @@ public class TieFighterGame
 
             badguys.Spawn();
             badguys.Animate();
-            explodytest.Animate();
 
             if (debug)
             {
@@ -83,7 +80,7 @@ public class TieFighterGame
                         debug = !debug;
                         break;
                     case ConsoleKey.X:
-                        explodytest.Sprites.Add(new AsciiEngine.Sprite('#', AsciiEngine.Width / 2, AsciiEngine.Height / 2, 5));
+                        badguys.test();
                         break;
                 }
                 while (Console.KeyAvailable) { Console.ReadKey(true); } // eat keys

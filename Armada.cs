@@ -8,7 +8,8 @@ public class Armada
 
     int _MaxFighters;
 
-    List<Ship> ships = new List<Ship>();
+    List<Ship> _ships = new List<Ship>();
+    AsciiEngine.SpriteField _explosions = new AsciiEngine.SpriteField();
 
     #endregion
 
@@ -18,16 +19,16 @@ public class Armada
 
     public void Spawn()
     {
-        while (ships.Count < this._MaxFighters)
+        while (_ships.Count < this._MaxFighters)
         {
-            ships.Add(new Ship(Ship.eShipType.Fighter));
-            ships.Add(new Ship(Ship.eShipType.Fighter));
-            ships.Add(new Ship(Ship.eShipType.Fighter));
-            ships.Add(new Ship(Ship.eShipType.Bomber));
-            ships.Add(new Ship(Ship.eShipType.Bomber));
-            ships.Add(new Ship(Ship.eShipType.Vader));
-            ships.Add(new Ship(Ship.eShipType.Squadron));
-            ships.Add(new Ship(Ship.eShipType.Interceptor));
+            _ships.Add(new Ship(Ship.eShipType.Fighter));
+            _ships.Add(new Ship(Ship.eShipType.Fighter));
+            _ships.Add(new Ship(Ship.eShipType.Fighter));
+            _ships.Add(new Ship(Ship.eShipType.Bomber));
+            _ships.Add(new Ship(Ship.eShipType.Bomber));
+            _ships.Add(new Ship(Ship.eShipType.Vader));
+            _ships.Add(new Ship(Ship.eShipType.Squadron));
+            _ships.Add(new Ship(Ship.eShipType.Interceptor));
         }
     }
 
@@ -37,7 +38,8 @@ public class Armada
 
     public void Animate()
     {
-        foreach (Ship ship in ships) { ship.Animate(); }
+        foreach (Ship ship in _ships) { ship.Animate(); }
+        this._explosions.Animate();
     }
 
     #endregion
@@ -48,6 +50,30 @@ public class Armada
         this._MaxFighters = maxfighters;
     }
 
+    #endregion
+
+    #region " Testing "
+
+    public void test()
+    {
+        foreach (Ship s in this._ships)
+        {
+            s.Hurt();
+        }
+
+        foreach (Ship s in this._ships.FindAll(x => !x.Alive))
+        {
+            s.Hide();
+            foreach (AsciiEngine.Sprite exp in s.Debris)
+            {
+                this._explosions.Sprites.Add(exp);
+            }
+            this._ships.Remove(s);
+        }
+
+
+
+    }
     #endregion
 
 }

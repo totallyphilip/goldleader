@@ -46,20 +46,40 @@ public class Ship
 
     FlyZone _flyzone;
 
-    int Width
+    int Width { get { return this._Ascii.Length; } }
+    public bool Alive { get { return this._HP > 0; } }
+
+    public List<AsciiEngine.Sprite> Debris
     {
-        get { return this._Ascii.Length; }
+        get
+        {
+            List<AsciiEngine.Sprite> sprites = new List<AsciiEngine.Sprite>();
+            foreach (char c in this._Ascii.ToCharArray())
+            {
+                sprites.Add(new AsciiEngine.Sprite(c, this._X + this.Width / 2, this._Y, 3));
+                sprites.Add(new AsciiEngine.Sprite('*', this._X + this.Width / 2, this._Y, 4));
+            }
+            return sprites;
+        }
     }
 
     #endregion
 
-    #region " Animation "
+    #region " Methods "
 
+    public void Hurt() { this.Hurt(1); }
+    public void Hurt(int hp) { this._HP = this._HP - hp; }
+
+    public void Hide()
+    {
+        AsciiEngine.TryWrite(this._X, this._Y, new String(' ', this._Ascii.Length));
+    }
     public void Animate()
     {
 
         bool turnedaround = false;
-        AsciiEngine.TryWrite(this._X, this._Y, new String(' ', this._Ascii.Length));  // hide it
+        this.Hide();
+        //AsciiEngine.TryWrite(this._X, this._Y, new String(' ', this._Ascii.Length));  // hide it
 
         if (this._X <= this._flyzone.Left) { this._XDirection = 1; turnedaround = true; }
         if (this._X + this.Width >= this._flyzone.Right) { this._XDirection = -1; turnedaround = true; }
@@ -83,30 +103,35 @@ public class Ship
     {
         switch (fightertype)
         {
-            case eShipType.Bomber:
-                this._Ascii = "{—o-o—}";
-                this._flyzone = new FlyZone(.5, .25, -.25);
-                this._SquirrelyFactor = .01;
-                break;
             case eShipType.Fighter:
                 this._Ascii = "|—o—|";
                 this._flyzone = new FlyZone(0, 0, 0);
                 this._SquirrelyFactor = .25;
+                this._HP = 1;
                 break;
-            case eShipType.Vader:
-                this._Ascii = "[—o—]";
-                this._flyzone = new FlyZone(.66, 0, .10);
-                this._SquirrelyFactor = .1;
-                break;
-            case eShipType.Squadron:
-                this._Ascii = "|—o—|[—o—]|—o—|";
-                this._flyzone = new FlyZone(0, .15, .20);
-                this._SquirrelyFactor = 0;
+            case eShipType.Bomber:
+                this._Ascii = "{—o-o—}";
+                this._flyzone = new FlyZone(.5, .25, -.25);
+                this._SquirrelyFactor = .01;
+                this._HP = 2;
                 break;
             case eShipType.Interceptor:
                 this._Ascii = "<—o—>";
                 this._flyzone = new FlyZone(-.15, -.15, 0);
                 this._SquirrelyFactor = .4;
+                this._HP = 2;
+                break;
+            case eShipType.Vader:
+                this._Ascii = "[—o—]";
+                this._flyzone = new FlyZone(.66, 0, .10);
+                this._SquirrelyFactor = .1;
+                this._HP = 3;
+                break;
+            case eShipType.Squadron:
+                this._Ascii = "|—o—|[—o—]|—o—|";
+                this._flyzone = new FlyZone(0, .15, .20);
+                this._SquirrelyFactor = 0;
+                this._HP = 6;
                 break;
         }
 

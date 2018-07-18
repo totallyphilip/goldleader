@@ -17,9 +17,9 @@ public class AsciiEngine
         char _Ascii;
         double _Range;
 
-        public bool Expired
+        public bool Alive
         {
-            get { return Math.Sqrt(Math.Pow(this._X - this._OriginalX, 2) + Math.Pow(this._Y - this._OriginalY, 2)) >= this._Range; }
+            get { return Math.Sqrt(Math.Pow(this._X - this._OriginalX, 2) + Math.Pow(this._Y - this._OriginalY, 2)) < this._Range; }
         }
 
         public void Hide()
@@ -80,13 +80,13 @@ public class AsciiEngine
         public void Animate()
         {
 
-            foreach (Sprite s in this._sprites.FindAll(x => x.Expired))
+            foreach (Sprite s in this._sprites.FindAll(x => !x.Alive))
             {
                 s.Hide();
                 this.Sprites.Remove(s);
             }
 
-            foreach (Sprite s in this._sprites.FindAll(x => !x.Expired)) { s.Animate(); }
+            foreach (Sprite s in this._sprites.FindAll(x => x.Alive)) { s.Animate(); }
         }
 
         public SpriteField() { }
