@@ -54,11 +54,16 @@ public class Ship
         get
         {
             List<AsciiEngine.Sprite> sprites = new List<AsciiEngine.Sprite>();
-            foreach (char c in this._Ascii.ToCharArray())
+
+            char[] chars = this._Ascii.ToCharArray();
+            for (int c = 0; c < chars.Length; c++)
             {
-                sprites.Add(new AsciiEngine.Sprite(c, this._X + this.Width / 2, this._Y, 3));
-                sprites.Add(new AsciiEngine.Sprite('*', this._X + this.Width / 2, this._Y, 4));
+                sprites.Add(new AsciiEngine.Sprite(chars[c], this._X + c, this._Y, 4));
             }
+
+            for (int splat = 0; splat < 2; splat++) { sprites.Add(new AsciiEngine.Sprite('\x00d7', this._X + this.Width / 2, this._Y, 3)); }
+            for (int splat = 0; splat < 2; splat++) { sprites.Add(new AsciiEngine.Sprite('\'', this._X + this.Width / 2, this._Y, 6)); }
+
             return sprites;
         }
     }
