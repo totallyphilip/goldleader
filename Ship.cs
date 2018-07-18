@@ -3,31 +3,29 @@ using System.Collections.Generic;
 
 public class Ship
 {
-    public enum eShipType { Fighter, Vader, Bomber };
+    public enum eShipType { Fighter, Vader, Bomber, Squadron, Interceptor };
 
     #region " Fly Zone Class "
 
     class FlyZone
     {
 
-        int _TopOffset;
-        int _BottomOffset;
-        int _LeftOffset;
-        int _RightOffset;
+        double _TopOffsetPct;
+        double _BottomOffsetPct;
+        double _SideOffsetPct;
 
-        public int Top { get { return this._TopOffset; } }
-        public int Bottom { get { return Textify.BottomEdge - this._BottomOffset; } }
-        public int Left { get { return this._LeftOffset; } }
-        public int Right { get { return Textify.RightEdge - this._RightOffset; } }
+        public int Top { get { return Convert.ToInt32(Math.Round(Textify.Height * this._TopOffsetPct, MidpointRounding.AwayFromZero)); } }
+        public int Bottom { get { return Convert.ToInt32(Math.Round(Textify.BottomEdge - Textify.Height * this._BottomOffsetPct, MidpointRounding.AwayFromZero)); } }
+        public int Left { get { return Convert.ToInt32(Math.Round(Textify.RightEdge * this._SideOffsetPct, MidpointRounding.AwayFromZero)); } }
+        public int Right { get { return Convert.ToInt32(Math.Round(Textify.RightEdge - Textify.RightEdge * this._SideOffsetPct, MidpointRounding.AwayFromZero)); } }
 
         #region " Constructor "
 
-        public FlyZone(double toff, double boff, double loff, double roff)
+        public FlyZone(double toff, double boff, double soff)
         {
-            this._TopOffset = Convert.ToInt32(Math.Round(toff, MidpointRounding.AwayFromZero));
-            this._BottomOffset = Convert.ToInt32(Math.Round(boff, MidpointRounding.AwayFromZero));
-            this._LeftOffset = Convert.ToInt32(Math.Round(loff, MidpointRounding.AwayFromZero)); ;
-            this._RightOffset = Convert.ToInt32(Math.Round(roff, MidpointRounding.AwayFromZero)); ;
+            this._TopOffsetPct = toff;
+            this._BottomOffsetPct = boff;
+            this._SideOffsetPct = soff;
         }
 
         #endregion
@@ -44,6 +42,7 @@ public class Ship
     int _YDirection = 1;
     char[] _Ascii;
     int _HP;
+    double _SquirrelyFactor;
 
     FlyZone _flyzone;
 
@@ -68,14 +67,16 @@ public class Ship
     public void Animate()
     {
 
-        bool _XReverse = false;
+        bool turnedaround = false;
         this.Hide();
 
-        if (this._X <= this._flyzone.Left) { this._XDirection = 1; _XReverse = true; }
-        if (this._X + this.Width >= this._flyzone.Right) { this._XDirection = -1; _XReverse = true; }
+        if (this._X <= this._flyzone.Left) { this._XDirection = 1; turnedaround = true; }
+        if (this._X + this.Width >= this._flyzone.Right) { this._XDirection = -1; turnedaround = true; }
         this._X = this._X + this._XDirection;
 
-        if (_XReverse) { this._Y = this._Y + _YDirection; }
+        Random r = new Random();
+
+        if (turnedaround || r.Next(100) < (this._SquirrelyFactor * 100)) { this._Y = this._Y + _YDirection; }
         if (this._Y <= this._flyzone.Top) { this._YDirection = 1; }
         if (this._Y >= this._flyzone.Bottom) { this._YDirection = -1; }
 
@@ -93,15 +94,28 @@ public class Ship
         {
             case eShipType.Bomber:
                 this._Ascii = "{—o-o—}".ToCharArray();
-                this._flyzone = new FlyZone(Textify.Height / 2, Textify.Height / 4, -15, -15); // lower 1/4 screen
+                this._flyzone = new FlyZone(.5, .25, -.25);
+                this._SquirrelyFactor = .01;
                 break;
             case eShipType.Fighter:
                 this._Ascii = "|—o—|".ToCharArray();
-                this._flyzone = new FlyZone(0, 0, 0, 0); // full screen
+                this._flyzone = new FlyZone(0, 0, 0);
+                this._SquirrelyFactor = .25;
                 break;
             case eShipType.Vader:
                 this._Ascii = "[—o—]".ToCharArray();
-                this._flyzone = new FlyZone(Textify.Height * .66, 0, 10, 10); // lower 1/3g screen
+                this._flyzone = new FlyZone(.66, 0, .10);
+                this._SquirrelyFactor = .1;
+                break;
+            case eShipType.Squadron:
+                this._Ascii = "|—o—|[—o—]|—o—|".ToCharArray();
+                this._flyzone = new FlyZone(0, .15, .20);
+                this._SquirrelyFactor = 0;
+                break;
+            case eShipType.Interceptor:
+                this._Ascii = "<—o—>".ToCharArray();
+                this._flyzone = new FlyZone(-.15, -.15, 0);
+                this._SquirrelyFactor = .4;
                 break;
         }
 

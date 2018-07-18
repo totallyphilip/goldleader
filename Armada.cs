@@ -21,8 +21,13 @@ public class Armada
         while (ships.Count < this._MaxFighters)
         {
             ships.Add(new Ship(Ship.eShipType.Fighter));
+            ships.Add(new Ship(Ship.eShipType.Fighter));
+            ships.Add(new Ship(Ship.eShipType.Fighter));
+            ships.Add(new Ship(Ship.eShipType.Bomber));
             ships.Add(new Ship(Ship.eShipType.Bomber));
             ships.Add(new Ship(Ship.eShipType.Vader));
+            ships.Add(new Ship(Ship.eShipType.Squadron));
+            ships.Add(new Ship(Ship.eShipType.Interceptor));
         }
     }
 
