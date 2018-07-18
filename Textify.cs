@@ -96,4 +96,13 @@ public class Textify
         Console.ReadKey(true);
     }
 
+    public static void SayInbounds(int x, int y, char c)
+    {
+        if (x >= Textify.LeftEdge && x <= Textify.RightEdge && y >= 0 && y <= Textify.BottomEdge)
+        {
+            Console.SetCursorPosition(x, y);
+            Console.Write(c);
+        }
+    }
+
 }

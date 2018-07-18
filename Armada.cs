@@ -8,20 +8,31 @@ public class Armada
 
     int _MaxFighters;
 
-    List<Ship> fighters = new List<Ship>();
+    List<Ship> ships = new List<Ship>();
 
     #endregion
 
-    #region " Methods "
+    #region " Ship Creation "
 
     void RaiseFighterLimit() { this._MaxFighters++; }
 
     public void Spawn()
     {
-        while (fighters.Count < this._MaxFighters)
+        while (ships.Count < this._MaxFighters)
         {
-            fighters.Add(new Ship(Ship.eShipType.Vader));
+            ships.Add(new Ship(Ship.eShipType.Fighter));
+            ships.Add(new Ship(Ship.eShipType.Bomber));
+            ships.Add(new Ship(Ship.eShipType.Vader));
         }
+    }
+
+    #endregion
+
+    #region " Movement and Drawing "
+
+    public void Animate()
+    {
+        foreach (Ship ship in ships) { ship.Animate(); }
     }
 
     #endregion

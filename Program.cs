@@ -5,7 +5,7 @@
         static void Main(string[] args)
         {
 
-            TieFight game = new TieFight();
+            TieFighterGame game = new TieFighterGame();
             game.TryPlay();
             System.Environment.Exit(0);
 

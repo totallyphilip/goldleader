@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-public class TieFight
+
+public class TieFighterGame
 {
 
     public void TryPlay()
@@ -10,7 +11,7 @@ public class TieFight
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
 
-        if (Textify.SetWindowSizeSafely(50, 35))
+        if (Textify.SetWindowSizeSafely(80, 25))
         {
             Console.CursorVisible = false;
             this.Play();
@@ -31,12 +32,12 @@ public class TieFight
         Console.Clear();
 
         // Make stars
-        List<Starfield> starlayer = new List<Starfield>();
-        starlayer.Add(new Starfield(10, Textify.Height / 2, '.')); // slow background
-        starlayer.Add(new Starfield(0, Textify.Height / 5, '.')); // fast foreground
+        List<Starfield> backgroundstars = new List<Starfield>();
+        backgroundstars.Add(new Starfield(10, Textify.Height / 2, '.')); // slow background
+        backgroundstars.Add(new Starfield(0, Textify.Height / 5, '.')); // fast foreground
 
         // Make baddies
-        Armada fleet = new Armada(1);
+        Armada badguys = new Armada(1);
 
         // Main loop
         int FPS = 10;
@@ -46,11 +47,13 @@ public class TieFight
         do
         {
 
-            foreach (Starfield stars in starlayer)
+            foreach (Starfield starfield in backgroundstars)
             {
-                stars.Execute();
+                starfield.Execute();
             }
-            fleet.Spawn();
+
+            badguys.Spawn();
+            badguys.Animate();
 
 
             if (debug)

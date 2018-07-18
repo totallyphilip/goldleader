@@ -16,6 +16,11 @@ public class Ship
         int _RightOffset;
         bool _Bouncy;
 
+        public int Top { get { return this._TopOffset; } }
+        public int Bottom { get { return Textify.BottomEdge - this._BottomOffset; } }
+        public int Left { get { return this._LeftOffset; } }
+        public int Right { get { return Textify.RightEdge - this._RightOffset; } }
+
         #region " Constructor "
 
         public FlyZone() : this(0, 0, 0, 0, false) { }
@@ -41,6 +46,8 @@ public class Ship
 
     int _X;
     int _Y = 0;
+    int _XDirection = 1;
+    int _YDirection = 1;
     char[] _Ascii;
     int _HP;
 
@@ -59,6 +66,34 @@ public class Ship
     {
         this._X = x;
         this._Y = y;
+    }
+
+    public void Hide()
+    {
+        for (int c = 0; c < this.Width; c++) { Textify.SayInbounds(this._X + c, this._Y, ' '); }
+    }
+    public void Show()
+    {
+        for (int c = 0; c < this.Width; c++) { Textify.SayInbounds(this._X + c, this._Y, this._Ascii[c]); }
+    }
+
+    public void Animate()
+    {
+
+        bool _XReverse = false;
+        this.Hide();
+        if (this._X < this._flyzone.Left - 2) { this._XDirection = 1; _XReverse = true; }
+        if (this._X + this.Width > this._flyzone.Right + 2) { this._XDirection = -1; _XReverse = true; }
+        if (_XReverse) { this._Y = this._Y + _YDirection; }
+        if (this._Y <= this._flyzone.Top) { this._YDirection = 1; }
+        if (this._Y >= this._flyzone.Bottom) { this._YDirection = -1; }
+        this._X = this._X + this._XDirection;
+
+        this.Show();
+
+
+
+
     }
 
     #endregion
