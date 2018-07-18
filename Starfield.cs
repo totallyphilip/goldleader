@@ -1,116 +1,40 @@
-using System;
-using System.Collections.Generic;
-
 public class Starfield
 {
+    AsciiEngine.SpriteField stars = new AsciiEngine.SpriteField();
+    double _speed;
+    double _rowcoveragepct;
 
-    #region " Sub Classes "
-
-    class Star
+    int MaxStars
     {
+        get { return AsciiEngine.RoundNumber(AsciiEngine.Height * this._rowcoveragepct); }
+    }
 
-        #region " Properties " 
+    public Starfield(double speed, double coverage)
+    {
+        this._speed = speed;
+        this._rowcoveragepct = coverage;
 
-        int _X;
-        int _Y;
-        int _FrameCount;
-        int _SkipFrames;
-        char _Ascii;
+        // spawn initial stars
 
-        public bool OffScreen
+        System.Random r = new System.Random();
+        while (stars.Sprites.Count < this.MaxStars)
         {
-            get { return _Y < AsciiEngine.TopEdge || _Y > AsciiEngine.BottomEdge; }
+            int y = r.Next(AsciiEngine.TopEdge - 1, AsciiEngine.Height);
+            this.stars.Sprites.Add(new AsciiEngine.Sprite('.', r.Next(AsciiEngine.LeftEdge, AsciiEngine.RightEdge), y, 0, this._speed, AsciiEngine.Height - y));
+
         }
 
-        #endregion
+    }
 
-        #region " Constructor "
-
-        public Star(int Y, int skipframes, char ascii)
+    public void Animate()
+    {
+        while (stars.Sprites.Count < this.MaxStars)
         {
-            Random r = new Random();
-            this._X = r.Next(AsciiEngine.LeftEdge, AsciiEngine.Width);
-            this._Y = Y;
-            this._SkipFrames = skipframes;
-            this._FrameCount = this._SkipFrames;
-            this._Ascii = ascii;
+            System.Random r = new System.Random();
+            this.stars.Sprites.Add(new AsciiEngine.Sprite('.', r.Next(AsciiEngine.LeftEdge, AsciiEngine.RightEdge), AsciiEngine.TopEdge - 1, 0, this._speed, AsciiEngine.Height));
         }
 
-        public Star(int skipframes, char ascii) : this(-1, skipframes, ascii) { }
-
-        #endregion
-
-        #region " Animation "
-
-        public void Move()
-        {
-            if (this._FrameCount >= this._SkipFrames)
-            {
-                AsciiEngine.TryWrite(this._X, this._Y, ' '); // hide
-                _Y++;
-                _FrameCount = 0;
-                AsciiEngine.TryWrite(this._X, this._Y, this._Ascii); // show
-            }
-            _FrameCount++;
-        }
-
-        #endregion
+        this.stars.Animate();
     }
-
-    #endregion
-
-    #region " Properties "
-
-    List<Star> starfield = new List<Star>();
-    int _SkipFrames;
-    int _MaxStars;
-    char _Ascii;
-
-    #endregion
-
-    #region " Methods "
-
-    public void Execute()
-    {
-        this.Sweep();
-        this.Spawn();
-        this.Animate();
-    }
-
-    void Sweep()
-    {
-        starfield.Remove(starfield.Find(x => x.OffScreen));
-    }
-
-    void Spawn()
-    {
-        while (starfield.Count < this._MaxStars)
-        {
-            starfield.Add(new Star(this._SkipFrames, this._Ascii));
-        }
-    }
-
-    void Animate()
-    {
-        foreach (var s in starfield) { s.Move(); }
-    }
-
-    #endregion
-
-    #region " Constructor "
-
-    public Starfield(int skipframes, int maximum, char ascii)
-    {
-        Random r = new Random();
-        this._SkipFrames = skipframes;
-        this._MaxStars = maximum;
-        this._Ascii = ascii;
-        for (int count = 0; count < maximum; count++)
-        {
-            starfield.Add(new Star(r.Next(0, AsciiEngine.Height), skipframes, this._Ascii));
-        }
-    }
-
-    #endregion
 
 }

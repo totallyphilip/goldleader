@@ -32,14 +32,15 @@ public class TieFighterGame
         Console.Clear();
 
         // Make stars
-        List<Starfield> backgroundstars = new List<Starfield>();
-        backgroundstars.Add(new Starfield(10, AsciiEngine.Height / 2, '.')); // slow background
-        backgroundstars.Add(new Starfield(0, AsciiEngine.Height / 5, '.')); // fast foreground
+        List<Starfield> starfields = new List<Starfield>();
+        starfields.Add(new Starfield(.1, .75)); // slow
+        starfields.Add(new Starfield(1, .2)); // fast
+
 
         // Make baddies
         Armada badguys = new Armada(1);
 
-        AsciiEngine.Beach sand = new AsciiEngine.Beach();
+        AsciiEngine.SpriteField explodytest = new AsciiEngine.SpriteField();
 
         // Main loop
         int FPS = 10;
@@ -49,14 +50,11 @@ public class TieFighterGame
         do
         {
 
-            foreach (Starfield starfield in backgroundstars)
-            {
-                starfield.Execute();
-            }
+            foreach (Starfield starfield in starfields) { starfield.Animate(); }
 
             badguys.Spawn();
             badguys.Animate();
-            sand.Animate();
+            explodytest.Animate();
 
             if (debug)
             {
@@ -85,7 +83,7 @@ public class TieFighterGame
                         debug = !debug;
                         break;
                     case ConsoleKey.X:
-                        sand.AddSand('#', AsciiEngine.Width / 2, AsciiEngine.Height / 2, 5);
+                        explodytest.Sprites.Add(new AsciiEngine.Sprite('#', AsciiEngine.Width / 2, AsciiEngine.Height / 2, 5));
                         break;
                 }
                 while (Console.KeyAvailable) { Console.ReadKey(true); } // eat keys

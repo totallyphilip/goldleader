@@ -3,9 +3,9 @@ using System.Collections.Generic;
 public class AsciiEngine
 {
 
-    #region " Classes "
+    #region " Sprites "
 
-    public class Sand
+    public class Sprite
     {
 
         double _OriginalX;
@@ -35,9 +35,9 @@ public class AsciiEngine
             AsciiEngine.TryWrite(AsciiEngine.RoundNumber(this._X), AsciiEngine.RoundNumber(this._Y), this._Ascii);
         }
 
-        public Sand(char c, double x, double y, double range) : this(c, x, y, -1, -1, range) { } // random increments
+        public Sprite(char c, double x, double y, double range) : this(c, x, y, -1, -1, range) { } // random direction increments
 
-        public Sand(char c, double x, double y, double incx, double incy, double range)
+        public Sprite(char c, double x, double y, double incx, double incy, double range)
         {
             this._Ascii = c;
             this._OriginalX = x;
@@ -67,27 +67,31 @@ public class AsciiEngine
 
     }
 
-    public class Beach
+    public class SpriteField
     {
 
-        List<Sand> sands = new List<Sand>();
+        List<Sprite> _sprites = new List<Sprite>();
 
-        public void AddSand(char c, double x, double y, double range)
+        public List<Sprite> Sprites
         {
-            sands.Add(new Sand(c, x, y, range));
+            get { return _sprites; }
         }
 
         public void Animate()
         {
-            foreach (Sand s in this.sands.FindAll(x => x.Expired)) { s.Hide(); }
-            sands.RemoveAll(x => x.Expired);
-            foreach (Sand s in this.sands) { s.Animate(); }
+
+            foreach (Sprite s in this._sprites.FindAll(x => x.Expired))
+            {
+                s.Hide();
+                this.Sprites.Remove(s);
+            }
+
+            foreach (Sprite s in this._sprites.FindAll(x => !x.Expired)) { s.Animate(); }
         }
 
-        public Beach() { }
+        public SpriteField() { }
 
     }
-
 
     #endregion
 
