@@ -1,3 +1,5 @@
+using AsciiEngine;
+using Easy;
 public class Starfield
 {
     AsciiEngine.SpriteField stars = new AsciiEngine.SpriteField();
@@ -6,7 +8,7 @@ public class Starfield
 
     int MaxStars
     {
-        get { return AsciiEngine.RoundNumber(AsciiEngine.Height * this._rowcoveragepct); }
+        get { return Mathy.Round(Screen.Height * this._rowcoveragepct); }
     }
 
     public Starfield(double speed, double coverage)
@@ -18,8 +20,8 @@ public class Starfield
 
         while (stars.Sprites.Count < this.MaxStars)
         {
-            int y = r.Next(AsciiEngine.TopEdge - 1, AsciiEngine.Height);
-            this.stars.Sprites.Add(new AsciiEngine.Sprite('.', r.Next(AsciiEngine.LeftEdge, AsciiEngine.RightEdge), y, 0, this._speed, AsciiEngine.Height - y));
+            int y = Mathy.Random.Next(Screen.TopEdge - 1, Screen.Height);
+            this.stars.Sprites.Add(new AsciiEngine.Sprite('.', Mathy.Random.Next(Screen.LeftEdge, Screen.RightEdge), y, 0, this._speed, Screen.Height - y));
 
         }
 
@@ -29,7 +31,7 @@ public class Starfield
     {
         while (stars.Sprites.Count < this.MaxStars)
         {
-            this.stars.Sprites.Add(new AsciiEngine.Sprite('.', r.Next(AsciiEngine.LeftEdge, AsciiEngine.RightEdge), AsciiEngine.TopEdge - 1, 0, this._speed, AsciiEngine.Height));
+            this.stars.Sprites.Add(new AsciiEngine.Sprite('.', Mathy.Random.Next(Screen.LeftEdge, Screen.RightEdge), Screen.TopEdge - 1, 0, this._speed, Screen.Height));
         }
 
         this.stars.Animate();

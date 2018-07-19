@@ -21,17 +21,17 @@ namespace AsciiEngine
         double _Range;
         bool _Killed = false;
 
-        public int X { get { return EzMath.RoundInt(this._X); } }
-        public int Y { get { return EzMath.RoundInt(this._Y); } }
+        public int X { get { return Mathy.Round(this._X); } }
+        public int Y { get { return Mathy.Round(this._Y); } }
 
         public bool Alive
         {
-            get { return EzMath.Distance(this._X, this._OriginalX, this._Y, this._OriginalY) < this._Range && !this._Killed; }
+            get { return Mathy.Distance(this._X, this._OriginalX, this._Y, this._OriginalY) < this._Range && !this._Killed; }
         }
 
         public void Hide()
         {
-            Screen.TryWrite(EzMath.RoundInt(this._X), EzMath.RoundInt(this._Y), ' ');
+            Screen.TryWrite(Mathy.Round(this._X), Mathy.Round(this._Y), ' ');
         }
 
         public void Kill()
@@ -43,7 +43,7 @@ namespace AsciiEngine
             this.Hide();
             this._X += this._IncrementX;
             this._Y += this._IncrementY;
-            Screen.TryWrite(EzMath.RoundInt(this._X), EzMath.RoundInt(this._Y), this._Ascii);
+            Screen.TryWrite(Mathy.Round(this._X), Mathy.Round(this._Y), this._Ascii);
         }
 
         public Sprite(char c, double x, double y, double range) : this(c, x, y, -1, -1, range) { } // random direction increments
@@ -60,10 +60,10 @@ namespace AsciiEngine
             if (incx == -1 && incy == -1)
             {
                 // add a fraction to make sure it's not zero
-                this._IncrementX = EzMath.Random.NextDouble() + .1;
-                this._IncrementY = EzMath.Random.NextDouble() + .1;
-                if (EzMath.Random.NextDouble() < .5) { this._IncrementX *= -1; }
-                if (EzMath.Random.NextDouble() < .5) { this._IncrementY *= -1; }
+                this._IncrementX = Easy.Mathy.Random.NextDouble() + .1;
+                this._IncrementY = Easy.Mathy.Random.NextDouble() + .1;
+                if (Mathy.Random.NextDouble() < .5) { this._IncrementX *= -1; }
+                if (Mathy.Random.NextDouble() < .5) { this._IncrementY *= -1; }
 
             }
             else
@@ -110,7 +110,7 @@ namespace AsciiEngine
 
     #endregion
 
-    #region " Static Properties "
+    #region " Screen "
 
     public class Screen
     {
@@ -127,16 +127,12 @@ namespace AsciiEngine
 
         public static int Height { get { return Console.WindowHeight; } }
 
-        #endregion
-
-        #region " Screen Manipulation "
-
-        public static bool TrySetWindowSize(int setwidth, int setheight)
+        public static bool TrySetSize(int setwidth, int setheight)
         {
-            return TrySetWindowSize(setwidth, setheight, true);
+            return TrySetSize(setwidth, setheight, true);
         }
 
-        public static bool TrySetWindowSize(int setwidth, int setheight, bool manualadjust)
+        public static bool TrySetSize(int setwidth, int setheight, bool manualadjust)
         {
 
             try
@@ -178,14 +174,9 @@ namespace AsciiEngine
 
         #endregion
 
-        public static char CharPrompt(string s)
-        {
-            Console.Write(s);
-            return Console.ReadKey(true).KeyChar;
-        }
-
         public static bool TryWrite(int x, int y, string s)
         {
+            bool success = false;
             try
             {
                 if (y >= Screen.TopEdge && y <= Screen.BottomEdge)
@@ -195,25 +186,25 @@ namespace AsciiEngine
                     {
                         Console.SetCursorPosition(x, y);
                         Console.Write(s);
-                        return true;
+                        success = true;
                     }
                     // some or all of the text is off the screen, so go character by character
                     else
                     {
                         char[] chars = s.ToCharArray();
                         for (int c = 0; c < chars.Length; c++) { Screen.TryWrite(x + c, y, chars[c]); }
-                        return (x >= Screen.LeftEdge && x + s.Length - 1 <= Screen.RightEdge && y >= Screen.TopEdge && y <= Screen.BottomEdge);
+                        success = (x >= Screen.LeftEdge && x + s.Length - 1 <= Screen.RightEdge && y >= Screen.TopEdge && y <= Screen.BottomEdge);
                     }
                 }
-                else
-                { return false; }
             }
-            catch { return false; }
+            catch { }
+            return success;
         }
 
         public static bool TryWrite(int x, int y, char c)
         {
-            // don't write anything past the screen edges, nor in lower right corner
+            // don't write anything past the screen edges
+            // don't write anything in the lower right corner because that can cause scrolling
             if (x >= Screen.LeftEdge && x <= Screen.RightEdge && y >= Screen.TopEdge && y <= Screen.BottomEdge && !(x == Screen.RightEdge && y == Screen.BottomEdge))
             {
                 Console.SetCursorPosition(x, y);

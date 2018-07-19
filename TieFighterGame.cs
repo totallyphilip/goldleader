@@ -1,3 +1,4 @@
+using AsciiEngine;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -11,7 +12,7 @@ public class TieFighterGame
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
 
-        if (AsciiEngine.TrySetWindowSize(80, 25))
+        if (Screen.TrySetSize(80, 25))
         {
             Console.CursorVisible = false;
             this.Play();
@@ -19,10 +20,10 @@ public class TieFighterGame
         }
         else
         {
-            AsciiEngine.CharPrompt("something went horribly wrong");
+            Screen.CharPrompt("something went horribly wrong");
         }
 
-        AsciiEngine.TrySetWindowSize(oldwidth, oldheight, false);
+        Screen.TrySetSize(oldwidth, oldheight, false);
 
     }
 
@@ -76,8 +77,8 @@ public class TieFighterGame
 
             if (debug)
             {
-                Console.SetCursorPosition(AsciiEngine.LeftEdge + 2, AsciiEngine.BottomEdge - 2); Console.Write('-'); // scroll bug watcher
-                Console.SetCursorPosition(AsciiEngine.LeftEdge + 2, AsciiEngine.BottomEdge - 1); Console.Write(FPS + " "); // fps display
+                Console.SetCursorPosition(Screen.LeftEdge + 2, Screen.BottomEdge - 2); Console.Write('-'); // scroll bug watcher
+                Console.SetCursorPosition(Screen.LeftEdge + 2, Screen.BottomEdge - 1); Console.Write(FPS + " "); // fps display
             }
 
             Thread.Sleep(1000 / FPS);

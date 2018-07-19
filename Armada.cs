@@ -1,3 +1,5 @@
+using AsciiEngine;
+using Easy;
 using System;
 using System.Collections.Generic;
 
@@ -10,7 +12,7 @@ public class Armada
     int _SelectionRange = 1;
 
     List<Ship> _ships = new List<Ship>();
-    AsciiEngine.SpriteField _explosions = new AsciiEngine.SpriteField();
+    SpriteField _explosions = new AsciiEngine.SpriteField();
 
     public List<Ship> Ships { get { return this._ships; } }
 
@@ -24,7 +26,7 @@ public class Armada
     {
         while (_ships.Count < this._SelectionRange / 3 || _ships.Count == 0)   // this._MaxShips)
         {
-            int selection = r.Next(this._SelectionRange);
+            int selection = Easy.Mathy.Random.Next(this._SelectionRange);
             if (selection < 5) { _ships.Add(new Ship(Ship.eShipType.Fighter)); }
             else if (selection < 10) { _ships.Add(new Ship(Ship.eShipType.Bomber)); }
             else if (selection < 15) { _ships.Add(new Ship(Ship.eShipType.Interceptor)); }
@@ -50,7 +52,7 @@ public class Armada
             this._explosions.Sprites.AddRange(s.Debris);
             this._ships.Remove(s);
 
-            if (r.NextDouble() < .2) { this.IncreaseShipLimit(); }
+            if (Mathy.Random.NextDouble() < .2) { this.IncreaseShipLimit(); }
             this._SelectionRange++;
         }
     }
