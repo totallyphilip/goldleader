@@ -11,6 +11,8 @@ public class Armada
     List<Ship> _ships = new List<Ship>();
     AsciiEngine.SpriteField _explosions = new AsciiEngine.SpriteField();
 
+    public List<Ship> Ships { get { return this._ships; } }
+
     #endregion
 
     #region " Ship Creation "
@@ -63,7 +65,7 @@ public class Armada
         }
     }
 
-    void HurtShip(Ship s, int hp)
+    public void HurtShip(Ship s, int hp)
     {
         s.Hurt(hp);
         this._explosions.Sprites.AddRange(s.Sparks);
@@ -88,14 +90,6 @@ public class Armada
         this._MaxShips = maxfighters;
     }
 
-    #endregion
-
-    #region " Testing "
-
-    public void test()
-    {
-        foreach (Ship s in this._ships) { this.HurtShip(s, 1); }
-    }
     #endregion
 
 }

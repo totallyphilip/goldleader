@@ -16,10 +16,14 @@ public class AsciiEngine
         double _IncrementY;
         char _Ascii;
         double _Range;
+        bool _Killed = false;
+
+        public int X { get { return AsciiEngine.RoundNumber(this._X); } }
+        public int Y { get { return AsciiEngine.RoundNumber(this._Y); } }
 
         public bool Alive
         {
-            get { return Math.Sqrt(Math.Pow(this._X - this._OriginalX, 2) + Math.Pow(this._Y - this._OriginalY, 2)) < this._Range; }
+            get { return Math.Sqrt(Math.Pow(this._X - this._OriginalX, 2) + Math.Pow(this._Y - this._OriginalY, 2)) < this._Range && !this._Killed; }
         }
 
         public void Hide()
@@ -27,6 +31,10 @@ public class AsciiEngine
             AsciiEngine.TryWrite(AsciiEngine.RoundNumber(this._X), AsciiEngine.RoundNumber(this._Y), ' ');
         }
 
+        public void Kill()
+        {
+            this._Killed = true;
+        }
         public void Animate()
         {
             this.Hide();
@@ -75,6 +83,11 @@ public class AsciiEngine
         public List<Sprite> Sprites
         {
             get { return _sprites; }
+        }
+
+        public void RemoveSprite(Sprite s)
+        {
+            this.Sprites.Find(x => s.Equals(x)).Kill();
         }
 
         public void Animate()

@@ -85,6 +85,12 @@ public class Ship
     public void Hurt() { this.Hurt(1); }
     public void Hurt(int hp) { this._HP = this._HP - hp; }
 
+
+    public bool Hit(int x, int y)
+    {
+        return (x >= this._X && x < this._X + this.Width && y == this._Y);
+    }
+
     public void Hide()
     {
         AsciiEngine.TryWrite(this._X, this._Y, new String(' ', this._Ascii.Length));

@@ -39,6 +39,9 @@ public class TieFighterGame
         // Make baddies
         Armada badguys = new Armada(1);
 
+        // The player
+        Player p = new Player();
+
         // Main loop
         int FPS = 10;
         bool UserQuit = false;
@@ -51,6 +54,23 @@ public class TieFighterGame
 
             badguys.Spawn();
             badguys.Animate();
+            p.Animate();
+
+            // check for hits
+            foreach (AsciiEngine.Sprite missile in p.Missiles.Sprites)
+            {
+                foreach (Ship badguy in badguys.Ships)
+                {
+                    if (badguy.Hit(missile.X, missile.Y))
+                    {
+                        badguys.HurtShip(badguy, 1);
+                        p.Missiles.RemoveSprite(missile);
+                    }
+
+                }
+
+
+            }
 
 
             if (debug)
@@ -73,14 +93,20 @@ public class TieFighterGame
                     case ConsoleKey.DownArrow:
                         if (FPS - 1 > 0) { FPS--; }
                         break;
+                    case ConsoleKey.LeftArrow:
+                        p.Direction = -1;
+                        break;
+                    case ConsoleKey.RightArrow:
+                        p.Direction = 1;
+                        break;
+                    case ConsoleKey.Spacebar:
+                        p.AddMissile();
+                        break;
                     case ConsoleKey.Escape:
                         UserQuit = true;
                         break;
                     case ConsoleKey.D:
                         debug = !debug;
-                        break;
-                    case ConsoleKey.X:
-                        badguys.test();
                         break;
                 }
                 while (Console.KeyAvailable) { Console.ReadKey(true); } // eat keys
