@@ -20,7 +20,8 @@ public class TieFighterGame
         }
         else
         {
-            Screen.CharPrompt("something went horribly wrong");
+            Console.Write("something went horribly wrong");
+            Console.ReadKey();
         }
 
         Screen.TrySetSize(oldwidth, oldheight, false);
