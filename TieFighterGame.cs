@@ -41,6 +41,7 @@ public class TieFighterGame
 
         // The player
         Player p = new Player();
+        int _MaxMissiles = 2;
 
         // Main loop
         int FPS = 10;
@@ -100,7 +101,10 @@ public class TieFighterGame
                         p.Direction = 1;
                         break;
                     case ConsoleKey.Spacebar:
-                        p.AddMissile();
+                        if (p.Missiles.Sprites.Count < _MaxMissiles)
+                        {
+                            p.AddMissile();
+                        }
                         break;
                     case ConsoleKey.Escape:
                         UserQuit = true;
