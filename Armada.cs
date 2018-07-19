@@ -24,7 +24,6 @@ public class Armada
     {
         while (_ships.Count < this._SelectionRange / 3 || _ships.Count == 0)   // this._MaxShips)
         {
-            Random r = new Random();
             int selection = r.Next(this._SelectionRange);
             if (selection < 5) { _ships.Add(new Ship(Ship.eShipType.Fighter)); }
             else if (selection < 10) { _ships.Add(new Ship(Ship.eShipType.Bomber)); }
@@ -51,7 +50,6 @@ public class Armada
             this._explosions.Sprites.AddRange(s.Debris);
             this._ships.Remove(s);
 
-            Random r = new Random();
             if (r.NextDouble() < .2) { this.IncreaseShipLimit(); }
             this._SelectionRange++;
         }

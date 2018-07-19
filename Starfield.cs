@@ -16,7 +16,6 @@ public class Starfield
 
         // spawn initial stars
 
-        System.Random r = new System.Random();
         while (stars.Sprites.Count < this.MaxStars)
         {
             int y = r.Next(AsciiEngine.TopEdge - 1, AsciiEngine.Height);
@@ -30,7 +29,6 @@ public class Starfield
     {
         while (stars.Sprites.Count < this.MaxStars)
         {
-            System.Random r = new System.Random();
             this.stars.Sprites.Add(new AsciiEngine.Sprite('.', r.Next(AsciiEngine.LeftEdge, AsciiEngine.RightEdge), AsciiEngine.TopEdge - 1, 0, this._speed, AsciiEngine.Height));
         }
 

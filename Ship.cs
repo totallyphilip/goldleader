@@ -109,8 +109,6 @@ public class Ship
         if (this._X + this.Width >= this._flyzone.Right) { this._XDirection = -1; turnedaround = true; }
         this._X = this._X + this._XDirection;
 
-        Random r = new Random();
-
         if (turnedaround || r.Next(100) < (this._SquirrelyFactor * 100)) { this._Y = this._Y + _YDirection; }
         if (this._Y <= this._flyzone.Top) { this._YDirection = 1; }
         if (this._Y >= this._flyzone.Bottom) { this._YDirection = -1; }
@@ -174,7 +172,6 @@ public class Ship
                 break;
         }
 
-        Random r = new Random();
         this._X = r.Next(0 - this.Width, AsciiEngine.RightEdge + this.Width);
     }
 
