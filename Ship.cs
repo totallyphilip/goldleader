@@ -43,6 +43,9 @@ public class Ship
     string _Ascii;
     int _HP;
     double _SquirrelyFactor;
+    char _Missile;
+    int _MissileRange;
+    int _MissileMaxCount;
 
     FlyZone _flyzone;
 
@@ -129,30 +132,45 @@ public class Ship
                 this._flyzone = new FlyZone(0, 0, 0);
                 this._SquirrelyFactor = .25;
                 this._HP = 1;
+                this._Missile = '|';
+                this._MissileRange = 5;
+                this._MissileMaxCount = 1;
                 break;
             case eShipType.Bomber:
                 this._Ascii = "{—o-o—}";
                 this._flyzone = new FlyZone(.5, .25, -.25);
                 this._SquirrelyFactor = .01;
                 this._HP = 2;
+                this._Missile = '@';
+                this._MissileRange = AsciiEngine.Height / 2;
+                this._MissileMaxCount = 2;
                 break;
             case eShipType.Interceptor:
                 this._Ascii = "<—o—>";
                 this._flyzone = new FlyZone(-.15, -.15, 0);
                 this._SquirrelyFactor = .4;
                 this._HP = 2;
+                this._Missile = '|';
+                this._MissileRange = 5;
+                this._MissileMaxCount = 2;
                 break;
             case eShipType.Vader:
                 this._Ascii = "[—o—]";
                 this._flyzone = new FlyZone(.66, 0, .10);
                 this._SquirrelyFactor = .1;
                 this._HP = 3;
+                this._Missile = '|';
+                this._MissileRange = 10;
+                this._MissileMaxCount = 3;
                 break;
             case eShipType.Squadron:
                 this._Ascii = "|—o—|[—o—]|—o—|";
                 this._flyzone = new FlyZone(0, .15, .20);
                 this._SquirrelyFactor = 0;
                 this._HP = 6;
+                this._Missile = '|';
+                this._MissileRange = 5;
+                this._MissileMaxCount = 5;
                 break;
         }
 

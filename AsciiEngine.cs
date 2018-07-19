@@ -186,9 +186,23 @@ public class AsciiEngine
 
     public static bool TryWrite(int x, int y, string s)
     {
-        char[] chars = s.ToCharArray();
-        for (int c = 0; c < chars.Length; c++) { AsciiEngine.TryWrite(x + c, y, chars[c]); }
-        return (x >= AsciiEngine.LeftEdge && x + s.Length - 1 <= AsciiEngine.RightEdge && y >= AsciiEngine.TopEdge && y <= AsciiEngine.BottomEdge);
+        if (y >= AsciiEngine.TopEdge && y <= AsciiEngine.BottomEdge)
+        {
+            if (x >= AsciiEngine.LeftEdge && x + s.Length < AsciiEngine.RightEdge)
+            {
+                Console.SetCursorPosition(x, y);
+                Console.Write(s);
+                return true;
+            }
+            else
+            {
+                char[] chars = s.ToCharArray();
+                for (int c = 0; c < chars.Length; c++) { AsciiEngine.TryWrite(x + c, y, chars[c]); }
+                return (x >= AsciiEngine.LeftEdge && x + s.Length - 1 <= AsciiEngine.RightEdge && y >= AsciiEngine.TopEdge && y <= AsciiEngine.BottomEdge);
+            }
+        }
+        else
+        { return false; }
     }
 
     public static bool TryWrite(int x, int y, char c)

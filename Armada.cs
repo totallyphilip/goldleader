@@ -7,6 +7,7 @@ public class Armada
     #region " Properties "
 
     int _MaxShips;
+    int _SelectionRange = 1;
 
     List<Ship> _ships = new List<Ship>();
     AsciiEngine.SpriteField _explosions = new AsciiEngine.SpriteField();
@@ -21,28 +22,18 @@ public class Armada
 
     public void Spawn()
     {
-        while (_ships.Count < this._MaxShips)
+        while (_ships.Count < this._SelectionRange / 3 || _ships.Count == 0)   // this._MaxShips)
         {
             Random r = new Random();
-            switch (r.Next(5))
-            {
-                case 0:
-                    _ships.Add(new Ship(Ship.eShipType.Fighter));
-                    break;
-                case 1:
-                    _ships.Add(new Ship(Ship.eShipType.Bomber));
-                    break;
-                case 2:
-                    _ships.Add(new Ship(Ship.eShipType.Interceptor));
-                    break;
-                case 3:
-                    _ships.Add(new Ship(Ship.eShipType.Vader));
-                    break;
-                case 4:
-                    _ships.Add(new Ship(Ship.eShipType.Squadron));
-                    break;
+            int selection = r.Next(this._SelectionRange);
+            if (selection < 5) { _ships.Add(new Ship(Ship.eShipType.Fighter)); }
+            else if (selection < 10) { _ships.Add(new Ship(Ship.eShipType.Bomber)); }
+            else if (selection < 15) { _ships.Add(new Ship(Ship.eShipType.Interceptor)); }
+            else if (selection < 20) { _ships.Add(new Ship(Ship.eShipType.Vader)); }
+            else if (selection < 30) { _ships.Add(new Ship(Ship.eShipType.Vader)); }
+            else { _ships.Add(new Ship(Ship.eShipType.Fighter)); }
 
-            }
+
         }
     }
 
@@ -61,7 +52,8 @@ public class Armada
             this._ships.Remove(s);
 
             Random r = new Random();
-            if (r.NextDouble() < .25) { this.IncreaseShipLimit(); }
+            if (r.NextDouble() < .2) { this.IncreaseShipLimit(); }
+            this._SelectionRange++;
         }
     }
 
@@ -76,7 +68,7 @@ public class Armada
 
     public void Animate()
     {
-        foreach (Ship ship in _ships) { ship.Animate(); } // move ships
+        foreach (Ship ship in _ships.FindAll(x => x.Alive)) { ship.Animate(); }
         this._explosions.Animate(); // move explosions
         this.Sweep(); // remove dead ships
 
