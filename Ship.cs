@@ -48,6 +48,7 @@ public class Ship
     char _Missile;
     int _MissileRange;
     int _MissileMaxCount;
+    SpriteField missilefield = new SpriteField();
 
     FlyZone _flyzone;
 
@@ -117,6 +118,14 @@ public class Ship
 
         Screen.TryWrite(this._X, this._Y, this._Ascii);  // show it
 
+        // fire!
+        // must be near the bottom, have more missiles, and not fire every time
+        if (missilefield.Sprites.Count < _MissileMaxCount && this._Y + this._MissileRange >= Screen.BottomEdge && Mathy.Random.NextDouble() < .2)
+        {
+            missilefield.Sprites.Add(new Sprite(_Missile, this._X + this.Width / 2, this._Y, 0, 1, _MissileRange));
+        }
+        missilefield.Animate();
+
     }
 
     #endregion
@@ -133,7 +142,7 @@ public class Ship
                 this._SquirrelyFactor = .25;
                 this._HP = 1;
                 this._Missile = '|';
-                this._MissileRange = 5;
+                this._MissileRange = 6;
                 this._MissileMaxCount = 1;
                 break;
             case eShipType.Bomber:
@@ -143,7 +152,7 @@ public class Ship
                 this._HP = 2;
                 this._Missile = '@';
                 this._MissileRange = Screen.Height / 2;
-                this._MissileMaxCount = 2;
+                this._MissileMaxCount = 1;
                 break;
             case eShipType.Interceptor:
                 this._Ascii = "<—o—>";
@@ -151,7 +160,7 @@ public class Ship
                 this._SquirrelyFactor = .4;
                 this._HP = 2;
                 this._Missile = '|';
-                this._MissileRange = 5;
+                this._MissileRange = 6;
                 this._MissileMaxCount = 2;
                 break;
             case eShipType.Vader:
@@ -169,7 +178,7 @@ public class Ship
                 this._SquirrelyFactor = 0;
                 this._HP = 6;
                 this._Missile = '|';
-                this._MissileRange = 5;
+                this._MissileRange = 6;
                 this._MissileMaxCount = 5;
                 break;
         }

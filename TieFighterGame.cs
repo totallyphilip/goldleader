@@ -12,7 +12,7 @@ public class TieFighterGame
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
 
-        if (Screen.TrySetSize(80, 25))
+        if (Screen.TrySetSize(40, 30))
         {
             Console.CursorVisible = false;
             this.Play();
@@ -78,8 +78,8 @@ public class TieFighterGame
 
             if (debug)
             {
-                Console.SetCursorPosition(Screen.LeftEdge + 2, Screen.BottomEdge - 2); Console.Write('-'); // scroll bug watcher
-                Console.SetCursorPosition(Screen.LeftEdge + 2, Screen.BottomEdge - 1); Console.Write(FPS + " "); // fps display
+                //Console.SetCursorPosition(Screen.LeftEdge + 2, Screen.BottomEdge - 2); Console.Write('-'); // scroll bug watcher
+                //Console.SetCursorPosition(Screen.LeftEdge + 2, Screen.BottomEdge - 1); Console.Write(FPS + " "); // fps display
             }
 
             Thread.Sleep(1000 / FPS);

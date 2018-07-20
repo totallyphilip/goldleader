@@ -2,7 +2,7 @@ using AsciiEngine;
 using Easy;
 public class Starfield
 {
-    AsciiEngine.SpriteField stars = new AsciiEngine.SpriteField();
+    SpriteField stars = new SpriteField();
     double _speed;
     double _rowcoveragepct;
 
@@ -20,9 +20,9 @@ public class Starfield
 
         while (stars.Sprites.Count < this.MaxStars)
         {
+            int x = Mathy.Random.Next(Screen.LeftEdge, Screen.RightEdge);
             int y = Mathy.Random.Next(Screen.TopEdge - 1, Screen.Height);
-            this.stars.Sprites.Add(new AsciiEngine.Sprite('.', Mathy.Random.Next(Screen.LeftEdge, Screen.RightEdge), y, 0, this._speed, Screen.Height - y));
-
+            this.stars.Sprites.Add(new AsciiEngine.Sprite('.', x, y, 0, this._speed, Screen.Height - y));
         }
 
     }
