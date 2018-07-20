@@ -25,5 +25,19 @@ namespace Easy
             while (Console.KeyAvailable) { Console.ReadKey(true); }
         }
     }
+
+    public class Clock
+    {
+        public static Int64 LastTick = 0;
+
+        public static void FpsThrottle(int slices)
+        {
+            // divide a second into slices, then wait for the fps specified
+            Int64 minimumticks = 10000000 / slices;
+            while (DateTime.Now.Ticks < Clock.LastTick + minimumticks) { System.Threading.Thread.Sleep(10); }
+
+            Clock.LastTick = DateTime.Now.Ticks;
+        }
+    }
 }
 

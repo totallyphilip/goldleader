@@ -47,6 +47,9 @@ public class TieFighterGame
         Player p = new Player();
         int _MaxMissiles = 2;
 
+        // keyboard buffer
+        List<ConsoleKeyInfo> keybuffer = new List<ConsoleKeyInfo>();
+
         // Main loop
         int FPS = 10;
         bool UserQuit = false;
@@ -80,16 +83,33 @@ public class TieFighterGame
 
             if (debug)
             {
-                //Console.SetCursorPosition(Screen.LeftEdge + 2, Screen.BottomEdge - 2); Console.Write('-'); // scroll bug watcher
-                //Console.SetCursorPosition(Screen.LeftEdge + 2, Screen.BottomEdge - 1); Console.Write(FPS + " "); // fps display
+                int x = Screen.LeftEdge;
+                int y = Screen.BottomEdge;
+                Screen.TryWrite(0, 0, "[fps: " + FPS + " ships: " + badguys.Ships.Count + ']');
             }
 
-            Thread.Sleep(1000 / FPS);
+            Easy.Clock.FpsThrottle(FPS);
 
-            if (Console.KeyAvailable)
+
+            // wipe the keyboard buffer if a priority key is pressed
+            while (Console.KeyAvailable)
+            {
+                ConsoleKeyInfo k = Console.ReadKey(true);
+                if (
+                    k.Key == ConsoleKey.LeftArrow
+                        || k.Key == ConsoleKey.RightArrow
+                        || k.Key == ConsoleKey.Escape
+                        || k.Key == ConsoleKey.UpArrow
+                        || k.Key == ConsoleKey.DownArrow
+                 ) { keybuffer.Clear(); }
+                keybuffer.Add(k);
+            }
+
+            if (keybuffer.Count > 0)
             {
 
-                ConsoleKeyInfo k = Console.ReadKey(true);
+                ConsoleKeyInfo k = keybuffer[0];
+                keybuffer.Remove(k);
                 switch (k.Key)
                 {
                     case ConsoleKey.UpArrow:
@@ -117,8 +137,6 @@ public class TieFighterGame
                         debug = !debug;
                         break;
                 }
-
-                // Easy.Keys.EatKeys();
 
             }
 
