@@ -9,6 +9,8 @@ public class Ship
 
     #region " Fly Zone "
 
+    FlyZone _FlyZone;
+
     class FlyZone
     {
 
@@ -36,28 +38,44 @@ public class Ship
 
     #endregion
 
-    #region " Properties "
+    #region " Movement Properties "
 
     int _X;
     int _Y = 0;
     int _XDirection = 1;
     int _YDirection = 1;
-    string _Ascii;
     int _HP;
     double _SquirrelyFactor;
-    char _Missile;
+
+    #endregion
+
+    #region " Missile Properties "
+
+    char _MissileAscii;
     int _MissileRange;
-    int _MissileMaxCount;
-    SpriteField missilefield = new SpriteField();
+    int _MissileLimit;
+    SpriteField _MissileField = new SpriteField();
+    public bool Firing { get { return this._MissileField.Sprites.Count > 0; } }
+    public SpriteField MissileField { get { return this._MissileField; } }
 
-    FlyZone _flyzone;
+    #endregion
 
+    #region " General Properties "
+
+    string _Ascii;
     int Width { get { return this._Ascii.Length; } }
     public bool Alive { get { return this._HP > 0; } }
 
     #endregion
 
     #region " Explody Properties "
+
+    bool _Exploded = false;
+    public bool Exploded
+    {
+        get { return this._Exploded; }
+        set { this._Exploded = value; }
+    }
 
     public List<AsciiEngine.Sprite> Sparks
     {
@@ -88,9 +106,7 @@ public class Ship
 
     #region " Methods "
 
-    public void Hurt() { this.Hurt(1); }
     public void Hurt(int hp) { this._HP = this._HP - hp; }
-
 
     public bool Hit(int x, int y)
     {
@@ -108,23 +124,22 @@ public class Ship
         bool turnedaround = false;
         this.Hide();
 
-        if (this._X <= this._flyzone.Left) { this._XDirection = 1; turnedaround = true; }
-        if (this._X + this.Width >= this._flyzone.Right) { this._XDirection = -1; turnedaround = true; }
+        if (this._X <= this._FlyZone.Left) { this._XDirection = 1; turnedaround = true; }
+        if (this._X + this.Width >= this._FlyZone.Right) { this._XDirection = -1; turnedaround = true; }
         this._X = this._X + this._XDirection;
 
         if (turnedaround || Numbers.Random.Next(100) < (this._SquirrelyFactor * 100)) { this._Y = this._Y + _YDirection; }
-        if (this._Y <= this._flyzone.Top) { this._YDirection = 1; }
-        if (this._Y >= this._flyzone.Bottom) { this._YDirection = -1; }
+        if (this._Y <= this._FlyZone.Top) { this._YDirection = 1; }
+        if (this._Y >= this._FlyZone.Bottom) { this._YDirection = -1; }
 
         Screen.TryWrite(this._X, this._Y, this._Ascii);  // show it
 
         // fire!
         // must be near the bottom, have more missiles, and not fire every time
-        if (missilefield.Sprites.Count < _MissileMaxCount && this._Y + this._MissileRange >= Screen.BottomEdge && Numbers.Random.NextDouble() < .2)
+        if (this.MissileField.Sprites.Count < this._MissileLimit && this._Y + this._MissileRange >= Screen.BottomEdge && Numbers.Random.NextDouble() < .2)
         {
-            missilefield.Sprites.Add(new Sprite(_Missile, this._X + this.Width / 2, this._Y, 0, 1, _MissileRange));
+            this.MissileField.Sprites.Add(new Sprite(this._MissileAscii, this._X + this.Width / 2, this._Y, 0, 1, _MissileRange));
         }
-        missilefield.Animate();
 
     }
 
@@ -138,48 +153,48 @@ public class Ship
         {
             case eShipType.Fighter:
                 this._Ascii = "|—o—|";
-                this._flyzone = new FlyZone(0, 0, 0);
+                this._FlyZone = new FlyZone(0, 0, 0);
                 this._SquirrelyFactor = .25;
                 this._HP = 1;
-                this._Missile = '|';
+                this._MissileAscii = '|';
                 this._MissileRange = 6;
-                this._MissileMaxCount = 1;
+                this._MissileLimit = 1;
                 break;
             case eShipType.Bomber:
                 this._Ascii = "{—o-o—}";
-                this._flyzone = new FlyZone(.5, .25, -.25);
+                this._FlyZone = new FlyZone(.5, .25, -.25);
                 this._SquirrelyFactor = .01;
                 this._HP = 2;
-                this._Missile = '@';
+                this._MissileAscii = '@';
                 this._MissileRange = Screen.Height / 2;
-                this._MissileMaxCount = 1;
+                this._MissileLimit = 1;
                 break;
             case eShipType.Interceptor:
                 this._Ascii = "<—o—>";
-                this._flyzone = new FlyZone(-.15, -.15, 0);
+                this._FlyZone = new FlyZone(-.15, -.15, 0);
                 this._SquirrelyFactor = .4;
                 this._HP = 2;
-                this._Missile = '|';
+                this._MissileAscii = '|';
                 this._MissileRange = 6;
-                this._MissileMaxCount = 2;
+                this._MissileLimit = 2;
                 break;
             case eShipType.Vader:
                 this._Ascii = "[—o—]";
-                this._flyzone = new FlyZone(.66, 0, .10);
+                this._FlyZone = new FlyZone(.66, 0, .10);
                 this._SquirrelyFactor = .1;
                 this._HP = 3;
-                this._Missile = '|';
+                this._MissileAscii = '|';
                 this._MissileRange = 10;
-                this._MissileMaxCount = 3;
+                this._MissileLimit = 3;
                 break;
             case eShipType.Squadron:
                 this._Ascii = "|—o—|[—o—]|—o—|";
-                this._flyzone = new FlyZone(0, .15, .20);
+                this._FlyZone = new FlyZone(0, .15, .20);
                 this._SquirrelyFactor = 0;
                 this._HP = 6;
-                this._Missile = '|';
+                this._MissileAscii = '|';
                 this._MissileRange = 6;
-                this._MissileMaxCount = 5;
+                this._MissileLimit = 5;
                 break;
         }
 
