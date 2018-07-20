@@ -2,7 +2,7 @@ using System;
 
 namespace Easy
 {
-    public class Mathy
+    public class Numbers
     {
         public static Random Random = new Random();
 
@@ -16,6 +16,14 @@ namespace Easy
             return Convert.ToInt32(Math.Round(d, MidpointRounding.AwayFromZero));
         }
 
+    }
+
+    public class Keys
+    {
+        public static void EatKeys()
+        {
+            while (Console.KeyAvailable) { Console.ReadKey(true); }
+        }
     }
 }
 

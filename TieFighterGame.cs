@@ -15,6 +15,8 @@ public class TieFighterGame
         if (Screen.TrySetSize(40, 30))
         {
             Console.CursorVisible = false;
+            Screen.Countdown(5);
+            Easy.Keys.EatKeys();
             this.Play();
             Console.CursorVisible = true;
         }
@@ -115,7 +117,8 @@ public class TieFighterGame
                         debug = !debug;
                         break;
                 }
-                while (Console.KeyAvailable) { Console.ReadKey(true); } // eat keys
+
+                // Easy.Keys.EatKeys();
 
             }
 

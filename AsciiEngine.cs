@@ -21,17 +21,17 @@ namespace AsciiEngine
         double _Range;
         bool _Killed = false;
 
-        public int X { get { return Mathy.Round(this._X); } }
-        public int Y { get { return Mathy.Round(this._Y); } }
+        public int X { get { return Numbers.Round(this._X); } }
+        public int Y { get { return Numbers.Round(this._Y); } }
 
         public bool Alive
         {
-            get { return Mathy.Distance(this._X, this._OriginalX, this._Y, this._OriginalY) < this._Range && !this._Killed; }
+            get { return Numbers.Distance(this._X, this._OriginalX, this._Y, this._OriginalY) < this._Range && !this._Killed; }
         }
 
         public void Hide()
         {
-            Screen.TryWrite(Mathy.Round(this._X), Mathy.Round(this._Y), ' ');
+            Screen.TryWrite(Numbers.Round(this._X), Numbers.Round(this._Y), ' ');
         }
 
         public void Kill()
@@ -43,7 +43,7 @@ namespace AsciiEngine
             this.Hide();
             this._X += this._IncrementX;
             this._Y += this._IncrementY;
-            Screen.TryWrite(Mathy.Round(this._X), Mathy.Round(this._Y), this._Ascii);
+            Screen.TryWrite(Numbers.Round(this._X), Numbers.Round(this._Y), this._Ascii);
         }
 
         public Sprite(char c, double x, double y, double range) : this(c, x, y, -1, -1, range) { } // random direction increments
@@ -60,10 +60,10 @@ namespace AsciiEngine
             if (incx == -1 && incy == -1)
             {
                 // add a fraction to make sure it's not zero
-                this._IncrementX = Easy.Mathy.Random.NextDouble() + .1;
-                this._IncrementY = Easy.Mathy.Random.NextDouble() + .1;
-                if (Mathy.Random.NextDouble() < .5) { this._IncrementX *= -1; }
-                if (Mathy.Random.NextDouble() < .5) { this._IncrementY *= -1; }
+                this._IncrementX = Easy.Numbers.Random.NextDouble() + .1;
+                this._IncrementY = Easy.Numbers.Random.NextDouble() + .1;
+                if (Numbers.Random.NextDouble() < .5) { this._IncrementX *= -1; }
+                if (Numbers.Random.NextDouble() < .5) { this._IncrementY *= -1; }
 
             }
             else
@@ -115,6 +115,8 @@ namespace AsciiEngine
     public class Screen
     {
 
+        #region " Dimensions "
+
         public static int TopEdge { get { return 0; } }
 
         public static int BottomEdge { get { return Console.WindowHeight - 1; } }
@@ -127,52 +129,75 @@ namespace AsciiEngine
 
         public static int Height { get { return Console.WindowHeight; } }
 
-        public static bool TrySetSize(int setwidth, int setheight)
+        public static void GetCenterXY(ref int x, ref int y)
         {
-            return TrySetSize(setwidth, setheight, true);
+            x = Numbers.Round(Screen.Width / 2);
+            y = Numbers.Round(Screen.Height / 2);
         }
 
-        public static bool TrySetSize(int setwidth, int setheight, bool manualadjust)
+        public static bool TrySetSize(int targetwidth, int targetheight)
+        {
+            return TrySetSize(targetwidth, targetheight, true);
+        }
+
+        public static bool TrySetSize(int targetwidth, int targetheight, bool adjustmanually)
         {
 
             try
             {
-                Console.SetWindowSize(setwidth, setheight);
-                Console.SetBufferSize(setwidth, setheight);
+                Console.SetWindowSize(targetwidth, targetheight);
+                Console.SetBufferSize(targetwidth, targetheight);
             }
             catch
             {
 
-                while ((Console.WindowWidth != setwidth || Console.WindowHeight != setheight) && (!Console.KeyAvailable) && manualadjust)
+                while ((Console.WindowWidth != targetwidth || Console.WindowHeight != targetheight || !Console.KeyAvailable) && !Console.KeyAvailable && adjustmanually)
                 {
 
                     Console.Clear();
-                    Console.SetCursorPosition(0, 0);
-                    Console.WriteLine("can't resize window.");
-                    Console.WriteLine("please adjust manually.");
-                    Console.WriteLine();
 
-                    Console.Write("adjust width: ");
-                    if (Console.WindowWidth > setwidth) { Console.WriteLine(new String('\x2190', Console.WindowWidth - setwidth)); }
-                    else if (Console.WindowWidth < setwidth) { Console.WriteLine(new String('\x2192', setwidth - Console.WindowWidth)); }
-                    else { Console.WriteLine("Perfect!"); }
+                    if (Console.WindowWidth == targetwidth && Console.WindowHeight == targetheight)
+                    {
+                        Console.Write("Perfect size!\nPress ENTER to continue.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Resize windown to");
+                        Console.WriteLine(targetwidth + " X " + targetheight);
+                        Console.WriteLine("or keypress to quit.");
+                        Console.WriteLine();
 
-                    Console.Write("adjust height: ");
-                    if (Console.WindowHeight > setheight) { Console.Write(new String('\x2191', Console.WindowHeight - setheight)); }
-                    else if (Console.WindowHeight < setheight) { Console.Write(new String('\x2193', setheight - Console.WindowHeight)); }
-                    else { Console.Write("Perfect!"); }
+                        char leftarrow = '<'; // \x2190
+                        char rightarrow = '>'; // \x2192
+                        char uparrow = '^'; // \x2191
+                        char downarrow = 'v'; // \x2193
 
-                    System.Threading.Thread.Sleep(100); // good enough so the CPU doesn't go crazy
+                        Console.WriteLine(Console.WindowWidth + " X " + Console.WindowHeight);
+
+                        Console.Write("resize: " + Console.WindowWidth + " ");
+                        if (Console.WindowWidth > targetwidth) { Console.WriteLine(new String(leftarrow, Console.WindowWidth - targetwidth)); }
+                        else if (Console.WindowWidth < targetwidth) { Console.WriteLine(new String(rightarrow, targetwidth - Console.WindowWidth)); }
+                        else { Console.WriteLine("Perfect!"); }
+
+                        Console.Write("resize: " + Console.WindowHeight + " ");
+                        if (Console.WindowHeight > targetheight) { Console.Write(new String(uparrow, Console.WindowHeight - targetheight)); }
+                        else if (Console.WindowHeight < targetheight) { Console.Write(new String(downarrow, targetheight - Console.WindowHeight)); }
+                        else { Console.Write("Perfect!"); }
+                    }
+
+                    System.Threading.Thread.Sleep(200); // good enough so the CPU doesn't go crazy
 
                 }
 
             }
 
-            return (Console.WindowHeight == setheight && Console.WindowWidth == setwidth);
+            return (Console.WindowHeight == targetheight && Console.WindowWidth == targetwidth);
 
         }
 
         #endregion
+
+        #region " Writing "
 
         public static bool TryWrite(int x, int y, string s)
         {
@@ -214,5 +239,24 @@ namespace AsciiEngine
             else { return false; }
         }
 
+        public static void Countdown(int start)
+        {
+            Keys.EatKeys();
+            int x = 0;
+            int y = 0;
+            Screen.GetCenterXY(ref x, ref y);
+
+            for (int n = start; n > 0; n--)
+            {
+                Screen.TryWrite(x, y, n + " ");
+                if (Console.KeyAvailable) { n = 0; }
+                else { System.Threading.Thread.Sleep(1000); }
+            }
+        }
+
+        #endregion
     }
+
+    #endregion 
+
 }

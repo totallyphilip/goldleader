@@ -112,7 +112,7 @@ public class Ship
         if (this._X + this.Width >= this._flyzone.Right) { this._XDirection = -1; turnedaround = true; }
         this._X = this._X + this._XDirection;
 
-        if (turnedaround || Mathy.Random.Next(100) < (this._SquirrelyFactor * 100)) { this._Y = this._Y + _YDirection; }
+        if (turnedaround || Numbers.Random.Next(100) < (this._SquirrelyFactor * 100)) { this._Y = this._Y + _YDirection; }
         if (this._Y <= this._flyzone.Top) { this._YDirection = 1; }
         if (this._Y >= this._flyzone.Bottom) { this._YDirection = -1; }
 
@@ -120,7 +120,7 @@ public class Ship
 
         // fire!
         // must be near the bottom, have more missiles, and not fire every time
-        if (missilefield.Sprites.Count < _MissileMaxCount && this._Y + this._MissileRange >= Screen.BottomEdge && Mathy.Random.NextDouble() < .2)
+        if (missilefield.Sprites.Count < _MissileMaxCount && this._Y + this._MissileRange >= Screen.BottomEdge && Numbers.Random.NextDouble() < .2)
         {
             missilefield.Sprites.Add(new Sprite(_Missile, this._X + this.Width / 2, this._Y, 0, 1, _MissileRange));
         }
@@ -183,7 +183,7 @@ public class Ship
                 break;
         }
 
-        this._X = Mathy.Random.Next(0 - this.Width, Screen.RightEdge + this.Width);
+        this._X = Numbers.Random.Next(0 - this.Width, Screen.RightEdge + this.Width);
     }
 
     #endregion

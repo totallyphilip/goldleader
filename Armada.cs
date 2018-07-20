@@ -26,7 +26,7 @@ public class Armada
     {
         while (_ships.Count < this._SelectionRange / 3 || _ships.Count == 0)   // this._MaxShips)
         {
-            int selection = Easy.Mathy.Random.Next(this._SelectionRange);
+            int selection = Easy.Numbers.Random.Next(this._SelectionRange);
             if (selection < 5) { _ships.Add(new Ship(Ship.eShipType.Fighter)); }
             else if (selection < 10) { _ships.Add(new Ship(Ship.eShipType.Bomber)); }
             else if (selection < 15) { _ships.Add(new Ship(Ship.eShipType.Interceptor)); }
@@ -52,7 +52,7 @@ public class Armada
             this._explosions.Sprites.AddRange(s.Debris);
             this._ships.Remove(s);
 
-            if (Mathy.Random.NextDouble() < .2) { this.IncreaseShipLimit(); }
+            if (Numbers.Random.NextDouble() < .2) { this.IncreaseShipLimit(); }
             this._SelectionRange++;
         }
     }
