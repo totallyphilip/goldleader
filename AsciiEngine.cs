@@ -86,13 +86,13 @@ namespace AsciiEngine
             Screen.TryWrite(XY.X, XY.Y, this._Ascii);
         }
 
-        public Sprite(char c, double x, double y, double range) : this(c, x, y, -1, -1, range) { } // random direction increments
+        public Sprite(char c, Coordinate xy, double range) : this(c, xy, -1, -1, range) { } // random direction increments
 
-        public Sprite(char c, double x, double y, double incx, double incy, double range)
+        public Sprite(char c, Coordinate xy, double incx, double incy, double range)
         {
             this._Ascii = c;
-            OriginalXY = new Coordinate(x, y);
-            XY = new Coordinate(x, y);
+            OriginalXY = xy;
+            XY = new Coordinate(xy.X, xy.Y);
 
             this._Range = range;
 

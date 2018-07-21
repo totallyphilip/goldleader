@@ -44,7 +44,7 @@ public class Player
 
     public void AddMissile()
     {
-        this._missiles.Sprites.Add(new Sprite('|', this._X + this.Width / 2, this._Y, 0, -1, this._Y));
+        this._missiles.Sprites.Add(new Sprite('|', new Coordinate(this._X + this.Width / 2, this._Y), 0, -1, this._Y));
     }
 
 }
