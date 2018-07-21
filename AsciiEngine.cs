@@ -14,18 +14,9 @@ namespace AsciiEngine
 
         double _X;
         double _Y;
-        double _OldX;
-        double _OldY;
 
         public double X { get { return this._X; } }
         public double Y { get { return this._Y; } }
-        public double OldX { get { return this._OldX; } }
-        public double OldY { get { return this._OldY; } }
-
-        public bool RealMoved
-        {
-            get { return (Numbers.Round(this._X) != Numbers.Round(this._OldX) || Numbers.Round(this._Y) != Numbers.Round(this._OldY)); }
-        }
 
         public void Offset(double incx, double incy)
         {
@@ -34,8 +25,6 @@ namespace AsciiEngine
 
         public void Set(double x, double y)
         {
-            this._OldX = this._X;
-            this._OldY = this._Y;
             this._X = x;
             this._Y = y;
         }
@@ -81,8 +70,8 @@ namespace AsciiEngine
 
         public void Animate()
         {
+            Screen.TryWrite(XY.X, XY.Y, ' ');
             this.XY.Offset(this._IncrementX, this._IncrementY);
-            if (XY.RealMoved) { Screen.TryWrite(XY.OldX, XY.OldY, ' '); }
             Screen.TryWrite(XY.X, XY.Y, this._Ascii);
         }
 
