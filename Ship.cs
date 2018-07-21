@@ -70,50 +70,46 @@ public class Ship
 
     #region " Explody Properties "
 
+    double _DebrisRange;
     bool _Exploded = false;
-    public bool Exploded
+    public bool Exploded { get { return this._Exploded; } }
+    public void Explode()
     {
-        get { return this._Exploded; }
-        set { this._Exploded = value; }
-    }
+        this.Hide();
+        this._Exploded = true;
 
-    public List<AsciiEngine.Sprite> Sparks
-    {
-        get
+        // add ship debris to missiles
+        char[] chars = this._Ascii.ToCharArray();
+        for (int c = 0; c < chars.Length; c++)
         {
-            List<AsciiEngine.Sprite> sprites = new List<AsciiEngine.Sprite>();
-            for (int splat = 0; splat < 2; splat++) { sprites.Add(new AsciiEngine.Sprite('\x00d7', this._X + this.Width / 2, this._Y, 2)); }
-            return sprites;
+            this.MissileField.Sprites.Add(new AsciiEngine.Sprite(chars[c], this._X + c, this._Y, this._DebrisRange));
         }
-    }
+        for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite('*', this._X + this.Width / 2, this._Y, this._DebrisRange * 1.5)); }
 
-    public List<AsciiEngine.Sprite> Debris
-    {
-        get
-        {
-            List<AsciiEngine.Sprite> sprites = new List<AsciiEngine.Sprite>();
-            char[] chars = this._Ascii.ToCharArray();
-            for (int c = 0; c < chars.Length; c++)
-            {
-                sprites.Add(new AsciiEngine.Sprite(chars[c], this._X + c, this._Y, 4));
-            }
-            for (int splat = 0; splat < 2; splat++) { sprites.Add(new AsciiEngine.Sprite('*', this._X + this.Width / 2, this._Y, 6)); }
-            return sprites;
-        }
     }
 
     #endregion
 
     #region " Methods "
 
-    public void Hurt(int hp) { this._HP = this._HP - hp; }
-
     public bool Hit(int x, int y)
     {
-        return (x >= this._X && x < this._X + this.Width && y == this._Y);
+        if (x >= this._X && x < this._X + this.Width && y == this._Y)
+        {
+            // make sparks
+            for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite('\x00d7', this._X + this.Width / 2, this._Y, 2)); }
+            // reduce health
+            this._HP--;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
     }
 
-    public void Hide()
+    void Hide()
     {
         Screen.TryWrite(this._X, this._Y, new String(' ', this._Ascii.Length));
     }
@@ -159,6 +155,7 @@ public class Ship
                 this._MissileAscii = '|';
                 this._MissileRange = 6;
                 this._MissileLimit = 1;
+                this._DebrisRange = 0.5;
                 break;
             case eShipType.Bomber:
                 this._Ascii = "{—o-o—}";
@@ -168,6 +165,7 @@ public class Ship
                 this._MissileAscii = '@';
                 this._MissileRange = Screen.Height / 2;
                 this._MissileLimit = 1;
+                this._DebrisRange = 6;
                 break;
             case eShipType.Interceptor:
                 this._Ascii = "<—o—>";
@@ -177,6 +175,7 @@ public class Ship
                 this._MissileAscii = '|';
                 this._MissileRange = 6;
                 this._MissileLimit = 2;
+                this._DebrisRange = 1;
                 break;
             case eShipType.Vader:
                 this._Ascii = "[—o—]";
@@ -186,6 +185,7 @@ public class Ship
                 this._MissileAscii = '|';
                 this._MissileRange = 10;
                 this._MissileLimit = 3;
+                this._DebrisRange = 1;
                 break;
             case eShipType.Squadron:
                 this._Ascii = "|—o—|[—o—]|—o—|";
@@ -195,6 +195,7 @@ public class Ship
                 this._MissileAscii = '|';
                 this._MissileRange = 6;
                 this._MissileLimit = 5;
+                this._DebrisRange = 8;
                 break;
         }
 

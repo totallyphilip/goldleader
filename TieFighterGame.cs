@@ -71,7 +71,6 @@ public class TieFighterGame
                 {
                     if (badguy.Hit(missile.X, missile.Y))
                     {
-                        badguys.HurtShip(badguy, 1);
                         p.Missiles.RemoveSprite(missile);
                     }
 
