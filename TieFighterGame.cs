@@ -69,7 +69,7 @@ public class TieFighterGame
             {
                 foreach (Ship badguy in badguys.Ships)
                 {
-                    if (badguy.Hit(missile.X, missile.Y))
+                    if (badguy.Hit(missile.XY.X, missile.XY.Y))
                     {
                         p.Missiles.RemoveSprite(missile);
                     }

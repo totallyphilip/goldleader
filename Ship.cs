@@ -92,8 +92,10 @@ public class Ship
 
     #region " Methods "
 
-    public bool Hit(int x, int y)
+    public bool Hit(double x, double y)
     {
+        x = Numbers.Round(x);
+        y = Numbers.Round(y);
         if (x >= this._X && x < this._X + this.Width && y == this._Y)
         {
             // make sparks

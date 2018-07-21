@@ -6,44 +6,84 @@ using System.Collections.Generic;
 namespace AsciiEngine
 {
 
+    #region " Coordinates "
+
+    public class Coordinate
+    {
+
+
+        double _X;
+        double _Y;
+        double _OldX;
+        double _OldY;
+
+        public double X { get { return this._X; } }
+        public double Y { get { return this._Y; } }
+        public double OldX { get { return this._OldX; } }
+        public double OldY { get { return this._OldY; } }
+
+        public bool RealMoved
+        {
+            get { return (Numbers.Round(this._X) != Numbers.Round(this._OldX) || Numbers.Round(this._Y) != Numbers.Round(this._OldY)); }
+        }
+
+        public void Offset(double incx, double incy)
+        {
+            this.Set(this._X + incx, this._Y + incy);
+        }
+
+        public void Set(double x, double y)
+        {
+            this._OldX = this._X;
+            this._OldY = this._Y;
+            this._X = x;
+            this._Y = y;
+        }
+
+        public Coordinate() : this(0, 0) { }
+        public Coordinate(double x, double y)
+        {
+            this._X = x;
+            this._Y = y;
+        }
+
+    }
+
+    #endregion
+
     #region " Sprites "
 
     public class Sprite
     {
 
-        double _OriginalX;
-        double _OriginalY;
-        double _X;
-        double _Y;
+        public Coordinate XY;
+        Coordinate OriginalXY;
         double _IncrementX;
         double _IncrementY;
         char _Ascii;
         double _Range;
         bool _Killed = false;
 
-        public int X { get { return Numbers.Round(this._X); } }
-        public int Y { get { return Numbers.Round(this._Y); } }
-
         public bool Alive
         {
-            get { return Numbers.Distance(this._X, this._OriginalX, this._Y, this._OriginalY) < this._Range && !this._Killed; }
+            get { return Numbers.Distance(XY.X, OriginalXY.X, XY.Y, OriginalXY.Y) < this._Range && !this._Killed; }
         }
 
         public void Hide()
         {
-            Screen.TryWrite(Numbers.Round(this._X), Numbers.Round(this._Y), ' ');
+            Screen.TryWrite(XY.X, XY.Y, ' ');
         }
 
         public void Kill()
         {
             this._Killed = true;
         }
+
         public void Animate()
         {
-            this.Hide();
-            this._X += this._IncrementX;
-            this._Y += this._IncrementY;
-            Screen.TryWrite(Numbers.Round(this._X), Numbers.Round(this._Y), this._Ascii);
+            this.XY.Offset(this._IncrementX, this._IncrementY);
+            if (XY.RealMoved) { Screen.TryWrite(XY.OldX, XY.OldY, ' '); }
+            Screen.TryWrite(XY.X, XY.Y, this._Ascii);
         }
 
         public Sprite(char c, double x, double y, double range) : this(c, x, y, -1, -1, range) { } // random direction increments
@@ -51,17 +91,16 @@ namespace AsciiEngine
         public Sprite(char c, double x, double y, double incx, double incy, double range)
         {
             this._Ascii = c;
-            this._OriginalX = x;
-            this._OriginalY = y;
-            this._X = x;
-            this._Y = y;
+            OriginalXY = new Coordinate(x, y);
+            XY = new Coordinate(x, y);
+
             this._Range = range;
 
             if (incx == -1 && incy == -1)
             {
                 // add a fraction to make sure it's not zero
-                this._IncrementX = Easy.Numbers.Random.NextDouble() + .1;
-                this._IncrementY = Easy.Numbers.Random.NextDouble() + .1;
+                this._IncrementX = Numbers.Random.NextDouble() + .1;
+                this._IncrementY = Numbers.Random.NextDouble() + .1;
                 if (Numbers.Random.NextDouble() < .5) { this._IncrementX *= -1; }
                 if (Numbers.Random.NextDouble() < .5) { this._IncrementY *= -1; }
 
@@ -70,7 +109,6 @@ namespace AsciiEngine
             {
                 this._IncrementX = incx;
                 this._IncrementY = incy;
-
             }
 
         }
@@ -129,10 +167,9 @@ namespace AsciiEngine
 
         public static int Height { get { return Console.WindowHeight; } }
 
-        public static void GetCenterXY(ref int x, ref int y)
+        public static Coordinate GetCenterCoordinate()
         {
-            x = Numbers.Round(Screen.Width / 2);
-            y = Numbers.Round(Screen.Height / 2);
+            return new Coordinate(Numbers.Round(Screen.Width / 2), Numbers.Round(Screen.Height / 2));
         }
 
         public static bool TrySetSize(int targetwidth, int targetheight)
@@ -199,9 +236,12 @@ namespace AsciiEngine
 
         #region " Writing "
 
-        public static bool TryWrite(int x, int y, string s)
+        public static void TryWrite(double x, double y, string s)
         {
-            bool success = false;
+            TryWrite(Numbers.Round(x), Numbers.Round(y), s);
+        }
+        public static void TryWrite(int x, int y, string s)
+        {
             try
             {
                 if (y >= Screen.TopEdge && y <= Screen.BottomEdge)
@@ -211,22 +251,23 @@ namespace AsciiEngine
                     {
                         Console.SetCursorPosition(x, y);
                         Console.Write(s);
-                        success = true;
                     }
                     // some or all of the text is off the screen, so go character by character
                     else
                     {
                         char[] chars = s.ToCharArray();
                         for (int c = 0; c < chars.Length; c++) { Screen.TryWrite(x + c, y, chars[c]); }
-                        success = (x >= Screen.LeftEdge && x + s.Length - 1 <= Screen.RightEdge && y >= Screen.TopEdge && y <= Screen.BottomEdge);
                     }
                 }
             }
             catch { }
-            return success;
+        }
+        public static void TryWrite(double x, double y, char c)
+        {
+            TryWrite(Numbers.Round(x), Numbers.Round(y), c);
         }
 
-        public static bool TryWrite(int x, int y, char c)
+        public static void TryWrite(int x, int y, char c)
         {
             // don't write anything past the screen edges
             // don't write anything in the lower right corner because that can cause scrolling
@@ -234,21 +275,17 @@ namespace AsciiEngine
             {
                 Console.SetCursorPosition(x, y);
                 Console.Write(c);
-                return true;
             }
-            else { return false; }
         }
 
         public static void Countdown(int start)
         {
             Keys.EatKeys();
-            int x = 0;
-            int y = 0;
-            Screen.GetCenterXY(ref x, ref y);
+            Coordinate xy = Screen.GetCenterCoordinate();
 
             for (int n = start; n > 0; n--)
             {
-                Screen.TryWrite(x, y, n + " ");
+                Screen.TryWrite(xy.X, xy.Y, n + " ");
                 if (Console.KeyAvailable) { n = 0; }
                 else { System.Threading.Thread.Sleep(1000); }
             }
