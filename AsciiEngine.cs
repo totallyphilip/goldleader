@@ -24,6 +24,17 @@ namespace AsciiEngine
             this._Run = run;
             this._Range = range;
         }
+
+        public Trajectory(double range)
+        {
+            this._Range = range;
+            // add a fraction to make sure it's not zero
+            this._Run = Numbers.Random.NextDouble() + .1;
+            this._Rise = Numbers.Random.NextDouble() + .1;
+            if (Numbers.Random.NextDouble() < .5) { this._Run *= -1; }
+            if (Numbers.Random.NextDouble() < .5) { this._Rise *= -1; }
+
+        }
     }
     #endregion
 
@@ -101,7 +112,6 @@ namespace AsciiEngine
             Screen.TryWrite(XY.X, XY.Y, new String(this._Ascii));
         }
 
-        public Sprite(char[] c, Coordinate xy, double range) : this(c, xy, new Trajectory(-1, -1, range)) { } // random direction increments
 
         public Sprite(char[] c, Coordinate xy, Trajectory t)
         {
@@ -113,17 +123,6 @@ namespace AsciiEngine
             XY = new Coordinate(xy.X, xy.Y);
 
             this.course = t;
-
-            if (t.Run == -1 && t.Rise == -1)
-            {
-                // add a fraction to make sure it's not zero
-                this.course.Run = Numbers.Random.NextDouble() + .1;
-                this.course.Rise = Numbers.Random.NextDouble() + .1;
-                if (Numbers.Random.NextDouble() < .5) { this.course.Run *= -1; }
-                if (Numbers.Random.NextDouble() < .5) { this.course.Rise *= -1; }
-
-            }
-
         }
 
     }

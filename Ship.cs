@@ -82,9 +82,9 @@ public class Ship
         char[] chars = this._Ascii.ToCharArray();
         for (int c = 0; c < chars.Length; c++)
         {
-            this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { chars[c] }, new Coordinate(this._X + c, this._Y), this._DebrisRange));
+            this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { chars[c] }, new Coordinate(this._X + c, this._Y), new Trajectory(this._DebrisRange)));
         }
-        for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { '*' }, new Coordinate(this._X + this.Width / 2, this._Y), this._DebrisRange * 1.5)); }
+        for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { '*' }, new Coordinate(this._X + this.Width / 2, this._Y), new Trajectory(this._DebrisRange * 1.5))); }
 
     }
 
@@ -99,7 +99,7 @@ public class Ship
         if (x >= this._X && x < this._X + this.Width && y == this._Y)
         {
             // make sparks
-            for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { '\x00d7' }, new Coordinate(this._X + this.Width / 2, this._Y), 2)); }
+            for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { '\x00d7' }, new Coordinate(this._X + this.Width / 2, this._Y), new Trajectory(2))); }
             // reduce health
             this._HP--;
             return true;
