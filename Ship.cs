@@ -136,7 +136,7 @@ public class Ship
         // must be near the bottom, have more missiles, and not fire every time
         if (this.MissileField.Sprites.Count < this._MissileLimit && this._Y + this._MissileRange >= Screen.BottomEdge && Numbers.Random.NextDouble() < .2)
         {
-            this.MissileField.Sprites.Add(new Sprite(new[] { this._MissileAscii }, new Coordinate(this._X + this.Width / 2, this._Y), 0, 1, _MissileRange));
+            this.MissileField.Sprites.Add(new Sprite(new[] { this._MissileAscii }, new Coordinate(this._X + this.Width / 2, this._Y), new Trajectory(0, 1, _MissileRange)));
         }
 
     }

@@ -6,11 +6,31 @@ using System.Collections.Generic;
 namespace AsciiEngine
 {
 
+    #region " Trajectory "
+
+    public class Trajectory
+    {
+        double _Run;
+        double _Rise;
+        double _Range;
+
+        public double Run { get { return _Run; } set { _Run = value; } }
+        public double Rise { get { return _Rise; } set { _Rise = value; } }
+        public double Range { get { return _Range; } set { _Range = value; } }
+
+        public Trajectory(double rise, double run, double range)
+        {
+            this._Rise = rise;
+            this._Run = run;
+            this._Range = range;
+        }
+    }
+    #endregion
+
     #region " Coordinates "
 
     public class Coordinate
     {
-
 
         double _X;
         double _Y;
@@ -18,9 +38,9 @@ namespace AsciiEngine
         public double X { get { return this._X; } }
         public double Y { get { return this._Y; } }
 
-        public void Offset(double incx, double incy)
+        public void Offset(Trajectory t)
         {
-            this.Set(this._X + incx, this._Y + incy);
+            this.Set(this._X + t.Rise, this._Y + t.Run);
         }
 
         public void Set(double x, double y)
@@ -47,15 +67,21 @@ namespace AsciiEngine
 
         public Coordinate XY;
         Coordinate OriginalXY;
-        double _IncrementX;
-        double _IncrementY;
+        Trajectory course;
         char[] _Ascii;
-        double _Range;
         bool _Killed = false;
 
         public bool Alive
         {
-            get { return Numbers.Distance(XY.X, OriginalXY.X, XY.Y, OriginalXY.Y) < this._Range && !this._Killed; }
+            get
+            {
+                bool alive = !this._Killed;
+                if (alive && course != null)
+                {
+                    alive = Numbers.Distance(XY.X, OriginalXY.X, XY.Y, OriginalXY.Y) < course.Range;
+                }
+                return alive;
+            }
         }
 
         public void Hide()
@@ -71,13 +97,13 @@ namespace AsciiEngine
         public void Animate()
         {
             Screen.TryWrite(XY.X, XY.Y, new String(' ', this._Ascii.Length));
-            this.XY.Offset(this._IncrementX, this._IncrementY);
+            this.XY.Offset(course);
             Screen.TryWrite(XY.X, XY.Y, new String(this._Ascii));
         }
 
-        public Sprite(char[] c, Coordinate xy, double range) : this(c, xy, -1, -1, range) { } // random direction increments
+        public Sprite(char[] c, Coordinate xy, double range) : this(c, xy, new Trajectory(-1, -1, range)) { } // random direction increments
 
-        public Sprite(char[] c, Coordinate xy, double incx, double incy, double range)
+        public Sprite(char[] c, Coordinate xy, Trajectory t)
         {
             //this._Ascii.Clone(c);
 
@@ -86,21 +112,16 @@ namespace AsciiEngine
             OriginalXY = xy;
             XY = new Coordinate(xy.X, xy.Y);
 
-            this._Range = range;
+            this.course = t;
 
-            if (incx == -1 && incy == -1)
+            if (t.Run == -1 && t.Rise == -1)
             {
                 // add a fraction to make sure it's not zero
-                this._IncrementX = Numbers.Random.NextDouble() + .1;
-                this._IncrementY = Numbers.Random.NextDouble() + .1;
-                if (Numbers.Random.NextDouble() < .5) { this._IncrementX *= -1; }
-                if (Numbers.Random.NextDouble() < .5) { this._IncrementY *= -1; }
+                this.course.Run = Numbers.Random.NextDouble() + .1;
+                this.course.Rise = Numbers.Random.NextDouble() + .1;
+                if (Numbers.Random.NextDouble() < .5) { this.course.Run *= -1; }
+                if (Numbers.Random.NextDouble() < .5) { this.course.Rise *= -1; }
 
-            }
-            else
-            {
-                this._IncrementX = incx;
-                this._IncrementY = incy;
             }
 
         }
