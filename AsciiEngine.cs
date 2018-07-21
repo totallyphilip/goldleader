@@ -49,7 +49,7 @@ namespace AsciiEngine
         Coordinate OriginalXY;
         double _IncrementX;
         double _IncrementY;
-        char _Ascii;
+        char[] _Ascii;
         double _Range;
         bool _Killed = false;
 
@@ -60,7 +60,7 @@ namespace AsciiEngine
 
         public void Hide()
         {
-            Screen.TryWrite(XY.X, XY.Y, ' ');
+            Screen.TryWrite(XY.X, XY.Y, new string(' ', this._Ascii.Length));
         }
 
         public void Kill()
@@ -70,16 +70,19 @@ namespace AsciiEngine
 
         public void Animate()
         {
-            Screen.TryWrite(XY.X, XY.Y, ' ');
+            Screen.TryWrite(XY.X, XY.Y, new String(' ', this._Ascii.Length));
             this.XY.Offset(this._IncrementX, this._IncrementY);
-            Screen.TryWrite(XY.X, XY.Y, this._Ascii);
+            Screen.TryWrite(XY.X, XY.Y, new String(this._Ascii));
         }
 
-        public Sprite(char c, Coordinate xy, double range) : this(c, xy, -1, -1, range) { } // random direction increments
+        public Sprite(char[] c, Coordinate xy, double range) : this(c, xy, -1, -1, range) { } // random direction increments
 
-        public Sprite(char c, Coordinate xy, double incx, double incy, double range)
+        public Sprite(char[] c, Coordinate xy, double incx, double incy, double range)
         {
-            this._Ascii = c;
+            //this._Ascii.Clone(c);
+
+            this._Ascii = new List<char>(c).ToArray();
+
             OriginalXY = xy;
             XY = new Coordinate(xy.X, xy.Y);
 

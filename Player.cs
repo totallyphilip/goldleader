@@ -43,7 +43,7 @@ public class Player
 
     public void AddMissile()
     {
-        this._missiles.Sprites.Add(new Sprite('|', new Coordinate(this.xy.X + this.Width / 2, this.xy.Y), 0, -1, this.xy.Y));
+        this._missiles.Sprites.Add(new Sprite(new[] { '|' }, new Coordinate(this.xy.X + this.Width / 2, this.xy.Y), 0, -1, this.xy.Y));
     }
 
 }
