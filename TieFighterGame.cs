@@ -67,7 +67,7 @@ public class TieFighterGame
             // check for hits
             foreach (AsciiEngine.Sprite missile in p.Missiles.Sprites)
             {
-                foreach (Ship badguy in badguys.Ships)
+                foreach (Ship badguy in badguys.Ships.FindAll(x => x.Alive))
                 {
                     if (badguy.Hit(missile.XY.X, missile.XY.Y))
                     {
