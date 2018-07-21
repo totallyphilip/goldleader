@@ -12,7 +12,7 @@ public class TieFighterGame
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
 
-        if (Screen.TrySetSize(40, 30))
+        if (true || Screen.TrySetSize(40, 30))
         {
             Console.CursorVisible = false;
             Screen.Countdown(5);
@@ -51,7 +51,7 @@ public class TieFighterGame
         List<ConsoleKeyInfo> keybuffer = new List<ConsoleKeyInfo>();
 
         // Main loop
-        int FPS = 10;
+        int FPS = 2;
         bool UserQuit = false;
         bool debug = false;
 

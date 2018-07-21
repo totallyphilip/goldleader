@@ -34,7 +34,11 @@ namespace Easy
         {
             // divide a second into slices, then wait for the fps specified
             Int64 minimumticks = 10000000 / slices;
-            while (DateTime.Now.Ticks < Clock.LastTick + minimumticks) { System.Threading.Thread.Sleep(10); }
+
+            if (DateTime.Now.Ticks < Clock.LastTick + minimumticks)
+            {
+                System.Threading.Thread.Sleep(Convert.ToInt32(minimumticks - (DateTime.Now.Ticks - Clock.LastTick)) / 10000);
+            }
 
             Clock.LastTick = DateTime.Now.Ticks;
         }
