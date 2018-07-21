@@ -18,12 +18,17 @@ namespace AsciiEngine
         public double Rise { get { return _Rise; } set { _Rise = value; } }
         public double Range { get { return _Range; } set { _Range = value; } }
 
+        #region " Constructor "
+
         public Trajectory(double rise, double run, double range)
         {
             this._Rise = rise;
             this._Run = run;
             this._Range = range;
         }
+
+        public Trajectory() : this(double.MaxValue) { }
+        public Trajectory(double rise, double run) : this(rise, run, double.MaxValue) { }
 
         public Trajectory(double range)
         {
@@ -33,9 +38,12 @@ namespace AsciiEngine
             this._Rise = Numbers.Random.NextDouble() + .1;
             if (Numbers.Random.NextDouble() < .5) { this._Run *= -1; }
             if (Numbers.Random.NextDouble() < .5) { this._Rise *= -1; }
-
         }
+
+        #endregion
     }
+
+
     #endregion
 
     #region " Coordinates "
@@ -46,8 +54,8 @@ namespace AsciiEngine
         double _X;
         double _Y;
 
-        public double X { get { return this._X; } }
-        public double Y { get { return this._Y; } }
+        public double X { get { return this._X; } set { this._X = value; } }
+        public double Y { get { return this._Y; } set { this._Y = value; } }
 
         public void Offset(Trajectory t)
         {

@@ -40,10 +40,8 @@ public class Ship
 
     #region " Movement Properties "
 
-    int _X;
-    int _Y = 0;
-    int _XDirection = 1;
-    int _YDirection = 1;
+    Coordinate XY = new Coordinate(0, 0);
+    Trajectory course = new Trajectory(1, 1);
     int _HP;
     double _SquirrelyFactor;
 
@@ -82,9 +80,9 @@ public class Ship
         char[] chars = this._Ascii.ToCharArray();
         for (int c = 0; c < chars.Length; c++)
         {
-            this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { chars[c] }, new Coordinate(this._X + c, this._Y), new Trajectory(this._DebrisRange)));
+            this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { chars[c] }, new Coordinate(this.XY.X + c, this.XY.Y), new Trajectory(this._DebrisRange)));
         }
-        for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { '*' }, new Coordinate(this._X + this.Width / 2, this._Y), new Trajectory(this._DebrisRange * 1.5))); }
+        for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { '*' }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(this._DebrisRange * 1.5))); }
 
     }
 
@@ -96,10 +94,10 @@ public class Ship
     {
         x = Numbers.Round(x);
         y = Numbers.Round(y);
-        if (x >= this._X && x < this._X + this.Width && y == this._Y)
+        if (x >= this.XY.X && x < this.XY.X + this.Width && y == this.XY.Y)
         {
             // make sparks
-            for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { '\x00d7' }, new Coordinate(this._X + this.Width / 2, this._Y), new Trajectory(2))); }
+            for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { '\x00d7' }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(2))); }
             // reduce health
             this._HP--;
             return true;
@@ -113,7 +111,7 @@ public class Ship
 
     void Hide()
     {
-        Screen.TryWrite(this._X, this._Y, new String(' ', this._Ascii.Length));
+        Screen.TryWrite(this.XY, new String(' ', this._Ascii.Length));
     }
 
     public void Animate()
@@ -122,21 +120,21 @@ public class Ship
         bool turnedaround = false;
         this.Hide();
 
-        if (this._X <= this._FlyZone.Left) { this._XDirection = 1; turnedaround = true; }
-        if (this._X + this.Width >= this._FlyZone.Right) { this._XDirection = -1; turnedaround = true; }
-        this._X = this._X + this._XDirection;
+        if (this.XY.X <= this._FlyZone.Left) { this.course.Run = 1; turnedaround = true; }
+        if (this.XY.X + this.Width >= this._FlyZone.Right) { this.course.Run = -1; turnedaround = true; }
+        this.XY.X += this.course.Run;
 
-        if (turnedaround || Numbers.Random.Next(100) < (this._SquirrelyFactor * 100)) { this._Y = this._Y + _YDirection; }
-        if (this._Y <= this._FlyZone.Top) { this._YDirection = 1; }
-        if (this._Y >= this._FlyZone.Bottom) { this._YDirection = -1; }
+        if (turnedaround || Numbers.Random.Next(100) < (this._SquirrelyFactor * 100)) { this.XY.Y += this.course.Rise; }
+        if (this.XY.Y <= this._FlyZone.Top) { this.course.Rise = 1; }
+        if (this.XY.Y >= this._FlyZone.Bottom) { this.course.Rise = -1; }
 
-        Screen.TryWrite(this._X, this._Y, this._Ascii);  // show it
+        Screen.TryWrite(XY, this._Ascii);  // show it
 
         // fire!
         // must be near the bottom, have more missiles, and not fire every time
-        if (this.MissileField.Sprites.Count < this._MissileLimit && this._Y + this._MissileRange >= Screen.BottomEdge && Numbers.Random.NextDouble() < .2)
+        if (this.MissileField.Sprites.Count < this._MissileLimit && this.XY.Y + this._MissileRange >= Screen.BottomEdge && Numbers.Random.NextDouble() < .2)
         {
-            this.MissileField.Sprites.Add(new Sprite(new[] { this._MissileAscii }, new Coordinate(this._X + this.Width / 2, this._Y), new Trajectory(0, 1, _MissileRange)));
+            this.MissileField.Sprites.Add(new Sprite(new[] { this._MissileAscii }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(0, 1, _MissileRange)));
         }
 
     }
@@ -201,7 +199,7 @@ public class Ship
                 break;
         }
 
-        this._X = Numbers.Random.Next(0 - this.Width, Screen.RightEdge + this.Width);
+        this.XY.X = Numbers.Random.Next(0 - this.Width, Screen.RightEdge + this.Width);
     }
 
     #endregion
