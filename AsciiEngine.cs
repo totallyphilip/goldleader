@@ -236,6 +236,10 @@ namespace AsciiEngine
 
         #region " Writing "
 
+        public static void TryWrite(Coordinate xy, string s)
+        {
+            TryWrite(xy.X, xy.Y, s);
+        }
         public static void TryWrite(double x, double y, string s)
         {
             TryWrite(Numbers.Round(x), Numbers.Round(y), s);
@@ -262,6 +266,12 @@ namespace AsciiEngine
             }
             catch { }
         }
+
+        public static void TryWrite(Coordinate xy, char c)
+        {
+            TryWrite(xy.X, xy.Y, c);
+        }
+
         public static void TryWrite(double x, double y, char c)
         {
             TryWrite(Numbers.Round(x), Numbers.Round(y), c);
