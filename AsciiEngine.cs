@@ -20,7 +20,7 @@ namespace AsciiEngine
 
         #region " Constructor "
 
-        public Trajectory(double rise, double run, double range)
+        public Trajectory(double run, double rise, double range)
         {
             this._Rise = rise;
             this._Run = run;
@@ -57,11 +57,6 @@ namespace AsciiEngine
         public double X { get { return this._X; } set { this._X = value; } }
         public double Y { get { return this._Y; } set { this._Y = value; } }
 
-        public void Offset(Trajectory t)
-        {
-            this.Set(this._X + t.Rise, this._Y + t.Run);
-        }
-
         public void Set(double x, double y)
         {
             this._X = x;
@@ -77,6 +72,29 @@ namespace AsciiEngine
 
     }
 
+    public class Trail
+    {
+
+        List<Coordinate> _Trail = new List<Coordinate>();
+
+        public List<Coordinate> Items { get { return this._Trail; } }
+
+        public Coordinate XY { get { return Items[Items.Count - 1]; } } // current XY
+        public Coordinate PreviousXY { get { return Items[Items.Count - 2]; } }
+
+        public Coordinate InitialXY { get { return Items[0]; } }
+
+        public void MoveTo(Coordinate xy)
+        {
+            Items.Add(xy);
+        }
+
+        public Trail(Coordinate xy)
+        {
+            Items.Add(xy);
+        }
+    }
+
     #endregion
 
     #region " Sprites "
@@ -84,11 +102,12 @@ namespace AsciiEngine
     public class Sprite
     {
 
-        public Coordinate XY;
-        Coordinate OriginalXY;
+        public Trail SpriteTrail;
+
         Trajectory course;
         char[] _Ascii;
         bool _Killed = false;
+        public Coordinate XY { get { return this.SpriteTrail.XY; } }
 
         public bool Alive
         {
@@ -97,7 +116,7 @@ namespace AsciiEngine
                 bool alive = !this._Killed;
                 if (alive && course != null)
                 {
-                    alive = Numbers.Distance(XY.X, OriginalXY.X, XY.Y, OriginalXY.Y) < course.Range;
+                    alive = Numbers.Distance(this.SpriteTrail.XY, this.SpriteTrail.InitialXY) < course.Range;
                 }
                 return alive;
             }
@@ -105,7 +124,7 @@ namespace AsciiEngine
 
         public void Hide()
         {
-            Screen.TryWrite(XY.X, XY.Y, new string(' ', this._Ascii.Length));
+            Screen.TryWrite(this.XY, new String(' ', this._Ascii.Length));
         }
 
         public void Kill()
@@ -113,23 +132,21 @@ namespace AsciiEngine
             this._Killed = true;
         }
 
+
         public void Animate()
         {
-            Screen.TryWrite(XY.X, XY.Y, new String(' ', this._Ascii.Length));
-            this.XY.Offset(course);
-            Screen.TryWrite(XY.X, XY.Y, new String(this._Ascii));
+            this.Hide();
+            this.SpriteTrail.Items.Add(new Coordinate(this.SpriteTrail.XY.X + this.course.Run, this.SpriteTrail.XY.Y + this.course.Rise));
+            Screen.TryWrite(this.XY, new String(this._Ascii));
         }
 
 
         public Sprite(char[] c, Coordinate xy, Trajectory t)
         {
-            //this._Ascii.Clone(c);
-
             this._Ascii = new List<char>(c).ToArray();
+            this.SpriteTrail = new Trail(xy);
 
-            OriginalXY = xy;
-            XY = new Coordinate(xy.X, xy.Y);
-
+            SpriteTrail = new Trail(xy);
             this.course = t;
         }
 

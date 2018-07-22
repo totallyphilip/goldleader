@@ -60,8 +60,8 @@ public class Ship
 
     #region " General Properties "
 
-    string _Ascii;
-    int Width { get { return this._Ascii.Length; } }
+    public string Ascii;
+    int Width { get { return this.Ascii.Length; } }
     public bool Alive { get { return this._HP > 0; } }
 
     #endregion
@@ -77,7 +77,7 @@ public class Ship
         this._Exploded = true;
 
         // add ship debris to missiles
-        char[] chars = this._Ascii.ToCharArray();
+        char[] chars = this.Ascii.ToCharArray();
         for (int c = 0; c < chars.Length; c++)
         {
             this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { chars[c] }, new Coordinate(this.XY.X + c, this.XY.Y), new Trajectory(this._DebrisRange)));
@@ -90,11 +90,11 @@ public class Ship
 
     #region " Methods "
 
-    public bool Hit(double x, double y)
+    public bool Hit(Coordinate missile)
     {
-        x = Numbers.Round(x);
-        y = Numbers.Round(y);
-        if (x >= this.XY.X && x < this.XY.X + this.Width && y == this.XY.Y)
+        missile.X = Numbers.Round(missile.X);
+        missile.Y = Numbers.Round(missile.Y);
+        if (missile.X >= this.XY.X && missile.X < this.XY.X + this.Width && missile.Y == this.XY.Y)
         {
             // make sparks
             for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { '\x00d7' }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(2))); }
@@ -111,7 +111,7 @@ public class Ship
 
     void Hide()
     {
-        Screen.TryWrite(this.XY, new String(' ', this._Ascii.Length));
+        Screen.TryWrite(this.XY, new String(' ', this.Ascii.Length));
     }
 
     public void Animate()
@@ -128,7 +128,7 @@ public class Ship
         if (this.XY.Y <= this._FlyZone.Top) { this.course.Rise = 1; }
         if (this.XY.Y >= this._FlyZone.Bottom) { this.course.Rise = -1; }
 
-        Screen.TryWrite(XY, this._Ascii);  // show it
+        Screen.TryWrite(XY, this.Ascii);  // show it
 
         // fire!
         // must be near the bottom, have more missiles, and not fire every time
@@ -148,7 +148,7 @@ public class Ship
         switch (fightertype)
         {
             case eShipType.Fighter:
-                this._Ascii = "|—o—|";
+                this.Ascii = "|—o—|";
                 this._FlyZone = new FlyZone(0, 0, 0);
                 this._SquirrelyFactor = .25;
                 this._HP = 1;
@@ -158,7 +158,7 @@ public class Ship
                 this._DebrisRange = 0.5;
                 break;
             case eShipType.Bomber:
-                this._Ascii = "{—o-o—}";
+                this.Ascii = "{—o-o—}";
                 this._FlyZone = new FlyZone(.5, .25, -.25);
                 this._SquirrelyFactor = .01;
                 this._HP = 2;
@@ -168,7 +168,7 @@ public class Ship
                 this._DebrisRange = 6;
                 break;
             case eShipType.Interceptor:
-                this._Ascii = "<—o—>";
+                this.Ascii = "<—o—>";
                 this._FlyZone = new FlyZone(-.15, -.15, 0);
                 this._SquirrelyFactor = .4;
                 this._HP = 2;
@@ -178,7 +178,7 @@ public class Ship
                 this._DebrisRange = 1;
                 break;
             case eShipType.Vader:
-                this._Ascii = "[—o—]";
+                this.Ascii = "[—o—]";
                 this._FlyZone = new FlyZone(.66, 0, .10);
                 this._SquirrelyFactor = .1;
                 this._HP = 3;
@@ -188,7 +188,7 @@ public class Ship
                 this._DebrisRange = 1;
                 break;
             case eShipType.Squadron:
-                this._Ascii = "|—o—|[—o—]|—o—|";
+                this.Ascii = "|—o—|[—o—]|—o—|";
                 this._FlyZone = new FlyZone(0, .15, .20);
                 this._SquirrelyFactor = 0;
                 this._HP = 6;

@@ -1,4 +1,5 @@
 using System;
+using AsciiEngine;
 
 namespace Easy
 {
@@ -6,9 +7,9 @@ namespace Easy
     {
         public static Random Random = new Random();
 
-        public static double Distance(double x1, double x2, double y1, double y2)
+        public static double Distance(Coordinate c1, Coordinate c2)
         {
-            return Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
+            return Math.Sqrt(Math.Pow(c1.X - c2.X, 2) + Math.Pow(c1.Y - c2.Y, 2));
         }
 
         public static int Round(double d)
