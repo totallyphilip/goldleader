@@ -1,5 +1,4 @@
 using AsciiEngine;
-using Easy;
 using System;
 using System.Collections.Generic;
 
@@ -29,7 +28,7 @@ namespace AsciiEngine
                 bool alive = !this.Terminated;
                 if (alive && Trajectory != null)
                 {
-                    alive = Numbers.Distance(this.Trail.XY, this.Trail.InitialXY) < Trajectory.Range;
+                    alive = Easy.Numbers.Distance(this.Trail.XY, this.Trail.InitialXY) < Trajectory.Range;
                 }
                 return alive;
             }
@@ -43,7 +42,6 @@ namespace AsciiEngine
         #endregion
 
         #region " Animation "
-
 
         char[] Ascii;
 
@@ -75,24 +73,12 @@ namespace AsciiEngine
 
         #endregion
 
-
-
-
-
-
-
-
     }
 
     public class SpriteField
     {
 
-        List<Sprite> _sprites = new List<Sprite>();
-
-        public List<Sprite> Sprites
-        {
-            get { return _sprites; }
-        }
+        public List<Sprite> Sprites = new List<Sprite>();
 
         public void RemoveSprite(Sprite s)
         {
@@ -102,13 +88,13 @@ namespace AsciiEngine
         public void Animate()
         {
 
-            foreach (Sprite s in this._sprites.FindAll(x => !x.Alive))
+            foreach (Sprite s in this.Sprites.FindAll(x => !x.Alive))
             {
                 s.Hide();
                 this.Sprites.Remove(s);
             }
 
-            foreach (Sprite s in this._sprites.FindAll(x => x.Alive)) { s.Animate(); }
+            foreach (Sprite s in this.Sprites.FindAll(x => x.Alive)) { s.Animate(); }
         }
 
         public SpriteField() { }
@@ -189,10 +175,10 @@ namespace AsciiEngine
             {
                 this._Range = range;
                 // add a fraction to make sure it's not zero
-                this._Run = Numbers.Random.NextDouble() + .1;
-                this._Rise = Numbers.Random.NextDouble() + .1;
-                if (Numbers.Random.NextDouble() < .5) { this._Run *= -1; }
-                if (Numbers.Random.NextDouble() < .5) { this._Rise *= -1; }
+                this._Run = Easy.Numbers.Random.NextDouble() + .1;
+                this._Rise = Easy.Numbers.Random.NextDouble() + .1;
+                if (Easy.Numbers.Random.NextDouble() < .5) { this._Run *= -1; }
+                if (Easy.Numbers.Random.NextDouble() < .5) { this._Rise *= -1; }
             }
 
             #endregion
@@ -217,7 +203,7 @@ namespace AsciiEngine
 
         public static Screen.Coordinate GetCenterCoordinate()
         {
-            return new Screen.Coordinate(Numbers.Round(Screen.Width / 2), Numbers.Round(Screen.Height / 2));
+            return new Screen.Coordinate(Easy.Numbers.Round(Screen.Width / 2), Easy.Numbers.Round(Screen.Height / 2));
         }
 
         public static bool TrySetSize(int targetwidth, int targetheight)
@@ -290,7 +276,7 @@ namespace AsciiEngine
         }
         public static void TryWrite(double x, double y, string s)
         {
-            TryWrite(Numbers.Round(x), Numbers.Round(y), s);
+            TryWrite(Easy.Numbers.Round(x), Easy.Numbers.Round(y), s);
         }
         public static void TryWrite(int x, int y, string s)
         {
@@ -322,7 +308,7 @@ namespace AsciiEngine
 
         public static void TryWrite(double x, double y, char c)
         {
-            TryWrite(Numbers.Round(x), Numbers.Round(y), c);
+            TryWrite(Easy.Numbers.Round(x), Easy.Numbers.Round(y), c);
         }
 
         public static void TryWrite(int x, int y, char c)
@@ -338,7 +324,7 @@ namespace AsciiEngine
 
         public static void Countdown(int start)
         {
-            Keys.EatKeys();
+            Easy.Keys.EatKeys();
             Screen.Coordinate xy = Screen.GetCenterCoordinate();
 
             for (int n = start; n > 0; n--)
