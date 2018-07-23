@@ -20,6 +20,7 @@ namespace AsciiEngine
         #region " Status "
 
         bool Terminated = false;
+        protected int Width { get { return this.Ascii.Length; } }
 
         public bool Alive
         {
@@ -30,9 +31,11 @@ namespace AsciiEngine
                 {
                     alive = Easy.Numbers.Distance(this.Trail.XY, this.Trail.InitialXY) < Trajectory.Range;
                 }
-                return alive;
+                return alive && AliveOverride;
             }
         }
+
+        protected virtual bool AliveOverride { get { return true; } } // optional additional code in overriding property
 
         public void Terminate()
         {
@@ -43,23 +46,30 @@ namespace AsciiEngine
 
         #region " Animation "
 
-        protected char[] Ascii;
+        public char[] Ascii;
 
         public void Hide()
         {
-            Screen.TryWrite(this.XY, new String(' ', this.Ascii.Length));
+            Screen.TryWrite(this.XY, new String(' ', this.Width));
         }
 
         public void Animate()
         {
             this.Hide();
-            this.Trail.Items.Add(new Screen.Coordinate(this.Trail.XY.X + this.Trajectory.Run, this.Trail.XY.Y + this.Trajectory.Rise));
+            this.Trail.Items.Add(this.NextCoordinate());
             Screen.TryWrite(this.XY, new String(this.Ascii));
+        }
+
+        protected virtual Screen.Coordinate NextCoordinate()
+        {
+            return new Screen.Coordinate(this.Trail.XY.X + this.Trajectory.Run, this.Trail.XY.Y + this.Trajectory.Rise);
         }
 
         #endregion
 
         #region  " Constructor "
+
+        public Sprite() : this(new Screen.Coordinate(), new Screen.Trajectory()) { }
 
         public Sprite(Screen.Coordinate xy, Screen.Trajectory t)
         {
@@ -287,6 +297,11 @@ namespace AsciiEngine
         #endregion
 
         #region " Writing "
+
+        public static void TryWrite(Screen.Coordinate xy, char[] s)
+        {
+            TryWrite(xy.X, xy.Y, s.ToString());
+        }
 
         public static void TryWrite(Screen.Coordinate xy, string s)
         {
