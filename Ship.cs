@@ -40,8 +40,8 @@ public class Ship
 
     #region " Movement Properties "
 
-    Coordinate XY = new Coordinate(0, 0);
-    Trajectory course = new Trajectory(1, 1);
+    Screen.Coordinate XY = new Screen.Coordinate(0, 0);
+    Screen.Trajectory course = new Screen.Trajectory(1, 1);
     int _HP;
     double _SquirrelyFactor;
 
@@ -80,9 +80,9 @@ public class Ship
         char[] chars = this.Ascii.ToCharArray();
         for (int c = 0; c < chars.Length; c++)
         {
-            this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { chars[c] }, new Coordinate(this.XY.X + c, this.XY.Y), new Trajectory(this._DebrisRange)));
+            this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { chars[c] }, new Screen.Coordinate(this.XY.X + c, this.XY.Y), new Screen.Trajectory(this._DebrisRange)));
         }
-        for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { '*' }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(this._DebrisRange * 1.5))); }
+        for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { '*' }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(this._DebrisRange * 1.5))); }
 
     }
 
@@ -90,14 +90,14 @@ public class Ship
 
     #region " Methods "
 
-    public bool Hit(Coordinate missile)
+    public bool Hit(Screen.Coordinate missile)
     {
         missile.X = Numbers.Round(missile.X);
         missile.Y = Numbers.Round(missile.Y);
         if (missile.X >= this.XY.X && missile.X < this.XY.X + this.Width && missile.Y == this.XY.Y)
         {
             // make sparks
-            for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { '\x00d7' }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(2))); }
+            for (int splat = 0; splat < 2; splat++) { this.MissileField.Sprites.Add(new AsciiEngine.Sprite(new[] { '\x00d7' }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(2))); }
             // reduce health
             this._HP--;
             return true;
@@ -134,7 +134,7 @@ public class Ship
         // must be near the bottom, have more missiles, and not fire every time
         if (this.MissileField.Sprites.Count < this._MissileLimit && this.XY.Y + this._MissileRange >= Screen.BottomEdge && Numbers.Random.NextDouble() < .2)
         {
-            this.MissileField.Sprites.Add(new Sprite(new[] { this._MissileAscii }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(0, 1, _MissileRange)));
+            this.MissileField.Sprites.Add(new Sprite(new[] { this._MissileAscii }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(0, 1, _MissileRange)));
         }
 
     }

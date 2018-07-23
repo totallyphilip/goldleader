@@ -5,150 +5,82 @@ using System.Collections.Generic;
 
 namespace AsciiEngine
 {
-
-    #region " Trajectory "
-
-    public class Trajectory
-    {
-        double _Run;
-        double _Rise;
-        double _Range;
-
-        public double Run { get { return _Run; } set { _Run = value; } }
-        public double Rise { get { return _Rise; } set { _Rise = value; } }
-        public double Range { get { return _Range; } set { _Range = value; } }
-
-        #region " Constructor "
-
-        public Trajectory(double run, double rise, double range)
-        {
-            this._Rise = rise;
-            this._Run = run;
-            this._Range = range;
-        }
-
-        public Trajectory() : this(double.MaxValue) { }
-        public Trajectory(double rise, double run) : this(rise, run, double.MaxValue) { }
-
-        public Trajectory(double range)
-        {
-            this._Range = range;
-            // add a fraction to make sure it's not zero
-            this._Run = Numbers.Random.NextDouble() + .1;
-            this._Rise = Numbers.Random.NextDouble() + .1;
-            if (Numbers.Random.NextDouble() < .5) { this._Run *= -1; }
-            if (Numbers.Random.NextDouble() < .5) { this._Rise *= -1; }
-        }
-
-        #endregion
-    }
-
-
-    #endregion
-
-    #region " Coordinates "
-
-    public class Coordinate
-    {
-
-        double _X;
-        double _Y;
-
-        public double X { get { return this._X; } set { this._X = value; } }
-        public double Y { get { return this._Y; } set { this._Y = value; } }
-
-        public void Set(double x, double y)
-        {
-            this._X = x;
-            this._Y = y;
-        }
-
-        public Coordinate() : this(0, 0) { }
-        public Coordinate(double x, double y)
-        {
-            this._X = x;
-            this._Y = y;
-        }
-
-    }
-
-    public class Trail
-    {
-
-        List<Coordinate> _Trail = new List<Coordinate>();
-
-        public List<Coordinate> Items { get { return this._Trail; } }
-
-        public Coordinate XY { get { return Items[Items.Count - 1]; } } // current XY
-        public Coordinate PreviousXY { get { return Items[Items.Count - 2]; } }
-
-        public Coordinate InitialXY { get { return Items[0]; } }
-
-        public void MoveTo(Coordinate xy)
-        {
-            Items.Add(xy);
-        }
-
-        public Trail(Coordinate xy)
-        {
-            Items.Add(xy);
-        }
-    }
-
-    #endregion
-
     #region " Sprites "
 
     public class Sprite
     {
 
-        public Trail SpriteTrail;
+        #region " Locations "
 
-        Trajectory course;
-        char[] _Ascii;
-        bool _Killed = false;
-        public Coordinate XY { get { return this.SpriteTrail.XY; } }
+        public Screen.CoordinateHistory Trail;
+        Screen.Trajectory Trajectory;
+        public Screen.Coordinate XY { get { return this.Trail.XY; } }
+
+        #endregion
+
+        #region " Status "
+
+        bool Terminated = false;
 
         public bool Alive
         {
             get
             {
-                bool alive = !this._Killed;
-                if (alive && course != null)
+                bool alive = !this.Terminated;
+                if (alive && Trajectory != null)
                 {
-                    alive = Numbers.Distance(this.SpriteTrail.XY, this.SpriteTrail.InitialXY) < course.Range;
+                    alive = Numbers.Distance(this.Trail.XY, this.Trail.InitialXY) < Trajectory.Range;
                 }
                 return alive;
             }
         }
 
+        public void Terminate()
+        {
+            this.Terminated = true;
+        }
+
+        #endregion
+
+        #region " Animation "
+
+
+        char[] Ascii;
+
         public void Hide()
         {
-            Screen.TryWrite(this.XY, new String(' ', this._Ascii.Length));
+            Screen.TryWrite(this.XY, new String(' ', this.Ascii.Length));
         }
-
-        public void Kill()
-        {
-            this._Killed = true;
-        }
-
 
         public void Animate()
         {
             this.Hide();
-            this.SpriteTrail.Items.Add(new Coordinate(this.SpriteTrail.XY.X + this.course.Run, this.SpriteTrail.XY.Y + this.course.Rise));
-            Screen.TryWrite(this.XY, new String(this._Ascii));
+            this.Trail.Items.Add(new Screen.Coordinate(this.Trail.XY.X + this.Trajectory.Run, this.Trail.XY.Y + this.Trajectory.Rise));
+            Screen.TryWrite(this.XY, new String(this.Ascii));
         }
 
+        #endregion
 
-        public Sprite(char[] c, Coordinate xy, Trajectory t)
+
+        #region  " Constructor "
+
+        public Sprite(char[] c, Screen.Coordinate xy, Screen.Trajectory t)
         {
-            this._Ascii = new List<char>(c).ToArray();
-            this.SpriteTrail = new Trail(xy);
+            this.Ascii = new List<char>(c).ToArray();
+            this.Trail = new Screen.CoordinateHistory(xy);
 
-            SpriteTrail = new Trail(xy);
-            this.course = t;
+            Trail = new Screen.CoordinateHistory(xy);
+            this.Trajectory = t;
         }
+
+        #endregion
+
+
+
+
+
+
+
 
     }
 
@@ -164,7 +96,7 @@ namespace AsciiEngine
 
         public void RemoveSprite(Sprite s)
         {
-            this.Sprites.Find(x => s.Equals(x)).Kill();
+            this.Sprites.Find(x => s.Equals(x)).Terminate();
         }
 
         public void Animate()
@@ -189,6 +121,85 @@ namespace AsciiEngine
 
     public class Screen
     {
+        #region " Coordinates "
+
+        public class Coordinate
+        {
+
+            public double X;
+            public double Y;
+
+            public Coordinate() : this(0, 0) { }
+            public Coordinate(double x, double y)
+            {
+                this.X = x;
+                this.Y = y;
+            }
+
+        }
+
+        public class CoordinateHistory
+        {
+
+            public List<Coordinate> Items = new List<Coordinate>();
+
+            public Coordinate XY { get { return Items[Items.Count - 1]; } } // current XY
+            public Coordinate PreviousXY { get { return Items[Items.Count - 2]; } }
+
+            public Coordinate InitialXY { get { return Items[0]; } }
+
+            public void MoveTo(Coordinate xy)
+            {
+                Items.Add(xy);
+            }
+
+            public CoordinateHistory(Coordinate xy)
+            {
+                Items.Add(xy);
+            }
+        }
+
+        #endregion
+
+        #region " Trajectory "
+
+        public class Trajectory
+        {
+            double _Run;
+            double _Rise;
+            double _Range;
+
+            public double Run { get { return _Run; } set { _Run = value; } }
+            public double Rise { get { return _Rise; } set { _Rise = value; } }
+            public double Range { get { return _Range; } set { _Range = value; } }
+
+            #region " Constructor "
+
+            public Trajectory(double run, double rise, double range)
+            {
+                this._Rise = rise;
+                this._Run = run;
+                this._Range = range;
+            }
+
+            public Trajectory() : this(double.MaxValue) { }
+            public Trajectory(double rise, double run) : this(rise, run, double.MaxValue) { }
+
+            public Trajectory(double range)
+            {
+                this._Range = range;
+                // add a fraction to make sure it's not zero
+                this._Run = Numbers.Random.NextDouble() + .1;
+                this._Rise = Numbers.Random.NextDouble() + .1;
+                if (Numbers.Random.NextDouble() < .5) { this._Run *= -1; }
+                if (Numbers.Random.NextDouble() < .5) { this._Rise *= -1; }
+            }
+
+            #endregion
+        }
+
+
+        #endregion
 
         #region " Dimensions "
 
@@ -204,9 +215,9 @@ namespace AsciiEngine
 
         public static int Height { get { return Console.WindowHeight; } }
 
-        public static Coordinate GetCenterCoordinate()
+        public static Screen.Coordinate GetCenterCoordinate()
         {
-            return new Coordinate(Numbers.Round(Screen.Width / 2), Numbers.Round(Screen.Height / 2));
+            return new Screen.Coordinate(Numbers.Round(Screen.Width / 2), Numbers.Round(Screen.Height / 2));
         }
 
         public static bool TrySetSize(int targetwidth, int targetheight)
@@ -273,7 +284,7 @@ namespace AsciiEngine
 
         #region " Writing "
 
-        public static void TryWrite(Coordinate xy, string s)
+        public static void TryWrite(Screen.Coordinate xy, string s)
         {
             TryWrite(xy.X, xy.Y, s);
         }
@@ -304,7 +315,7 @@ namespace AsciiEngine
             catch { }
         }
 
-        public static void TryWrite(Coordinate xy, char c)
+        public static void TryWrite(Screen.Coordinate xy, char c)
         {
             TryWrite(xy.X, xy.Y, c);
         }
@@ -328,7 +339,7 @@ namespace AsciiEngine
         public static void Countdown(int start)
         {
             Keys.EatKeys();
-            Coordinate xy = Screen.GetCenterCoordinate();
+            Screen.Coordinate xy = Screen.GetCenterCoordinate();
 
             for (int n = start; n > 0; n--)
             {

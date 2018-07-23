@@ -22,7 +22,7 @@ public class Starfield
         {
             int x = Numbers.Random.Next(Screen.LeftEdge, Screen.RightEdge);
             int y = Numbers.Random.Next(Screen.TopEdge - 1, Screen.Height);
-            this.stars.Sprites.Add(new AsciiEngine.Sprite(new[] { '.' }, new Coordinate(x, y), new Trajectory(0, this._speed, Screen.Height - y)));
+            this.stars.Sprites.Add(new AsciiEngine.Sprite(new[] { '.' }, new Screen.Coordinate(x, y), new Screen.Trajectory(0, this._speed, Screen.Height - y)));
         }
 
     }
@@ -31,8 +31,8 @@ public class Starfield
     {
         while (stars.Sprites.Count < this.MaxStars)
         {
-            Coordinate xy = new Coordinate(Numbers.Random.Next(Screen.LeftEdge, Screen.RightEdge), Screen.TopEdge - 1);
-            this.stars.Sprites.Add(new AsciiEngine.Sprite(new[] { '.' }, xy, new Trajectory(0, this._speed, Screen.Height)));
+            Screen.Coordinate xy = new Screen.Coordinate(Numbers.Random.Next(Screen.LeftEdge, Screen.RightEdge), Screen.TopEdge - 1);
+            this.stars.Sprites.Add(new AsciiEngine.Sprite(new[] { '.' }, xy, new Screen.Trajectory(0, this._speed, Screen.Height)));
         }
 
         this.stars.Animate();

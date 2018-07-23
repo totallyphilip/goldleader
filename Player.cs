@@ -5,7 +5,7 @@ public class Player
 {
 
 
-    Coordinate xy;
+    Screen.Coordinate xy;
     int _Direction;
     AsciiEngine.SpriteField _missiles = new AsciiEngine.SpriteField();
     string _Ascii = ":><:";
@@ -21,7 +21,7 @@ public class Player
     }
     public Player()
     {
-        this.xy = new Coordinate(Screen.Width / 2 - this.Width / 2, Screen.BottomEdge);
+        this.xy = new Screen.Coordinate(Screen.Width / 2 - this.Width / 2, Screen.BottomEdge);
     }
     void Hide()
     {
@@ -34,7 +34,8 @@ public class Player
         if (this.xy.X < Screen.LeftEdge) { this._Direction = 1; }
         if (this.xy.X + this.Width > Screen.RightEdge) { this._Direction = -1; }
         ;
-        xy.Set(this.xy.X + this._Direction, Screen.BottomEdge);
+        this.xy.X += this._Direction;
+        this.xy.Y = Screen.BottomEdge;
 
         Screen.TryWrite(this.xy, this._Ascii);  // show it
 
@@ -43,7 +44,7 @@ public class Player
 
     public void AddMissile()
     {
-        this._missiles.Sprites.Add(new Sprite(new[] { '|' }, new Coordinate(this.xy.X + this.Width / 2, this.xy.Y), new Trajectory(0, -1, this.xy.Y)));
+        this._missiles.Sprites.Add(new Sprite(new[] { '|' }, new Screen.Coordinate(this.xy.X + this.Width / 2, this.xy.Y), new Screen.Trajectory(0, -1, this.xy.Y)));
     }
 
 }
