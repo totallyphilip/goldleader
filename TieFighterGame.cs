@@ -57,7 +57,7 @@ public class TieFighterGame
 
         Console.Clear();
 
-        // Make stars
+        // Star fields
         List<Starfield> starfields = new List<Starfield>();
         starfields.Add(new Starfield(.1, .75)); // slow
         starfields.Add(new Starfield(1, .2)); // fast
@@ -167,7 +167,7 @@ public class TieFighterGame
                         debug = !debug;
                         break;
                     case ConsoleKey.P:
-                        powerups.Items.Add(new PowerUp(PowerUp.ePowerType.ExtraMissile, new Screen.Coordinate(player.xy.X, 0), new Screen.Trajectory(0, 1, 20)));
+                        powerups.Items.Add(new PowerUp(PowerUp.ePowerType.ExtraMissile, new Screen.Coordinate(player.xy.X, -1), new Screen.Trajectory(0, 1, Screen.Height)));
                         break;
                 }
 

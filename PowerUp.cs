@@ -29,7 +29,7 @@ public class PowerUp : Sprite
         switch (pow)
         {
             case ePowerType.ExtraMissile:
-                this.Ascii = new[] { 'M' };
+                this.Ascii = "{M}".ToCharArray();   //new[] { 'M' };
                 this.RewardMessage = "Extra Missile";
                 break;
             case ePowerType.SaySomething:

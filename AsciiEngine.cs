@@ -108,7 +108,12 @@ namespace AsciiEngine
             }
 
             foreach (Sprite s in this.Items.FindAll(x => x.Alive)) { s.Animate(); }
+
+            AnimateOverride();
+
         }
+
+        protected virtual void AnimateOverride() { } // optional additional code in overriding method
 
         public SpriteField() { }
 

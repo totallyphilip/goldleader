@@ -1,41 +1,36 @@
 using AsciiEngine;
 using Easy;
-public class Starfield
+public class Starfield : SpriteField
 {
-    SpriteField stars = new SpriteField();
-    double _speed;
-    double _rowcoveragepct;
-
-    int MaxStars
-    {
-        get { return Numbers.Round(Screen.Height * this._rowcoveragepct); }
-    }
+    double Speed;
+    double RowCoverageFactor;
+    int MaxStars { get { return Numbers.Round(Screen.Height * this.RowCoverageFactor); } }
 
     public Starfield(double speed, double coverage)
     {
-        this._speed = speed;
-        this._rowcoveragepct = coverage;
+        this.Speed = speed;
+        this.RowCoverageFactor = coverage;
+        this.Spawn(true);
+    }
 
-        // spawn initial stars
+    public void Spawn() { this.Spawn(false); }
 
-        while (stars.Items.Count < this.MaxStars)
+    public void Spawn(bool randomly)
+    {
+        while (this.Items.Count < this.MaxStars)
         {
             int x = Numbers.Random.Next(Screen.LeftEdge, Screen.RightEdge);
-            int y = Numbers.Random.Next(Screen.TopEdge - 1, Screen.Height);
-            this.stars.Items.Add(new AsciiEngine.Sprite(new[] { '.' }, new Screen.Coordinate(x, y), new Screen.Trajectory(0, this._speed, Screen.Height - y)));
+            int y = Screen.TopEdge - 1;
+            if (randomly) { y = Numbers.Random.Next(Screen.TopEdge - 1, Screen.Height); }
+            Screen.Coordinate xy = new Screen.Coordinate(x, y);
+            this.Items.Add(new AsciiEngine.Sprite(new[] { '.' }, xy, new Screen.Trajectory(0, this.Speed, Screen.Height - y)));
         }
 
     }
 
-    public void Animate()
+    protected override void AnimateOverride()
     {
-        while (stars.Items.Count < this.MaxStars)
-        {
-            Screen.Coordinate xy = new Screen.Coordinate(Numbers.Random.Next(Screen.LeftEdge, Screen.RightEdge), Screen.TopEdge - 1);
-            this.stars.Items.Add(new AsciiEngine.Sprite(new[] { '.' }, xy, new Screen.Trajectory(0, this._speed, Screen.Height)));
-        }
-
-        this.stars.Animate();
+        this.Spawn();
     }
 
 }
