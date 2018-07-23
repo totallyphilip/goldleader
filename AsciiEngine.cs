@@ -43,7 +43,7 @@ namespace AsciiEngine
 
         #region " Animation "
 
-        char[] Ascii;
+        protected char[] Ascii;
 
         public void Hide()
         {
@@ -59,8 +59,16 @@ namespace AsciiEngine
 
         #endregion
 
-
         #region  " Constructor "
+
+        public Sprite(Screen.Coordinate xy, Screen.Trajectory t)
+        {
+            this.Ascii = "sprite".ToCharArray();
+            this.Trail = new Screen.CoordinateHistory(xy);
+
+            Trail = new Screen.CoordinateHistory(xy);
+            this.Trajectory = t;
+        }
 
         public Sprite(char[] c, Screen.Coordinate xy, Screen.Trajectory t)
         {
