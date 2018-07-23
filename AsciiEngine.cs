@@ -12,7 +12,7 @@ namespace AsciiEngine
         #region " Locations "
 
         public Screen.CoordinateHistory Trail;
-        Screen.Trajectory Trajectory;
+        public Screen.Trajectory Trajectory;
         public Screen.Coordinate XY { get { return this.Trail.XY; } }
 
         #endregion
@@ -86,23 +86,28 @@ namespace AsciiEngine
     public class SpriteField
     {
 
-        public List<Sprite> Sprites = new List<Sprite>();
+        public List<Sprite> Items = new List<Sprite>();
+
+        public void AddSprite(Sprite s)
+        {
+            this.Items.Add(s);
+        }
 
         public void RemoveSprite(Sprite s)
         {
-            this.Sprites.Find(x => s.Equals(x)).Terminate();
+            this.Items.Find(x => s.Equals(x)).Terminate();
         }
 
         public void Animate()
         {
 
-            foreach (Sprite s in this.Sprites.FindAll(x => !x.Alive))
+            foreach (Sprite s in this.Items.FindAll(x => !x.Alive))
             {
                 s.Hide();
-                this.Sprites.Remove(s);
+                this.Items.Remove(s);
             }
 
-            foreach (Sprite s in this.Sprites.FindAll(x => x.Alive)) { s.Animate(); }
+            foreach (Sprite s in this.Items.FindAll(x => x.Alive)) { s.Animate(); }
         }
 
         public SpriteField() { }

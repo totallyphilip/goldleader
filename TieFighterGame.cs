@@ -66,8 +66,11 @@ public class TieFighterGame
         Armada badguys = new Armada(1);
 
         // The player
-        Player p = new Player();
+        Player player = new Player();
         int _MaxMissiles = 2;
+
+        // Power ups
+        SpriteField powerups = new SpriteField();
 
         // keyboard buffer
         List<ConsoleKeyInfo> keybuffer = new List<ConsoleKeyInfo>();
@@ -77,23 +80,29 @@ public class TieFighterGame
         bool UserQuit = false;
         bool debug = true;
 
+
+
+
         do
         {
+
+
 
             foreach (Starfield starfield in starfields) { starfield.Animate(); }
 
             badguys.Spawn();
             badguys.Animate();
-            p.Animate();
+            player.Animate();
+            powerups.Animate();
 
             // check for hits
-            foreach (AsciiEngine.Sprite missile in p.Missiles.Sprites)
+            foreach (AsciiEngine.Sprite missile in player.Missiles.Items)
             {
                 foreach (Ship badguy in badguys.Ships.FindAll(x => x.Alive))
                 {
                     if (badguy.Hit(missile.XY))
                     {
-                        p.Missiles.RemoveSprite(missile);
+                        player.Missiles.RemoveSprite(missile);
                     }
 
                 }
@@ -106,7 +115,7 @@ public class TieFighterGame
             {
                 int x = Screen.LeftEdge;
                 int y = Screen.BottomEdge;
-                Screen.TryWrite(0, 0, "[fps: " + FPS + " ships: " + badguys.Ships.Count + ']');
+                Screen.TryWrite(0, 0, "[fps: " + FPS + " ships: " + badguys.Ships.Count + " powerups: " + powerups.Items.Count + ']');
             }
 
             Easy.Clock.FpsThrottle(FPS);
@@ -140,15 +149,15 @@ public class TieFighterGame
                         if (FPS - 1 > 0) { FPS--; }
                         break;
                     case ConsoleKey.LeftArrow:
-                        p.Direction = -1;
+                        player.Direction = -1;
                         break;
                     case ConsoleKey.RightArrow:
-                        p.Direction = 1;
+                        player.Direction = 1;
                         break;
                     case ConsoleKey.Spacebar:
-                        if (p.Missiles.Sprites.Count < _MaxMissiles)
+                        if (player.Missiles.Items.Count < _MaxMissiles)
                         {
-                            p.AddMissile();
+                            player.AddMissile();
                         }
                         break;
                     case ConsoleKey.Escape:
@@ -156,6 +165,9 @@ public class TieFighterGame
                         break;
                     case ConsoleKey.D:
                         debug = !debug;
+                        break;
+                    case ConsoleKey.P:
+                        powerups.Items.Add(new PowerUp(PowerUp.ePowerType.ExtraMissile, new Screen.Coordinate(player.xy.X, 0), new Screen.Trajectory(0, 1, 20)));
                         break;
                 }
 

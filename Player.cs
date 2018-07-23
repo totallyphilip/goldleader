@@ -5,7 +5,7 @@ public class Player
 {
 
 
-    Screen.Coordinate xy;
+    public Screen.Coordinate xy;
     int _Direction;
     AsciiEngine.SpriteField _missiles = new AsciiEngine.SpriteField();
     string _Ascii = ":><:";
@@ -44,7 +44,7 @@ public class Player
 
     public void AddMissile()
     {
-        this._missiles.Sprites.Add(new Sprite(new[] { '|' }, new Screen.Coordinate(this.xy.X + this.Width / 2, this.xy.Y), new Screen.Trajectory(0, -1, this.xy.Y)));
+        this._missiles.Items.Add(new Sprite(new[] { '|' }, new Screen.Coordinate(this.xy.X + this.Width / 2, this.xy.Y), new Screen.Trajectory(0, -1, this.xy.Y)));
     }
 
 }
