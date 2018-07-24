@@ -47,12 +47,24 @@ public class Ship : Sprite
 
     #region " Missile Properties "
 
-    char _MissileAscii;
-    int _MissileRange;
-    int _MissileLimit;
+    struct MissileData
+    {
+        public char Ascii;
+        public int Range;
+        public int MaxCount;
+        public MissileData(char c, int range, int max)
+        {
+            this.Ascii = c;
+            this.Range = range;
+            this.MaxCount = max;
+        }
+    }
 
-    public bool Firing { get { return this.MissileField.Items.Count > 0; } }
+    MissileData Missile;
+
+    public bool Processing { get { return this.MissileField.Items.Count > 0 || this.DebrisField.Items.Count > 0; } }
     public SpriteField MissileField = new SpriteField();
+    public SpriteField DebrisField = new SpriteField();
 
     #endregion
 
@@ -64,21 +76,32 @@ public class Ship : Sprite
 
     #region " Explody Properties "
 
-    double _DebrisRange;
-    bool _Exploded = false;
-    public bool Exploded { get { return this._Exploded; } }
+    struct DebrisStruct
+    {
+        public double Range;
+        public bool Exploded;
+        public DebrisStruct(double range)
+        {
+            this.Range = range;
+            this.Exploded = false;
+        }
+    }
+
+    DebrisStruct Debris;
+
+    public bool Exploded { get { return this.Debris.Exploded; } }
     public void Explode()
     {
         this.Hide();
-        this._Exploded = true;
+        this.Debris.Exploded = true;
 
         // add ship debris to missiles
         char[] chars = this.Ascii;
         for (int c = 0; c < chars.Length; c++)
         {
-            this.MissileField.Items.Add(new AsciiEngine.Sprite(new[] { chars[c] }, new Screen.Coordinate(this.XY.X + c, this.XY.Y), new Screen.Trajectory(this._DebrisRange)));
+            this.DebrisField.Items.Add(new AsciiEngine.Sprite(new[] { chars[c] }, new Screen.Coordinate(this.XY.X + c, this.XY.Y), new Screen.Trajectory(this.Debris.Range)));
         }
-        for (int splat = 0; splat < 2; splat++) { this.MissileField.Items.Add(new AsciiEngine.Sprite(new[] { '*' }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(this._DebrisRange * 1.5))); }
+        for (int splat = 0; splat < 2; splat++) { this.DebrisField.Items.Add(new AsciiEngine.Sprite(new[] { '*' }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(this.Debris.Range * 1.5))); }
 
     }
 
@@ -86,14 +109,19 @@ public class Ship : Sprite
 
     #region " Methods "
 
+    public void AnimateBitsAndPieces()
+    {
+        this.MissileField.Animate();
+        this.DebrisField.Animate();
+    }
+
     public bool Hit(Screen.Coordinate missile)
     {
-        missile.X = Numbers.Round(missile.X);
-        missile.Y = Numbers.Round(missile.Y);
+
         if (missile.X >= this.XY.X && missile.X < this.XY.X + this.Width && missile.Y == this.XY.Y)
         {
             // make sparks
-            for (int splat = 0; splat < 2; splat++) { this.MissileField.Items.Add(new AsciiEngine.Sprite(new[] { '\x00d7' }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(2))); }
+            for (int splat = 0; splat < 2; splat++) { this.DebrisField.Items.Add(new AsciiEngine.Sprite(new[] { '\x00d7' }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(2))); }
             // reduce health
             this.HP--;
             return true;
@@ -124,9 +152,9 @@ public class Ship : Sprite
 
         // fire!
         // must be near the bottom, have more missiles, and not fire every time
-        if (this.MissileField.Items.Count < this._MissileLimit && this.XY.Y + this._MissileRange >= Screen.BottomEdge && Numbers.Random.NextDouble() < .2)
+        if (this.MissileField.Items.Count < this.Missile.MaxCount && this.XY.Y + this.Missile.Range >= Screen.BottomEdge && Numbers.Random.NextDouble() < .2)
         {
-            this.MissileField.Items.Add(new Sprite(new[] { this._MissileAscii }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(0, 1, _MissileRange)));
+            this.MissileField.Items.Add(new Sprite(new[] { this.Missile.Ascii }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(0, 1, this.Missile.Range)));
         }
 
         return new Screen.Coordinate(x, y);
@@ -146,50 +174,40 @@ public class Ship : Sprite
                 this.FlyZone = new FlyZoneClass(0, 0, 0);
                 this.SquirrelyFactor = .25;
                 this.HP = 1;
-                this._MissileAscii = '|';
-                this._MissileRange = 6;
-                this._MissileLimit = 1;
-                this._DebrisRange = 0.5;
+                this.Missile = new MissileData('|', 6, 1);
+                this.Debris = new DebrisStruct(0.5);
                 break;
             case eShipType.Bomber:
                 this.Ascii = "{—o-o—}".ToCharArray();
                 this.FlyZone = new FlyZoneClass(.5, .25, -.25);
                 this.SquirrelyFactor = .01;
                 this.HP = 2;
-                this._MissileAscii = '@';
-                this._MissileRange = Screen.Height / 2;
-                this._MissileLimit = 1;
-                this._DebrisRange = 6;
+                this.Missile = new MissileData('@', Screen.Height / 2, 1);
+                this.Debris = new DebrisStruct(6);
                 break;
             case eShipType.Interceptor:
                 this.Ascii = "<—o—>".ToCharArray();
                 this.FlyZone = new FlyZoneClass(-.15, -.15, 0);
                 this.SquirrelyFactor = .4;
                 this.HP = 2;
-                this._MissileAscii = '|';
-                this._MissileRange = 6;
-                this._MissileLimit = 2;
-                this._DebrisRange = 1;
+                this.Missile = new MissileData('|', 6, 2);
+                this.Debris = new DebrisStruct(1);
                 break;
             case eShipType.Vader:
                 this.Ascii = "[—o—]".ToCharArray();
                 this.FlyZone = new FlyZoneClass(.66, 0, .10);
                 this.SquirrelyFactor = .1;
                 this.HP = 3;
-                this._MissileAscii = '|';
-                this._MissileRange = 10;
-                this._MissileLimit = 3;
-                this._DebrisRange = 1;
+                this.Missile = new MissileData('|', 10, 3);
+                this.Debris = new DebrisStruct(1);
                 break;
             case eShipType.Squadron:
                 this.Ascii = "|—o—|[—o—]|—o—|".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, .15, .20);
                 this.SquirrelyFactor = 0;
                 this.HP = 6;
-                this._MissileAscii = '|';
-                this._MissileRange = 6;
-                this._MissileLimit = 5;
-                this._DebrisRange = 8;
+                this.Missile = new MissileData('|', 6, 5);
+                this.Debris = new DebrisStruct(8);
                 break;
         }
 

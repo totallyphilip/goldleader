@@ -35,7 +35,7 @@ public class Armada
     public void Animate()
     {
         foreach (Ship ship in _ships.FindAll(x => x.Alive)) { ship.Animate(); }
-        foreach (Ship ship in _ships.FindAll(x => x.Firing)) { ship.MissileField.Animate(); }
+        foreach (Ship ship in _ships.FindAll(x => x.Processing)) { ship.AnimateBitsAndPieces(); }
         this.Sweep(); // remove dead ships
 
     }
@@ -49,7 +49,7 @@ public class Armada
             this._RandomShipSelectionRange++;
         }
         // remove them once all their missiles are gone
-        this._ships.RemoveAll(x => !x.Alive && !x.Firing);
+        this._ships.RemoveAll(x => !x.Alive && !x.Processing);
 
     }
 
