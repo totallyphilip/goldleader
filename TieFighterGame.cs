@@ -30,30 +30,8 @@ public class TieFighterGame
 
     }
 
-    void StartupScreen()
-    {
-
-        Ship fighter = new Ship(Ship.eShipType.Fighter);
-        Ship bomber = new Ship(Ship.eShipType.Bomber);
-        Ship interceptor = new Ship(Ship.eShipType.Interceptor);
-        Ship vader = new Ship(Ship.eShipType.Vader);
-        Ship squadron = new Ship(Ship.eShipType.Squadron);
-
-        Console.Clear();
-        Console.WriteLine(fighter.Ascii + " - TIE Fighter");
-        Console.WriteLine(bomber.Ascii + " - TIE Bomber");
-        Console.WriteLine(interceptor.Ascii + " - TIE Interceptor");
-        Console.WriteLine(vader.Ascii + " - Darth Vader");
-        Console.WriteLine(squadron.Ascii + " - Death Star Trench Squadron");
-        Console.Write("press a key");
-        Console.ReadKey();
-
-    }
-
     public void Play()
     {
-
-        StartupScreen();
 
         Console.Clear();
 
@@ -97,7 +75,7 @@ public class TieFighterGame
             player.Animate();
             powerups.Animate();
             foofighters.Animate();
-            foofighters.Fire();
+            foofighters.DoStuff();
 
             // check for hits
             foreach (AsciiEngine.Sprite missile in player.Missiles.Items)

@@ -13,6 +13,7 @@ public class BadGuy : Sprite
     }
 
     int HP;
+    double ReverseFactor;
 
     struct MissileStructure
     {
@@ -33,13 +34,21 @@ public class BadGuy : Sprite
     SpriteField Debris = new SpriteField();
     double DebrisRange;
 
-    public void Fire()
+    public void DoStuff()
     {
+
+        // reverse direction
+
+        if (Numbers.Random.NextDouble() < this.ReverseFactor) { this.Trajectory.Run *= -1; }
+
+
+        // fire
         if (this.Missiles.Items.Count < this.MissileConfig.MaxCount && this.XY.Y > Screen.BottomEdge - MissileConfig.Range)
         {
             this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Ascii }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(1, 0, MissileConfig.Range)));
         }
         Missiles.Animate();
+
     }
 
     public BadGuy(eBadGuyType badguytype) : base()
@@ -58,6 +67,7 @@ public class BadGuy : Sprite
                 this.MissileConfig = new MissileStructure('|', 6, 1);
                 this.DebrisRange = .5;
                 DropsPerRow = 8;
+                ReverseFactor = .01;
                 break;
             case eBadGuyType.TieBomber:
                 this.Ascii = "{—X-X—}".ToCharArray();
@@ -66,6 +76,7 @@ public class BadGuy : Sprite
                 this.MissileConfig = new MissileStructure('@', Screen.Height / 2, 2);
                 this.DebrisRange = .5;
                 DropsPerRow = 1;
+                ReverseFactor = 0;
                 break;
 
         }
@@ -124,11 +135,11 @@ public class BadGuyField : SpriteField
     }
 
 
-    public void Fire()
+    public void DoStuff()
     {
         foreach (BadGuy badguy in Items.FindAll(x => x.Alive))
         {
-            badguy.Fire();
+            badguy.DoStuff();
         }
     }
 

@@ -154,7 +154,7 @@ public class Ship : Sprite
         // must be near the bottom, have more missiles, and not fire every time
         if (this.MissileField.Items.Count < this.Missile.MaxCount && this.XY.Y + this.Missile.Range >= Screen.BottomEdge && Numbers.Random.NextDouble() < .2)
         {
-            this.MissileField.Items.Add(new Sprite(new[] { this.Missile.Ascii }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(0, 1, this.Missile.Range)));
+            this.MissileField.Items.Add(new Sprite(new[] { this.Missile.Ascii }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(1, 0, this.Missile.Range)));
         }
 
         return new Screen.Coordinate(x, y);
