@@ -6,60 +6,57 @@ using System.Collections.Generic;
 
 public class BadGuy : Sprite
 {
-
-    #region " Fly Zone "
-
-    class FlyZoneClass
-    {
-
-        double TopMarginPercent;
-        double BottomMarginPercent;
-        double SideMarginPercent;
-
-        public int Top { get { return Numbers.Round(Screen.Height * this.TopMarginPercent); } }
-        public int Bottom { get { return Numbers.Round(Screen.BottomEdge - Screen.Height * this.BottomMarginPercent); } }
-        public int Left { get { return Numbers.Round(Screen.RightEdge * this.SideMarginPercent); } }
-        public int Right { get { return Numbers.Round(Screen.RightEdge - Screen.RightEdge * this.SideMarginPercent); } }
-
-        public FlyZoneClass(double toppct, double bottompct, double sidepct)
-        {
-            this.TopMarginPercent = toppct;
-            this.BottomMarginPercent = bottompct;
-            this.SideMarginPercent = sidepct;
-        }
-
-    }
-    FlyZoneClass FlyZone;
-
-    #endregion
-
-
     public enum eBadGuyType
     {
         TieFighter
         , TieInterceptor
     }
 
+    int HP;
+
+    struct tMissile
+    {
+        char Ascii;
+        double Range;
+        int MaxCount;
+        public tMissile(char c, double range, int maxcount)
+        {
+            this.Ascii = c;
+            this.Range = range;
+            this.MaxCount = maxcount;
+        }
+    }
+    tMissile MissileTemplate;
+
+    SpriteField Missiles = new SpriteField();
+
+    SpriteField Debris = new SpriteField();
+    double DebrisRange;
 
     public BadGuy(eBadGuyType badguytype) : base()
     {
+        this.FlyZone.EdgeMode = FlyZoneClass.eEdgeMode.Bounce;
 
-        /*         switch (badguytype)
-                {
-                    case eBadGuyType.TieFighter:
-                        this.Ascii = "|—o—|".ToCharArray();
-                        this.FlyZone = new FlyZoneClass(0, 0, 0);
-                        this.SquirrelyFactor = .25;
-                        this.HP = 1;
-                        this.Missile = new MissileData('|', 6, 1);
-                        this.Debris = new DebrisStruct(0.5);
-                        break;
-                    case ePowerType.SaySomething:
-                        this.Ascii = "just testing".ToCharArray();
-                        this.RewardMessage = "whatever";
-                        break;
-                } */
+        double Run = 1;
+        double Rise = 0; // initialized to avoid unassigned variable warning
 
+        switch (badguytype)
+        {
+            case eBadGuyType.TieFighter:
+                this.Ascii = "|—X—|".ToCharArray();
+                this.FlyZone = new FlyZoneClass(0, 0, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
+                this.HP = 1;
+                this.MissileTemplate = new tMissile('|', 6, 1);
+                this.DebrisRange = .5;
+                Rise = 3 / System.Convert.ToDouble(this.FlyZone.Width); // drop 3X per row
+                break;
+
+        }
+
+        this.Trail = new Screen.CoordinateHistory(new Screen.Coordinate(Numbers.Random.Next(this.FlyZone.LeftEdge - this.Width, this.FlyZone.RightEdge + this.Width), this.FlyZone.TopEdge));
+
+        if (Numbers.Random.NextDouble() < .5) { Run *= -1; }
+        this.Trajectory = new Screen.Trajectory(Rise, Run);
 
     }
 

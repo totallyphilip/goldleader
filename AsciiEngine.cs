@@ -9,6 +9,43 @@ namespace AsciiEngine
     public class Sprite
     {
 
+        #region " Fly Zone "
+
+        public class FlyZoneClass
+
+        {
+            public enum eEdgeMode { Ignore, Bounce }
+            public eEdgeMode EdgeMode = eEdgeMode.Ignore;
+
+            public int TopMargin = 0;
+            public int BottomMargin = 0;
+            public int LeftMargin = 0;
+            public int RightMargin = 0;
+
+            public int TopEdge { get { return Screen.TopEdge + this.TopMargin; } }
+            public int BottomEdge { get { return Screen.BottomEdge - this.BottomMargin; } }
+            public int LeftEdge { get { return Screen.LeftEdge + this.LeftMargin; } }
+            public int RightEdge { get { return Screen.RightEdge - this.RightMargin; } }
+            public int Width { get { return this.RightEdge - this.LeftEdge + 1; } }
+
+
+
+            public FlyZoneClass(int topmargin, int bottommargin, int leftmargin, int rightmargin) : this(topmargin, bottommargin, leftmargin, rightmargin, eEdgeMode.Ignore) { }
+
+            public FlyZoneClass(int topmargin, int bottommargin, int leftmargin, int rightmargin, eEdgeMode edgemode)
+            {
+                this.TopMargin = topmargin;
+                this.BottomMargin = bottommargin;
+                this.LeftMargin = leftmargin;
+                this.RightMargin = rightmargin;
+                this.EdgeMode = edgemode;
+            }
+        }
+
+        protected FlyZoneClass FlyZone = new FlyZoneClass(0, 0, 0, 0);
+
+        #endregion
+
         #region " Locations "
 
         public Screen.CoordinateHistory Trail;
@@ -62,6 +99,29 @@ namespace AsciiEngine
 
         protected virtual Screen.Coordinate NextCoordinate()
         {
+            if (this.XY.Y + this.Trajectory.Rise < this.FlyZone.TopEdge)
+            {
+                if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise); }
+                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+            }
+            else if (this.XY.Y + this.Trajectory.Rise > this.FlyZone.BottomEdge)
+            {
+                if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise) * (-1); }
+                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+            }
+
+            if (this.XY.X + this.Trajectory.Run < this.FlyZone.LeftEdge)
+            {
+                if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run); }
+                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+            }
+
+            if (this.XY.X + this.Trajectory.Run + this.Width > this.FlyZone.RightEdge)
+            {
+                if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run) * (-1); }
+                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+            }
+
             return new Screen.Coordinate(this.Trail.XY.X + this.Trajectory.Run, this.Trail.XY.Y + this.Trajectory.Rise);
         }
 
@@ -69,14 +129,13 @@ namespace AsciiEngine
 
         #region  " Constructor "
 
-        public Sprite() : this(new Screen.Coordinate(), new Screen.Trajectory()) { }
+        //        public Sprite() : this(new Screen.Coordinate(), new Screen.Trajectory()) { }
+        public Sprite() { }
 
         public Sprite(Screen.Coordinate xy, Screen.Trajectory t)
         {
             this.Ascii = "sprite".ToCharArray();
             this.Trail = new Screen.CoordinateHistory(xy);
-
-            Trail = new Screen.CoordinateHistory(xy);
             this.Trajectory = t;
         }
 
@@ -84,8 +143,6 @@ namespace AsciiEngine
         {
             this.Ascii = new List<char>(c).ToArray();
             this.Trail = new Screen.CoordinateHistory(xy);
-
-            Trail = new Screen.CoordinateHistory(xy);
             this.Trajectory = t;
         }
 
@@ -189,7 +246,7 @@ namespace AsciiEngine
 
             #region " Constructor "
 
-            public Trajectory(double run, double rise, double range)
+            public Trajectory(double rise, double run, double range)
             {
                 this._Rise = rise;
                 this._Run = run;

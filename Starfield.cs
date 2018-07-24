@@ -23,7 +23,7 @@ public class Starfield : SpriteField
             int y = Screen.TopEdge - 1;
             if (randomly) { y = Numbers.Random.Next(Screen.TopEdge - 1, Screen.Height); }
             Screen.Coordinate xy = new Screen.Coordinate(x, y);
-            this.Items.Add(new AsciiEngine.Sprite(new[] { '.' }, xy, new Screen.Trajectory(0, this.Speed, Screen.Height - y)));
+            this.Items.Add(new AsciiEngine.Sprite(new[] { '.' }, xy, new Screen.Trajectory(this.Speed, 0, Screen.Height - y)));
         }
 
     }

@@ -9,9 +9,9 @@ public class Ship : Sprite
 
     #region " Fly Zone "
 
-    FlyZoneClass FlyZone;
+    new FlyZoneClass FlyZone;
 
-    class FlyZoneClass
+    new class FlyZoneClass
     {
 
         double _TopOffsetPct;
@@ -211,8 +211,10 @@ public class Ship : Sprite
                 break;
         }
 
-        this.XY.X = Numbers.Random.Next(0 - this.Width, Screen.RightEdge + this.Width);
-        this.XY.Y = 0;
+        this.Trail = new Screen.CoordinateHistory(new Screen.Coordinate(Numbers.Random.Next(0 - this.Width, Screen.RightEdge + this.Width), 0));
+
+
+
         int Run;
         if (Numbers.Random.NextDouble() < .5) { Run = 1; } else { Run = -1; }
         this.Trajectory = new Screen.Trajectory(Run, 1);

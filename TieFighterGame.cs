@@ -65,6 +65,8 @@ public class TieFighterGame
         // Make baddies
         Armada badguys = new Armada(1);
 
+        BadGuy fooman = null;
+
         // The player
         Player player = new Player();
         int _MaxMissiles = 2;
@@ -94,6 +96,7 @@ public class TieFighterGame
             badguys.Animate();
             player.Animate();
             powerups.Animate();
+            if (fooman != null) { fooman.Animate(); }
 
             // check for hits
             foreach (AsciiEngine.Sprite missile in player.Missiles.Items)
@@ -116,6 +119,12 @@ public class TieFighterGame
                 int x = Screen.LeftEdge;
                 int y = Screen.BottomEdge;
                 Screen.TryWrite(0, 0, "[fps: " + FPS + " ships: " + badguys.Ships.Count + " powerups: " + powerups.Items.Count + ']');
+
+                if (fooman != null)
+                {
+                    Screen.TryWrite(0, 1, "[run: " + fooman.Trajectory.Run + " rise: " + fooman.Trajectory.Rise + ']');
+
+                }
             }
 
             Easy.Clock.FpsThrottle(FPS);
@@ -168,6 +177,7 @@ public class TieFighterGame
                         break;
                     case ConsoleKey.P:
                         powerups.Items.Add(new PowerUp(PowerUp.ePowerType.ExtraMissile, new Screen.Coordinate(player.xy.X, -1), new Screen.Trajectory(0, 1, Screen.Height)));
+                        fooman = new BadGuy(BadGuy.eBadGuyType.TieFighter);
                         break;
                 }
 
