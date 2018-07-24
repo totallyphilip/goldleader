@@ -65,7 +65,7 @@ public class TieFighterGame
         // Make baddies
         Armada badguys = new Armada(1);
 
-        BadGuy fooman = null;
+        BadGuyField foofighters = new BadGuyField();
 
         // The player
         Player player = new Player();
@@ -96,7 +96,8 @@ public class TieFighterGame
             badguys.Animate();
             player.Animate();
             powerups.Animate();
-            if (fooman != null) { fooman.Animate(); }
+            foofighters.Animate();
+            foofighters.Fire();
 
             // check for hits
             foreach (AsciiEngine.Sprite missile in player.Missiles.Items)
@@ -117,14 +118,18 @@ public class TieFighterGame
             if (debug)
             {
                 int x = Screen.LeftEdge;
-                int y = Screen.BottomEdge;
-                Screen.TryWrite(0, 0, "[fps: " + FPS + " ships: " + badguys.Ships.Count + " powerups: " + powerups.Items.Count + ']');
+                int y = Screen.TopEdge;
+                Screen.TryWrite(x, y, "[fps: " + FPS + " ships: " + badguys.Ships.Count + " powerups: " + powerups.Items.Count + ']');
 
-                if (fooman != null)
+                foreach (BadGuy bg in foofighters.Items)
                 {
-                    Screen.TryWrite(0, 1, "[run: " + fooman.Trajectory.Run + " rise: " + fooman.Trajectory.Rise + ']');
+                    y++;
+                    Screen.TryWrite(x, y, "[" + new string(bg.Ascii) + " missiles: " + bg.Missiles.Items.Count + ']');
+
 
                 }
+
+
             }
 
             Easy.Clock.FpsThrottle(FPS);
@@ -177,8 +182,6 @@ public class TieFighterGame
                         break;
                     case ConsoleKey.P:
                         powerups.Items.Add(new PowerUp(PowerUp.ePowerType.ExtraMissile, new Screen.Coordinate(player.xy.X, -1), new Screen.Trajectory(0, 1, Screen.Height)));
-                        if (Easy.Numbers.Random.NextDouble() < .5) { fooman = new BadGuy(BadGuy.eBadGuyType.TieFighter); }
-                        else { fooman = new BadGuy(BadGuy.eBadGuyType.TieBomber); }
                         break;
                 }
 

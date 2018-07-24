@@ -129,7 +129,6 @@ namespace AsciiEngine
 
         #region  " Constructor "
 
-        //        public Sprite() : this(new Screen.Coordinate(), new Screen.Trajectory()) { }
         public Sprite() { }
 
         public Sprite(Screen.Coordinate xy, Screen.Trajectory t)
