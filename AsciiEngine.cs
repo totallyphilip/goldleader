@@ -14,7 +14,7 @@ namespace AsciiEngine
         public class FlyZoneClass
 
         {
-            public enum eEdgeMode { Ignore, Bounce }
+            public enum eEdgeMode { Ignore, Bounce, Stop }
             public eEdgeMode EdgeMode = eEdgeMode.Ignore;
 
             public int TopMargin = 0;
@@ -102,23 +102,27 @@ namespace AsciiEngine
             if (this.XY.Y + this.Trajectory.Rise < this.FlyZone.TopEdge)
             {
                 if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise); }
+                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Rise = 0; }
                 else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
             }
             else if (this.XY.Y + this.Trajectory.Rise > this.FlyZone.BottomEdge)
             {
                 if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise) * (-1); }
+                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Rise = 0; }
                 else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
             }
 
             if (this.XY.X + this.Trajectory.Run < this.FlyZone.LeftEdge)
             {
                 if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run); }
+                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Run = 0; }
                 else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
             }
 
             if (this.XY.X + this.Trajectory.Run + this.Width > this.FlyZone.RightEdge)
             {
                 if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run) * (-1); }
+                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Run = 0; }
                 else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
             }
 

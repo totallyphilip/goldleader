@@ -47,7 +47,6 @@ public class TieFighterGame
 
         // The player
         Player player = new Player();
-        int _MaxMissiles = 2;
 
         // Power ups
         SpriteField powerups = new SpriteField();
@@ -73,6 +72,7 @@ public class TieFighterGame
             badguys.Spawn();
             badguys.Animate();
             player.Animate();
+            player.AnimateMissiles();
             powerups.Animate();
             foofighters.Animate();
             foofighters.DoStuff();
@@ -141,16 +141,13 @@ public class TieFighterGame
                         if (FPS - 1 > 0) { FPS--; }
                         break;
                     case ConsoleKey.LeftArrow:
-                        player.Direction = -1;
+                        player.Trajectory.Run = -1;
                         break;
                     case ConsoleKey.RightArrow:
-                        player.Direction = 1;
+                        player.Trajectory.Run = 1;
                         break;
                     case ConsoleKey.Spacebar:
-                        if (player.Missiles.Items.Count < _MaxMissiles)
-                        {
-                            player.AddMissile();
-                        }
+                        player.Fire();
                         break;
                     case ConsoleKey.Escape:
                         UserQuit = true;
@@ -159,7 +156,7 @@ public class TieFighterGame
                         debug = !debug;
                         break;
                     case ConsoleKey.P:
-                        powerups.Items.Add(new PowerUp(PowerUp.ePowerType.ExtraMissile, new Screen.Coordinate(player.xy.X, -1), new Screen.Trajectory(0, 1, Screen.Height)));
+                        powerups.Items.Add(new PowerUp(PowerUp.ePowerType.ExtraMissile, new Screen.Coordinate(player.XY.X, -1), new Screen.Trajectory(0, 1, Screen.Height)));
                         break;
                 }
 
