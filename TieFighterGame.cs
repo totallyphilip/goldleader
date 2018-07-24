@@ -177,7 +177,8 @@ public class TieFighterGame
                         break;
                     case ConsoleKey.P:
                         powerups.Items.Add(new PowerUp(PowerUp.ePowerType.ExtraMissile, new Screen.Coordinate(player.xy.X, -1), new Screen.Trajectory(0, 1, Screen.Height)));
-                        fooman = new BadGuy(BadGuy.eBadGuyType.TieFighter);
+                        if (Easy.Numbers.Random.NextDouble() < .5) { fooman = new BadGuy(BadGuy.eBadGuyType.TieFighter); }
+                        else { fooman = new BadGuy(BadGuy.eBadGuyType.TieBomber); }
                         break;
                 }
 

@@ -9,7 +9,7 @@ public class BadGuy : Sprite
     public enum eBadGuyType
     {
         TieFighter
-        , TieInterceptor
+        , TieBomber
     }
 
     int HP;
@@ -50,10 +50,18 @@ public class BadGuy : Sprite
                 this.DebrisRange = .5;
                 Rise = 3 / System.Convert.ToDouble(this.FlyZone.Width); // drop 3X per row
                 break;
+            case eBadGuyType.TieBomber:
+                this.Ascii = "{—X-X—}".ToCharArray();
+                this.FlyZone = new FlyZoneClass(Numbers.Round(Screen.Height * .5), Numbers.Round(Screen.Height * .25), Numbers.Round(Screen.Width * -.25), Numbers.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
+                this.HP = 2;
+                this.MissileTemplate = new tMissile('@', Screen.Height / 2, 6);
+                this.DebrisRange = .5;
+                Rise = 1 / System.Convert.ToDouble(this.FlyZone.Width); // drop 3X per row
+                break;
 
         }
 
-        this.Trail = new Screen.CoordinateHistory(new Screen.Coordinate(Numbers.Random.Next(this.FlyZone.LeftEdge - this.Width, this.FlyZone.RightEdge + this.Width), this.FlyZone.TopEdge));
+        this.Trail = new Screen.CoordinateHistory(new Screen.Coordinate(Numbers.Random.Next(Screen.LeftEdge - this.Width, Screen.RightEdge + this.Width), Screen.TopEdge));
 
         if (Numbers.Random.NextDouble() < .5) { Run *= -1; }
         this.Trajectory = new Screen.Trajectory(Rise, Run);
