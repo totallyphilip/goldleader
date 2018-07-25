@@ -38,6 +38,7 @@ public class Player : Sprite
                 if (badguy.Hit(missile.XY))
                 {
                     missile.Terminate();
+                    badguy.Damage();
                 }
 
             }

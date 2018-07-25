@@ -85,6 +85,8 @@ namespace AsciiEngine
 
         #region " Animation "
 
+        public bool Visible = true;
+
         public char[] Ascii;
 
         public void Hide()
@@ -160,16 +162,6 @@ namespace AsciiEngine
 
         public List<Sprite> Items = new List<Sprite>();
 
-        public void AddSprite(Sprite s)
-        {
-            this.Items.Add(s);
-        }
-
-        public void RemoveSprite(Sprite s)
-        {
-            this.Items.Find(x => s.Equals(x)).Terminate();
-        }
-
         public void Animate()
         {
 
@@ -179,7 +171,7 @@ namespace AsciiEngine
                 this.Items.Remove(s);
             }
 
-            foreach (Sprite s in this.Items.FindAll(x => x.Alive)) { s.Animate(); }
+            foreach (Sprite s in this.Items.FindAll(x => x.Alive && x.Visible)) { s.Animate(); }
 
             AnimateOverride();
 

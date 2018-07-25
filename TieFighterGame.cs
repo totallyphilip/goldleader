@@ -41,9 +41,7 @@ public class TieFighterGame
         starfields.Add(new Starfield(1, .2)); // fast
 
         // Make baddies
-        Armada badguys = new Armada(1);
-
-        BadGuyField foofighters = new BadGuyField();
+        BadGuyField badguys = new BadGuyField();
 
         // The player
         Player player = new Player();
@@ -60,53 +58,24 @@ public class TieFighterGame
         bool debug = true;
 
 
-
-
         do
         {
 
 
-
             foreach (Starfield starfield in starfields) { starfield.Animate(); }
-
-            badguys.Spawn();
-            badguys.Animate();
             player.Animate();
             player.AnimateMissiles();
-            player.CheckBadGuyHits(foofighters);
+            player.CheckBadGuyHits(badguys);
             powerups.Animate();
-            foofighters.Animate();
-            foofighters.DoStuff();
-
-            // check for hits
-            /*            foreach (AsciiEngine.Sprite missile in player.Missiles.Items)
-                       {
-                           foreach (Ship badguy in badguys.Ships.FindAll(x => x.Alive))
-                           {
-                               if (badguy.Hit(missile.XY))
-                               {
-                                   player.Missiles.RemoveSprite(missile);
-                               }
-
-                           }
-
-
-                       } */
-
+            badguys.Animate();
+            badguys.DoStuff();
 
             if (debug)
             {
                 int x = Screen.LeftEdge;
                 int y = Screen.TopEdge;
-                Screen.TryWrite(x, y, "[fps: " + FPS + " ships: " + badguys.Ships.Count + " powerups: " + powerups.Items.Count + ']');
+                Screen.TryWrite(x, y, "[fps: " + FPS + " ships: " + badguys.Items.Count + " powerups: " + powerups.Items.Count + ']');
 
-                foreach (BadGuy bg in foofighters.Items)
-                {
-                    y++;
-                    Screen.TryWrite(x, y, "[" + new string(bg.Ascii) + " missiles: " + bg.Missiles.Items.Count + ']');
-
-
-                }
 
 
             }
