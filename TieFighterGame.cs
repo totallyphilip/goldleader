@@ -50,9 +50,9 @@ public class TieFighterGame
         List<ConsoleKeyInfo> keybuffer = new List<ConsoleKeyInfo>();
 
         // Main loop
-        int FPS = 2;
+        int FPS = 8;
         bool UserQuit = false;
-        bool debug = true;
+        bool debug = false;
 
 
         do
@@ -60,9 +60,10 @@ public class TieFighterGame
 
 
             foreach (Starfield starfield in starfields) { starfield.Animate(); }
-            player.Animate();
-            player.AnimateMissiles();
+            if (player.Alive) { player.Animate(); }
+            if (player.Active) { player.DoActivities(); }
             player.CheckBadGuyHits(badguys);
+            player.CheckHitByBadGuys(badguys);
             badguys.Animate();
 
             if (debug)
@@ -124,7 +125,9 @@ public class TieFighterGame
 
             }
 
-        } while (!UserQuit);
+        } while (!UserQuit && player.Active);
+
+        Screen.Countdown(5);
 
     }
 }

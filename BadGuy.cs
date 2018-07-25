@@ -119,7 +119,7 @@ public class BadGuy : Sprite
                 this.Ascii = "|—o—|[—o—]|—o—|".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, 5, Screen.Width / 4, Screen.Width / 4, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 6;
-                this.MissileConfig = new MissileStructure('|', 6, 1);
+                this.MissileConfig = new MissileStructure('|', 8, 1);
                 this.DebrisRange = 8;
                 DropsPerRow = 2;
                 ReverseFactor = 0;

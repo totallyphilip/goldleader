@@ -1,4 +1,5 @@
 using AsciiEngine;
+using Easy;
 using System;
 
 public class Player : Sprite
@@ -8,6 +9,7 @@ public class Player : Sprite
     public SpriteField Messages = new SpriteField();
 
     public int MaxMissiles = 1;
+    SpriteField Debris = new SpriteField();
 
     public Player()
     {
@@ -15,6 +17,34 @@ public class Player : Sprite
         this.FlyZone = new FlyZoneClass(0, 0, 0, 0, FlyZoneClass.eEdgeMode.Stop);
         this.Trajectory = new Screen.Trajectory(0, 0);
         this.Trail = new Screen.CoordinateHistory(new Screen.Coordinate(Screen.Width / 2 - this.Width / 2, Screen.BottomEdge));
+        this.HP = 1;
+    }
+
+    public void MakeDebris()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            double Rise = -2 * Numbers.Random.NextDouble();
+            double Run = 2 * Numbers.Random.NextDouble();
+            if (Numbers.Random.NextDouble() < .5) { Run *= -1; }
+            Debris.Items.Add(new Sprite(new[] { '\x00d7' }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(Rise, Run, 10)));
+        }
+        for (int i = 0; i < 5; i++)
+        {
+            double Rise = -2 * Numbers.Random.NextDouble();
+            double Run = 2 * Numbers.Random.NextDouble();
+            if (Numbers.Random.NextDouble() < .5) { Run *= -1; }
+            Debris.Items.Add(new Sprite(new[] { '*' }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(Rise, Run, 10)));
+        }
+        for (int c = 0; c < this.Width; c++)
+        {
+            double Rise = -2 * Numbers.Random.NextDouble();
+            double Run = 2 * Numbers.Random.NextDouble();
+            if (Numbers.Random.NextDouble() < .5) { Run *= -1; }
+            this.Debris.Items.Add(new Sprite(new[] { this.Ascii[c] }, new Screen.Coordinate(this.XY.X + c, this.XY.Y), new Screen.Trajectory(Rise, Run, 10)));
+        }
+
+
     }
 
     public void Fire()
@@ -23,12 +53,6 @@ public class Player : Sprite
         {
             this.Missiles.Items.Add(new Sprite(new[] { '|' }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(-1, 0, this.XY.Y)));
         }
-    }
-
-    public void AnimateMissiles()
-    {
-        Missiles.Animate();
-        Messages.Animate();
     }
 
     public void CheckBadGuyHits(BadGuyField badguys)
@@ -46,5 +70,31 @@ public class Player : Sprite
             }
         }
     }
+
+    override public void DoActivities()
+    {
+        Missiles.Animate();
+        Messages.Animate();
+        Debris.Animate();
+
+        if (!this.Alive && this.Debris.Items.Count < 1 && this.Missiles.Items.Count < 1) { this.Active = false; }
+    }
+
+    public void CheckHitByBadGuys(BadGuyField badguys)
+    {
+        foreach (BadGuy badguy in badguys.Items)
+        {
+            foreach (Sprite missile in badguy.Missiles.Items)
+            {
+                if (this.Hit(missile.XY))
+                {
+                    missile.Terminate();
+                    this.MakeDebris();
+                }
+
+            }
+        }
+    }
+
 
 }
