@@ -56,6 +56,8 @@ namespace AsciiEngine
 
         #region " Status "
 
+        public int HP = int.MaxValue;
+        public bool Active = true;
         bool Terminated = false;
         protected int Width { get { return this.Ascii.Length; } }
 
@@ -63,7 +65,7 @@ namespace AsciiEngine
         {
             get
             {
-                bool alive = !this.Terminated;
+                bool alive = !this.Terminated && this.HP > 0;
                 if (alive && Trajectory != null)
                 {
                     alive = Easy.Numbers.Distance(this.Trail.XY, this.Trail.InitialXY) < Trajectory.Range;
@@ -74,18 +76,23 @@ namespace AsciiEngine
 
         protected virtual bool AliveOverride { get { return true; } } // optional additional code in overriding property
 
-        public bool Hit(Screen.Coordinate coord) { return this.Visible && coord.X >= this.XY.X && coord.X < this.XY.X + this.Width && Easy.Numbers.Round(coord.Y) == Easy.Numbers.Round(this.XY.Y); }
-
-        public void Terminate()
+        public bool Hit(Screen.Coordinate coord) { return this.Hit(coord, -1); } // default 1 damage
+        public bool Hit(Screen.Coordinate coord, int HealthEffect)
         {
-            this.Terminated = true;
+            // Hits are only detected if:
+            // * the sprite is still alive
+            // * the sprite is active (i.e. still doing something else even if dead)
+            // * the given coordinate is within the sprite body
+            bool HitDetected = this.Alive && this.Active && coord.X >= this.XY.X && coord.X < this.XY.X + this.Width && Easy.Numbers.Round(coord.Y) == Easy.Numbers.Round(this.XY.Y);
+            if (HitDetected) { this.HP += HealthEffect; }
+            return HitDetected;
         }
+
+        public void Terminate() { this.Terminated = true; }
 
         #endregion
 
         #region " Animation "
-
-        public bool Visible = true;
 
         public char[] Ascii;
 
@@ -131,7 +138,21 @@ namespace AsciiEngine
             }
 
             return new Screen.Coordinate(this.Trail.XY.X + this.Trajectory.Run, this.Trail.XY.Y + this.Trajectory.Rise);
+
         }
+
+        public virtual void DoActivities() // add more complex code in inherited tasks if needed
+        {
+            if (this.Alive)
+            {
+                // stuff to do while alive
+            }
+
+            // stuff to do regardless
+
+            if (!this.Alive) { this.Active = false; } // set false when no more stuff to do
+        }
+
 
         #endregion
 
@@ -165,19 +186,20 @@ namespace AsciiEngine
         public void Animate()
         {
 
-            foreach (Sprite s in this.Items.FindAll(x => !x.Alive))
+            foreach (Sprite s in this.Items.FindAll(x => !x.Alive && !x.Active))
             {
                 s.Hide();
                 this.Items.Remove(s);
             }
 
-            foreach (Sprite s in this.Items.FindAll(x => x.Alive && x.Visible)) { s.Animate(); }
+            foreach (Sprite s in this.Items.FindAll(x => x.Alive)) { s.Animate(); }
+            foreach (Sprite s in this.Items.FindAll(x => x.Active)) { s.DoActivities(); }
 
-            AnimateOverride();
+            this.Spawn();
 
         }
 
-        protected virtual void AnimateOverride() { } // optional additional code in overriding method
+        protected virtual void Spawn() { } // do nothing unless inherited class overrides this
 
         public SpriteField() { }
 

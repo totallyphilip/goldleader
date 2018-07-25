@@ -12,7 +12,6 @@ public class BadGuy : Sprite
         , TieBomber
     }
 
-    int HP;
     double ReverseFactor;
 
     struct MissileStructure
@@ -31,37 +30,18 @@ public class BadGuy : Sprite
 
     public SpriteField Missiles = new SpriteField();
 
-    protected override bool AliveOverride
-    {
-        get
-        {
-
-            if (this.HP < 1)
-            {
-                this.Hide();
-                this.Visible = false;
-            }
-            return this.HP > 0 || this.Debris.Items.Count > 0 || this.Missiles.Items.Count > 0;
-
-        }
-    }
-
-
     SpriteField Debris = new SpriteField();
     double DebrisRange;
 
-    public void Damage(bool Swear)
+    public void MakeDebris()
     {
-        this.HP--;
         for (int i = 0; i < Numbers.Random.Next(1, 4); i++)
         {
             Debris.Items.Add(new Sprite(new[] { '\x00d7' }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(2)));
-
         }
 
-        if (this.HP == 0)
+        if (!this.Alive)
         {
-
             for (int c = 0; c < this.Width; c++)
             {
                 this.Debris.Items.Add(new Sprite(new[] { this.Ascii[c] }, new Screen.Coordinate(this.XY.X + c, this.XY.Y), new Screen.Trajectory(this.DebrisRange)));
@@ -69,23 +49,25 @@ public class BadGuy : Sprite
         }
     }
 
-    public void DoStuff()
+    override public void DoActivities()
     {
 
-        // reverse direction
-
-        if (Numbers.Random.NextDouble() < this.ReverseFactor) { this.Trajectory.Run *= -1; }
-
-
-        // fire
-        if (this.Missiles.Items.Count < this.MissileConfig.MaxCount && this.XY.Y > Screen.BottomEdge - MissileConfig.Range && this.HP > 0)
+        if (this.Alive)
         {
-            this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Ascii }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(1, 0, MissileConfig.Range)));
-        }
-        Missiles.Animate();
+            // reverse direction
+            if (Numbers.Random.NextDouble() < this.ReverseFactor) { this.Trajectory.Run *= -1; }
 
-        // debris
+            // fire
+            if (this.Missiles.Items.Count < this.MissileConfig.MaxCount && this.XY.Y > Screen.BottomEdge - MissileConfig.Range && this.HP > 0)
+            {
+                this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Ascii }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(1, 0, MissileConfig.Range)));
+            }
+        }
+
+        this.Missiles.Animate();
         this.Debris.Animate();
+
+        if (!this.Alive && this.Debris.Items.Count < 1 && this.Missiles.Items.Count < 1) { this.Active = false; }
 
     }
 
@@ -188,11 +170,9 @@ public class BadGuyField : SpriteField
 {
     int MaxBadGuys { get { return 3; } }
 
-    public BadGuyField()
-    {
-    }
+    public BadGuyField() { }
 
-    public void Spawn()
+    protected override void Spawn()
     {
         while (this.Items.Count < this.MaxBadGuys)
         {
@@ -207,20 +187,6 @@ public class BadGuyField : SpriteField
             }
         }
 
-    }
-
-    protected override void AnimateOverride()
-    {
-        this.Spawn();
-    }
-
-
-    public void DoStuff()
-    {
-        foreach (BadGuy badguy in Items.FindAll(x => x.Alive))
-        {
-            badguy.DoStuff();
-        }
     }
 
 }

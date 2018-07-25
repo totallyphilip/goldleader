@@ -64,7 +64,6 @@ public class TieFighterGame
             player.AnimateMissiles();
             player.CheckBadGuyHits(badguys);
             badguys.Animate();
-            badguys.DoStuff();
 
             if (debug)
             {

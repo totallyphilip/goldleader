@@ -13,7 +13,8 @@ public class Starfield : SpriteField
         this.Spawn(true);
     }
 
-    public void Spawn() { this.Spawn(false); }
+
+    protected override void Spawn() { this.Spawn(false); }
 
     public void Spawn(bool randomly)
     {
@@ -26,11 +27,6 @@ public class Starfield : SpriteField
             this.Items.Add(new AsciiEngine.Sprite(new[] { '.' }, xy, new Screen.Trajectory(this.Speed, 0, Screen.Height - y)));
         }
 
-    }
-
-    protected override void AnimateOverride()
-    {
-        this.Spawn();
     }
 
 }

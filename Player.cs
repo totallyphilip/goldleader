@@ -6,7 +6,6 @@ public class Player : Sprite
 
     public SpriteField Missiles = new SpriteField();
     public SpriteField Messages = new SpriteField();
-    public bool Swearing = false;
 
     public int MaxMissiles = 1;
 
@@ -34,14 +33,14 @@ public class Player : Sprite
 
     public void CheckBadGuyHits(BadGuyField badguys)
     {
-        foreach (Sprite missile in this.Missiles.Items)
+        foreach (Sprite missile in this.Missiles.Items.FindAll(x => x.Alive))
         {
             foreach (BadGuy badguy in badguys.Items.FindAll(x => x.Alive))
             {
                 if (badguy.Hit(missile.XY))
                 {
                     missile.Terminate();
-                    badguy.Damage(this.Swearing);
+                    badguy.MakeDebris();
                 }
 
             }
