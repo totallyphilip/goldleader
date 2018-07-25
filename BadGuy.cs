@@ -8,8 +8,7 @@ public class BadGuy : Sprite
 {
     public enum eBadGuyType
     {
-        TieFighter
-        , TieBomber
+        TieFighter, TieBomber, TieInterceptor, Vader, Squadron
     }
 
     double ReverseFactor;
@@ -87,7 +86,7 @@ public class BadGuy : Sprite
                 this.MissileConfig = new MissileStructure('|', 6, 1);
                 this.DebrisRange = 4;
                 DropsPerRow = 8;
-                ReverseFactor = .01;
+                ReverseFactor = .001;
                 break;
             case eBadGuyType.TieBomber:
                 this.Ascii = "{—o-o—}".ToCharArray();
@@ -98,49 +97,33 @@ public class BadGuy : Sprite
                 DropsPerRow = 1;
                 ReverseFactor = 0;
                 break;
-
-                /* 
-                            case eShipType.Fighter:
-                                this.Ascii = "|—o—|".ToCharArray();
-                                this.FlyZone = new FlyZoneClass(0, 0, 0);
-                                this.SquirrelyFactor = .25;
-                                this.HP = 1;
-                                this.Missile = new MissileData('|', 6, 1);
-                                this.Debris = new DebrisStruct(0.5);
-                                break;
-                            case eShipType.Bomber:
-                                this.Ascii = "{—o-o—}".ToCharArray();
-                                this.FlyZone = new FlyZoneClass(.5, .25, -.25);
-                                this.SquirrelyFactor = .01;
-                                this.HP = 2;
-                                this.Missile = new MissileData('@', Screen.Height / 2, 1);
-                                this.Debris = new DebrisStruct(6);
-                                break;
-                            case eShipType.Interceptor:
-                                this.Ascii = "<—o—>".ToCharArray();
-                                this.FlyZone = new FlyZoneClass(-.15, -.15, 0);
-                                this.SquirrelyFactor = .4;
-                                this.HP = 2;
-                                this.Missile = new MissileData('|', 6, 2);
-                                this.Debris = new DebrisStruct(1);
-                                break;
-                            case eShipType.Vader:
-                                this.Ascii = "[—o—]".ToCharArray();
-                                this.FlyZone = new FlyZoneClass(.66, 0, .10);
-                                this.SquirrelyFactor = .1;
-                                this.HP = 3;
-                                this.Missile = new MissileData('|', 10, 3);
-                                this.Debris = new DebrisStruct(1);
-                                break;
-                            case eShipType.Squadron:
-                                this.Ascii = "|—o—|[—o—]|—o—|".ToCharArray();
-                                this.FlyZone = new FlyZoneClass(0, .15, .20);
-                                this.SquirrelyFactor = 0;
-                                this.HP = 6;
-                                this.Missile = new MissileData('|', 6, 5);
-                                this.Debris = new DebrisStruct(8);
-                                break;
-                 */
+            case eBadGuyType.TieInterceptor:
+                this.Ascii = "<—o—>".ToCharArray();
+                this.FlyZone = new FlyZoneClass(0, Numbers.Round(Screen.Height * -.15), 0, 0, FlyZoneClass.eEdgeMode.Bounce);
+                this.HP = 2;
+                this.MissileConfig = new MissileStructure('|', 6, 1);
+                this.DebrisRange = 4;
+                DropsPerRow = 16;
+                ReverseFactor = .05;
+                break;
+            case eBadGuyType.Vader:
+                this.Ascii = "[—o—]".ToCharArray();
+                this.FlyZone = new FlyZoneClass(Screen.Height / 2, 2, 5, 5, FlyZoneClass.eEdgeMode.Bounce);
+                this.HP = 2;
+                this.MissileConfig = new MissileStructure('|', 6, 1);
+                this.DebrisRange = 4;
+                DropsPerRow = 16;
+                ReverseFactor = .01;
+                break;
+            case eBadGuyType.Squadron:
+                this.Ascii = "|—o—|[—o—]|—o—|".ToCharArray();
+                this.FlyZone = new FlyZoneClass(0, 5, Screen.Width / 4, Screen.Width / 4, FlyZoneClass.eEdgeMode.Bounce);
+                this.HP = 6;
+                this.MissileConfig = new MissileStructure('|', 6, 1);
+                this.DebrisRange = 8;
+                DropsPerRow = 2;
+                ReverseFactor = 0;
+                break;
         }
 
         this.Trail = new Screen.CoordinateHistory(new Screen.Coordinate(Numbers.Random.Next(Screen.LeftEdge - this.Width, Screen.RightEdge + this.Width), Screen.TopEdge));
@@ -170,19 +153,34 @@ public class BadGuyField : SpriteField
 {
     int MaxBadGuys { get { return 3; } }
 
-    public BadGuyField() { }
+    public BadGuyField()
+    {
+
+        // foreach (BadGuy.eBadGuyType ship in (BadGuy.eBadGuyType[])System.Enum.GetValues(typeof(BadGuy.eBadGuyType))) { }
+
+
+    }
 
     protected override void Spawn()
     {
         while (this.Items.Count < this.MaxBadGuys)
         {
-            switch (Numbers.Random.Next(0, 2))
+            switch (Numbers.Random.Next(0, 6))
             {
                 case 0:
                     this.Items.Add(new BadGuy(BadGuy.eBadGuyType.TieFighter));
                     break;
                 case 1:
                     this.Items.Add(new BadGuy(BadGuy.eBadGuyType.TieBomber));
+                    break;
+                case 3:
+                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.TieInterceptor));
+                    break;
+                case 4:
+                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Vader));
+                    break;
+                case 5:
+                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Squadron));
                     break;
             }
         }
