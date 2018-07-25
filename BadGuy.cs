@@ -50,7 +50,7 @@ public class BadGuy : Sprite
     SpriteField Debris = new SpriteField();
     double DebrisRange;
 
-    public void Damage()
+    public void Damage(bool Swear)
     {
         this.HP--;
         for (int i = 0; i < Numbers.Random.Next(1, 4); i++)

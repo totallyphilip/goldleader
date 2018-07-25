@@ -74,7 +74,7 @@ namespace AsciiEngine
 
         protected virtual bool AliveOverride { get { return true; } } // optional additional code in overriding property
 
-        public bool Hit(Screen.Coordinate coord) { return coord.X >= this.XY.X && coord.X < this.XY.X + this.Width && Easy.Numbers.Round(coord.Y) == Easy.Numbers.Round(this.XY.Y); }
+        public bool Hit(Screen.Coordinate coord) { return this.Visible && coord.X >= this.XY.X && coord.X < this.XY.X + this.Width && Easy.Numbers.Round(coord.Y) == Easy.Numbers.Round(this.XY.Y); }
 
         public void Terminate()
         {

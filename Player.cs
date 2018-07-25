@@ -4,9 +4,11 @@ using System;
 public class Player : Sprite
 {
 
-    public SpriteField Missiles = new AsciiEngine.SpriteField();
+    public SpriteField Missiles = new SpriteField();
+    public SpriteField Messages = new SpriteField();
+    public bool Swearing = false;
 
-    public int MaxMissiles = 5;
+    public int MaxMissiles = 1;
 
     public Player()
     {
@@ -27,6 +29,7 @@ public class Player : Sprite
     public void AnimateMissiles()
     {
         Missiles.Animate();
+        Messages.Animate();
     }
 
     public void CheckBadGuyHits(BadGuyField badguys)
@@ -38,7 +41,7 @@ public class Player : Sprite
                 if (badguy.Hit(missile.XY))
                 {
                     missile.Terminate();
-                    badguy.Damage();
+                    badguy.Damage(this.Swearing);
                 }
 
             }

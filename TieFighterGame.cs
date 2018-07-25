@@ -46,9 +46,6 @@ public class TieFighterGame
         // The player
         Player player = new Player();
 
-        // Power ups
-        SpriteField powerups = new SpriteField();
-
         // keyboard buffer
         List<ConsoleKeyInfo> keybuffer = new List<ConsoleKeyInfo>();
 
@@ -66,7 +63,6 @@ public class TieFighterGame
             player.Animate();
             player.AnimateMissiles();
             player.CheckBadGuyHits(badguys);
-            powerups.Animate();
             badguys.Animate();
             badguys.DoStuff();
 
@@ -74,7 +70,7 @@ public class TieFighterGame
             {
                 int x = Screen.LeftEdge;
                 int y = Screen.TopEdge;
-                Screen.TryWrite(x, y, "[fps: " + FPS + " ships: " + badguys.Items.Count + " powerups: " + powerups.Items.Count + ']');
+                Screen.TryWrite(x, y, "[fps: " + FPS + " ships: " + badguys.Items.Count + ']');
 
 
 
@@ -124,9 +120,6 @@ public class TieFighterGame
                         break;
                     case ConsoleKey.D:
                         debug = !debug;
-                        break;
-                    case ConsoleKey.P:
-                        powerups.Items.Add(new PowerUp(PowerUp.ePowerType.ExtraMissile, new Screen.Coordinate(player.XY.X, -1), new Screen.Trajectory(0, 1, Screen.Height)));
                         break;
                 }
 
