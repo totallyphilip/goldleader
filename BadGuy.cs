@@ -151,7 +151,17 @@ public class BadGuy : Sprite
 
 public class BadGuyField : SpriteField
 {
-    int MaxBadGuys { get { return 3; } }
+
+    System.DateTime starttime = System.DateTime.Now;
+    int MaxBadGuys
+    {
+        get
+        {
+            System.DateTime rightnow = System.DateTime.Now;
+            System.TimeSpan span = rightnow.Subtract(starttime);
+            return 1 + System.Convert.ToInt32(span.TotalSeconds) / 30; // another bad guy every N seconds
+        }
+    }
 
     public BadGuyField()
     {
@@ -165,7 +175,7 @@ public class BadGuyField : SpriteField
     {
         while (this.Items.Count < this.MaxBadGuys)
         {
-            switch (Numbers.Random.Next(0, 6))
+            switch (Numbers.Random.Next(0, this.MaxBadGuys))
             {
                 case 0:
                     this.Items.Add(new BadGuy(BadGuy.eBadGuyType.TieFighter));
@@ -181,6 +191,9 @@ public class BadGuyField : SpriteField
                     break;
                 case 5:
                     this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Squadron));
+                    break;
+                default:
+                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.TieFighter));
                     break;
             }
         }

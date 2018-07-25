@@ -89,8 +89,14 @@ public class TieFighterGame
                         || k.Key == ConsoleKey.Escape
                         || k.Key == ConsoleKey.UpArrow
                         || k.Key == ConsoleKey.DownArrow
-                 ) { keybuffer.Clear(); }
-                keybuffer.Add(k);
+                 )
+                {
+                    keybuffer.Insert(0, k);
+                }
+                else
+                {
+                    keybuffer.Add(k);
+                }
             }
 
             if (keybuffer.Count > 0)
@@ -127,7 +133,7 @@ public class TieFighterGame
 
         } while (!UserQuit && player.Active);
 
-        Screen.Countdown(5);
+        if (!UserQuit) { Screen.Countdown(5); }
 
     }
 }
