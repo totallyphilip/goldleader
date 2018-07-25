@@ -73,24 +73,25 @@ public class TieFighterGame
             badguys.Animate();
             player.Animate();
             player.AnimateMissiles();
+            player.CheckBadGuyHits(foofighters);
             powerups.Animate();
             foofighters.Animate();
             foofighters.DoStuff();
 
             // check for hits
-            foreach (AsciiEngine.Sprite missile in player.Missiles.Items)
-            {
-                foreach (Ship badguy in badguys.Ships.FindAll(x => x.Alive))
-                {
-                    if (badguy.Hit(missile.XY))
-                    {
-                        player.Missiles.RemoveSprite(missile);
-                    }
+            /*            foreach (AsciiEngine.Sprite missile in player.Missiles.Items)
+                       {
+                           foreach (Ship badguy in badguys.Ships.FindAll(x => x.Alive))
+                           {
+                               if (badguy.Hit(missile.XY))
+                               {
+                                   player.Missiles.RemoveSprite(missile);
+                               }
 
-                }
+                           }
 
 
-            }
+                       } */
 
 
             if (debug)

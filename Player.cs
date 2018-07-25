@@ -29,4 +29,19 @@ public class Player : Sprite
         Missiles.Animate();
     }
 
+    public void CheckBadGuyHits(BadGuyField badguys)
+    {
+        foreach (Sprite missile in this.Missiles.Items)
+        {
+            foreach (BadGuy badguy in badguys.Items.FindAll(x => x.Alive))
+            {
+                if (badguy.Hit(missile.XY))
+                {
+                    missile.Terminate();
+                }
+
+            }
+        }
+    }
+
 }
