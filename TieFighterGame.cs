@@ -50,14 +50,15 @@ public class TieFighterGame
         List<ConsoleKeyInfo> keybuffer = new List<ConsoleKeyInfo>();
 
         // Main loop
-        int FPS = 8;
+        int MasterFPS = 8;
+        int FPS = MasterFPS;
         bool UserQuit = false;
         bool debug = false;
+        int SkipFrames = 0;
 
 
         do
         {
-
 
             foreach (Starfield starfield in starfields) { starfield.Animate(); }
             if (player.Alive) { player.Animate(); }
@@ -76,6 +77,8 @@ public class TieFighterGame
 
             }
 
+            if (SkipFrames < 1) { FPS = MasterFPS; }
+            else { FPS = int.MaxValue; SkipFrames--; }
             Easy.Clock.FpsThrottle(FPS);
 
 
@@ -106,11 +109,14 @@ public class TieFighterGame
                 keybuffer.Remove(k);
                 switch (k.Key)
                 {
+                    case ConsoleKey.Tab:
+                        SkipFrames = 20;
+                        break;
                     case ConsoleKey.UpArrow:
-                        FPS++;
+                        MasterFPS++;
                         break;
                     case ConsoleKey.DownArrow:
-                        if (FPS - 1 > 0) { FPS--; }
+                        if (MasterFPS - 1 > 0) { MasterFPS--; }
                         break;
                     case ConsoleKey.LeftArrow:
                         player.Trajectory.Run = -1;
