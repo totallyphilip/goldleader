@@ -83,7 +83,7 @@ public class BadGuy : Sprite
                 this.Ascii = "|—o—|".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, 2, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 1;
-                this.MissileConfig = new MissileStructure('|', 7, 1);
+                this.MissileConfig = new MissileStructure('|', Screen.Height * .33, 1);
                 this.DebrisRange = 4;
                 DropsPerRow = 8;
                 ReverseFactor = .001;
@@ -101,7 +101,7 @@ public class BadGuy : Sprite
                 this.Ascii = "<—o—>".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, Numbers.Round(Screen.Height * -.15), 0, 0, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 2;
-                this.MissileConfig = new MissileStructure('|', 6, 1);
+                this.MissileConfig = new MissileStructure('|', Screen.Height * .33, 1);
                 this.DebrisRange = 4;
                 DropsPerRow = 16;
                 ReverseFactor = .05;
@@ -110,7 +110,7 @@ public class BadGuy : Sprite
                 this.Ascii = "[—o—]".ToCharArray();
                 this.FlyZone = new FlyZoneClass(Screen.Height / 2, 2, 5, 5, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 2;
-                this.MissileConfig = new MissileStructure('|', 9, 2);
+                this.MissileConfig = new MissileStructure('|', Screen.Height * .25, 2);
                 this.DebrisRange = 4;
                 DropsPerRow = 16;
                 ReverseFactor = .01;
@@ -119,7 +119,7 @@ public class BadGuy : Sprite
                 this.Ascii = "|—o—|[—o—]|—o—|".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, 5, Screen.Width / 4, Screen.Width / 4, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 6;
-                this.MissileConfig = new MissileStructure('|', 8, 3);
+                this.MissileConfig = new MissileStructure('|', Screen.Height * .5, 3);
                 this.DebrisRange = 8;
                 DropsPerRow = 2;
                 ReverseFactor = 0;
