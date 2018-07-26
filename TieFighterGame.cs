@@ -94,6 +94,7 @@ public class TieFighterGame
                         || k.Key == ConsoleKey.DownArrow
                  )
                 {
+                    keybuffer = new List<ConsoleKeyInfo>(keybuffer.RemoveAll(x => x.Key == ConsoleKey.RightArrow || x.Key == ConsoleKey.LeftArrow));
                     keybuffer.Insert(0, k);
                 }
                 else

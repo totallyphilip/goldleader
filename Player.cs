@@ -57,7 +57,7 @@ public class Player : Sprite
             }
         }
 
-        if (this.MaxMissiles < badguys.MaxBadGuys / 3)
+        if (this.MaxMissiles < badguys.MaxBadGuys / 3 && this.Alive)
         {
             this.MaxMissiles++;
             this.Messages.Items.Add(new Sprite("Extra Missile".ToCharArray(), this.XY, new Screen.Trajectory(-1, 0, Screen.Height / 2)));
