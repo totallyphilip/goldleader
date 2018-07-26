@@ -7,7 +7,7 @@ public class Starfield : Swarm
 {
     double Speed;
     double RowCoverageFactor;
-    int MaxStars { get { return Numbers.Round(Screen.Height * this.RowCoverageFactor); } }
+    int MaxStars { get { return Abacus.Round(Screen.Height * this.RowCoverageFactor); } }
 
     public Starfield(double speed, double coverage)
     {
@@ -23,10 +23,10 @@ public class Starfield : Swarm
     {
         while (this.Items.Count < this.MaxStars)
         {
-            int x = Numbers.Random.Next(Screen.LeftEdge, Screen.RightEdge);
+            int x = Abacus.Random.Next(Screen.LeftEdge, Screen.RightEdge);
             int y = Screen.TopEdge - 1;
-            if (randomly) { y = Numbers.Random.Next(Screen.TopEdge - 1, Screen.Height); }
-            Coordinate xy = new Coordinate(x, y);
+            if (randomly) { y = Abacus.Random.Next(Screen.TopEdge - 1, Screen.Height); }
+            Point xy = new Point(x, y);
             this.Items.Add(new Sprite(new[] { '.' }, xy, new Trajectory(this.Speed, 0, Screen.Height - y)));
         }
 

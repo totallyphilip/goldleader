@@ -18,7 +18,7 @@ public class Player : Sprite
         this.Ascii = ":><:".ToCharArray();
         this.FlyZone = new FlyZoneClass(0, 0, 0, 0, FlyZoneClass.eEdgeMode.Stop);
         this.Trajectory = new Trajectory(0, 0);
-        this.Trail = new Trail(new Coordinate(Screen.Width / 2 - this.Width / 2, Screen.BottomEdge));
+        this.Trail = new Trail(new Point(Screen.Width / 2 - this.Width / 2, Screen.BottomEdge));
         this.HP = 1;
     }
 
@@ -28,10 +28,10 @@ public class Player : Sprite
         {
             for (int i = 0; i < 10; i++)
             {
-                double Rise = -2 * (Numbers.Random.NextDouble() + .1);
-                double Run = 2 * Numbers.Random.NextDouble();
-                if (Numbers.Random.NextDouble() < .5) { Run *= -1; }
-                Debris.Items.Add(new Sprite(new[] { c }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(Rise, Run, 20)));
+                double Rise = -2 * (Abacus.Random.NextDouble() + .1);
+                double Run = 2 * Abacus.Random.NextDouble();
+                if (Abacus.RandomTrue) { Run *= -1; }
+                Debris.Items.Add(new Sprite(new[] { c }, new Point(this.XY.dX + this.Width / 2, this.XY.dY), new Trajectory(Rise, Run, 20)));
             }
         }
     }
@@ -40,7 +40,7 @@ public class Player : Sprite
     {
         if (this.Missiles.Items.Count < this.MaxMissiles)
         {
-            this.Missiles.Items.Add(new Sprite(new[] { '|' }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(-1, 0, this.XY.Y)));
+            this.Missiles.Items.Add(new Sprite(new[] { '|' }, new Point(this.XY.dX + this.Width / 2, this.XY.dY), new Trajectory(-1, 0, this.XY.dY)));
         }
     }
 

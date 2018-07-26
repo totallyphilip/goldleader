@@ -2,23 +2,21 @@ using System;
 
 namespace Easy
 {
-    public class Numbers
+    public class Abacus
     {
         public static Random Random = new Random();
+        public static bool RandomTrue { get { return Abacus.Random.NextDouble() < .5; } }
 
-        public static double Distance(AsciiEngine.Coordinates.Coordinate c1, AsciiEngine.Coordinates.Coordinate c2)
+        public static double Distance(AsciiEngine.Coordinates.Point c1, AsciiEngine.Coordinates.Point c2)
         {
-            return Math.Sqrt(Math.Pow(c1.X - c2.X, 2) + Math.Pow(c1.Y - c2.Y, 2));
+            return Math.Sqrt(Math.Pow(c1.dX - c2.dX, 2) + Math.Pow(c1.dY - c2.dY, 2));
         }
 
-        public static int Round(double d)
-        {
-            return Convert.ToInt32(Math.Round(d, MidpointRounding.AwayFromZero));
-        }
+        public static int Round(double d) { return Convert.ToInt32(Math.Round(d, MidpointRounding.AwayFromZero)); }
 
     }
 
-    public class Keys
+    public class Keyboard
     {
         public static void EatKeys()
         {

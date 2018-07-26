@@ -3,6 +3,39 @@ using System.Collections.Generic;
 
 namespace AsciiEngine
 {
+    namespace Fx
+    {
+        public class Explosion : Sprites.Swarm
+        {
+            public Explosion(char[] ascii, Coordinates.Point coord, double range, bool centered, bool up, bool down, bool left, bool right)
+            {
+                for (int i = 0; i < ascii.Length; i++)
+                {
+                    double rise = Easy.Abacus.Random.NextDouble() + .01; // right (at least slightly)
+                    double run = Easy.Abacus.Random.NextDouble() + .01; // down (at least slightly)
+
+                    if (!up && !down) { rise = 0; } // no rise
+                    if (up && !down) { rise *= -1; } // go up
+                    if (up && down) { if (Easy.Abacus.RandomTrue) { rise *= -1; } } // surprise me
+
+                    if (!left && !right) { run = 0; } // no run
+                    if (left && !right) { run *= -1; } // go left
+                    if (left && right) { if (Easy.Abacus.RandomTrue) { run *= -1; } } // surprise me
+
+                    Coordinates.Trajectory t = new Coordinates.Trajectory(rise, run, range);
+                    Coordinates.Point xy = new Coordinates.Point(coord.dY, coord.dY);
+
+                    if (centered) { xy.dX = coord.dX + ascii.Length / 2; } else { xy.dX += i; }
+
+                    this.Items.Add(new Sprites.Sprite(new[] { ascii[i] }, xy, t));
+                }
+
+            }
+
+        }
+
+    }
+
     namespace Sprites
     {
         public class Sprite
@@ -49,7 +82,7 @@ namespace AsciiEngine
 
             public Coordinates.Trail Trail;
             public Coordinates.Trajectory Trajectory;
-            public Coordinates.Coordinate XY { get { return this.Trail.XY; } }
+            public Coordinates.Point XY { get { return this.Trail.XY; } }
 
             #endregion
 
@@ -67,7 +100,7 @@ namespace AsciiEngine
                     bool alive = !this.Terminated && this.HP > 0;
                     if (alive && Trajectory != null)
                     {
-                        alive = Easy.Numbers.Distance(this.Trail.XY, this.Trail.InitialXY) < Trajectory.Range;
+                        alive = Easy.Abacus.Distance(this.Trail.XY, this.Trail.InitialXY) < Trajectory.Range;
                     }
                     return alive && AliveOverride;
                 }
@@ -75,14 +108,14 @@ namespace AsciiEngine
 
             protected virtual bool AliveOverride { get { return true; } } // optional additional code in overriding property
 
-            public bool Hit(Coordinates.Coordinate coord) { return this.Hit(coord, -1); } // default 1 damage
-            public bool Hit(Coordinates.Coordinate coord, int HealthEffect)
+            public bool Hit(Coordinates.Point coord) { return this.Hit(coord, -1); } // default 1 damage
+            public bool Hit(Coordinates.Point coord, int HealthEffect)
             {
                 // Hits are only detected if:
                 // * the sprite is still alive
                 // * the sprite is active (i.e. still doing something else even if dead)
                 // * the given coordinate is within the sprite body
-                bool HitDetected = this.Alive && this.Active && coord.X >= this.XY.X && coord.X < this.XY.X + this.Width && Easy.Numbers.Round(coord.Y) == Easy.Numbers.Round(this.XY.Y);
+                bool HitDetected = this.Alive && this.Active && coord.dX >= this.XY.dX && coord.dX < this.XY.dX + this.Width && Easy.Abacus.Round(coord.dY) == Easy.Abacus.Round(this.XY.dY);
                 if (HitDetected) { this.HP += HealthEffect; }
                 return HitDetected;
             }
@@ -107,36 +140,36 @@ namespace AsciiEngine
                 Screen.TryWrite(this.XY, new String(this.Ascii));
             }
 
-            protected virtual Coordinates.Coordinate NextCoordinate()
+            protected virtual Coordinates.Point NextCoordinate()
             {
-                if (this.XY.Y + this.Trajectory.Rise < this.FlyZone.TopEdge)
+                if (this.XY.dY + this.Trajectory.Rise < this.FlyZone.TopEdge)
                 {
                     if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise); }
                     else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Rise = 0; }
                     else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
                 }
-                else if (this.XY.Y + this.Trajectory.Rise > this.FlyZone.BottomEdge)
+                else if (this.XY.dY + this.Trajectory.Rise > this.FlyZone.BottomEdge)
                 {
                     if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise) * (-1); }
                     else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Rise = 0; }
                     else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
                 }
 
-                if (this.XY.X + this.Trajectory.Run < this.FlyZone.LeftEdge)
+                if (this.XY.dX + this.Trajectory.Run < this.FlyZone.LeftEdge)
                 {
                     if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run); }
                     else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Run = 0; }
                     else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
                 }
 
-                if (this.XY.X + this.Trajectory.Run + this.Width > this.FlyZone.RightEdge)
+                if (this.XY.dX + this.Trajectory.Run + this.Width > this.FlyZone.RightEdge)
                 {
                     if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run) * (-1); }
                     else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Run = 0; }
                     else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
                 }
 
-                return new Coordinates.Coordinate(this.Trail.XY.X + this.Trajectory.Run, this.Trail.XY.Y + this.Trajectory.Rise);
+                return new Coordinates.Point(this.Trail.XY.dX + this.Trajectory.Run, this.Trail.XY.dY + this.Trajectory.Rise);
 
             }
 
@@ -159,14 +192,14 @@ namespace AsciiEngine
 
             public Sprite() { }
 
-            public Sprite(Coordinates.Coordinate xy, Coordinates.Trajectory t)
+            public Sprite(Coordinates.Point xy, Coordinates.Trajectory t)
             {
                 this.Ascii = "sprite".ToCharArray();
                 this.Trail = new Coordinates.Trail(xy);
                 this.Trajectory = t;
             }
 
-            public Sprite(char[] c, Coordinates.Coordinate xy, Coordinates.Trajectory t)
+            public Sprite(char[] c, Coordinates.Point xy, Coordinates.Trajectory t)
             {
                 this.Ascii = new List<char>(c).ToArray();
                 this.Trail = new Coordinates.Trail(xy);
@@ -203,22 +236,27 @@ namespace AsciiEngine
             public Swarm() { }
 
         }
+
+        #region " Specialty Swarms "
+        #endregion
     }
 
     namespace Coordinates
     {
 
-        public class Coordinate
+        public class Point
         {
 
-            public double X;
-            public double Y;
+            public double dX;
+            public double dY;
+            public int iX { get { return Easy.Abacus.Round(this.dX); } }
+            public int iY { get { return Easy.Abacus.Round(this.dY); } }
 
-            public Coordinate() : this(0, 0) { }
-            public Coordinate(double x, double y)
+            public Point() : this(0, 0) { }
+            public Point(double dx, double dy)
             {
-                this.X = x;
-                this.Y = y;
+                this.dX = dx;
+                this.dY = dy;
             }
 
         }
@@ -226,19 +264,19 @@ namespace AsciiEngine
         public class Trail
         {
 
-            public List<Coordinate> Items = new List<Coordinate>();
+            public List<Point> Items = new List<Point>();
 
-            public Coordinate XY { get { return Items[Items.Count - 1]; } } // current XY
-            public Coordinate PreviousXY { get { return Items[Items.Count - 2]; } }
+            public Point XY { get { return Items[Items.Count - 1]; } } // current XY
+            public Point PreviousXY { get { return Items[Items.Count - 2]; } }
 
-            public Coordinate InitialXY { get { return Items[0]; } }
+            public Point InitialXY { get { return Items[0]; } }
 
-            public void MoveTo(Coordinate xy)
+            public void MoveTo(Point xy)
             {
                 Items.Add(xy);
             }
 
-            public Trail(Coordinate xy)
+            public Trail(Point xy)
             {
                 Items.Add(xy);
             }
@@ -270,10 +308,10 @@ namespace AsciiEngine
             {
                 this._Range = range;
                 // add a fraction to make sure it's not zero
-                this._Run = Easy.Numbers.Random.NextDouble() + .1;
-                this._Rise = Easy.Numbers.Random.NextDouble() + .1;
-                if (Easy.Numbers.Random.NextDouble() < .5) { this._Run *= -1; }
-                if (Easy.Numbers.Random.NextDouble() < .5) { this._Rise *= -1; }
+                this._Run = Easy.Abacus.Random.NextDouble() + .1;
+                this._Rise = Easy.Abacus.Random.NextDouble() + .1;
+                if (Easy.Abacus.RandomTrue) { this._Run *= -1; }
+                if (Easy.Abacus.RandomTrue) { this._Rise *= -1; }
             }
 
             #endregion
@@ -296,9 +334,9 @@ namespace AsciiEngine
 
         public static int Height { get { return Console.WindowHeight; } }
 
-        public static Coordinates.Coordinate GetCenterCoordinate()
+        public static Coordinates.Point GetCenterCoordinate()
         {
-            return new Coordinates.Coordinate(Easy.Numbers.Round(Screen.Width / 2), Easy.Numbers.Round(Screen.Height / 2));
+            return new Coordinates.Point(Easy.Abacus.Round(Screen.Width / 2), Easy.Abacus.Round(Screen.Height / 2));
         }
 
         public static bool TrySetSize(int targetwidth, int targetheight)
@@ -365,18 +403,18 @@ namespace AsciiEngine
 
         #region " Writing "
 
-        public static void TryWrite(Coordinates.Coordinate xy, char[] s)
+        public static void TryWrite(Coordinates.Point xy, char[] s)
         {
-            TryWrite(xy.X, xy.Y, s.ToString());
+            TryWrite(xy.dX, xy.dY, s.ToString());
         }
 
-        public static void TryWrite(Coordinates.Coordinate xy, string s)
+        public static void TryWrite(Coordinates.Point xy, string s)
         {
-            TryWrite(xy.X, xy.Y, s);
+            TryWrite(xy.dX, xy.dY, s);
         }
         public static void TryWrite(double x, double y, string s)
         {
-            TryWrite(Easy.Numbers.Round(x), Easy.Numbers.Round(y), s);
+            TryWrite(Easy.Abacus.Round(x), Easy.Abacus.Round(y), s);
         }
         public static void TryWrite(int x, int y, string s)
         {
@@ -401,14 +439,14 @@ namespace AsciiEngine
             catch { }
         }
 
-        public static void TryWrite(Coordinates.Coordinate xy, char c)
+        public static void TryWrite(Coordinates.Point xy, char c)
         {
-            TryWrite(xy.X, xy.Y, c);
+            TryWrite(xy.dX, xy.dY, c);
         }
 
         public static void TryWrite(double x, double y, char c)
         {
-            TryWrite(Easy.Numbers.Round(x), Easy.Numbers.Round(y), c);
+            TryWrite(Easy.Abacus.Round(x), Easy.Abacus.Round(y), c);
         }
 
         public static void TryWrite(int x, int y, char c)
@@ -424,12 +462,12 @@ namespace AsciiEngine
 
         public static void Countdown(int start)
         {
-            Easy.Keys.EatKeys();
-            Coordinates.Coordinate xy = Screen.GetCenterCoordinate();
+            Easy.Keyboard.EatKeys();
+            Coordinates.Point xy = Screen.GetCenterCoordinate();
 
             for (int n = start; n > 0; n--)
             {
-                Screen.TryWrite(xy.X, xy.Y, n + " ");
+                Screen.TryWrite(xy.dX, xy.dY, n + " ");
                 if (Console.KeyAvailable) { n = 0; }
                 else { System.Threading.Thread.Sleep(1000); }
             }

@@ -33,16 +33,16 @@ public class BadGuy : Sprite
 
     public void MakeDebris()
     {
-        for (int i = 0; i < Numbers.Random.Next(1, 4); i++)
+        for (int i = 0; i < Abacus.Random.Next(1, 4); i++)
         {
-            Debris.Items.Add(new Sprite(new[] { '\x00d7' }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(2)));
+            Debris.Items.Add(new Sprite(new[] { '\x00d7' }, new Point(this.XY.dX + this.Width / 2, this.XY.dY), new Trajectory(2)));
         }
 
         if (!this.Alive)
         {
             for (int c = 0; c < this.Width; c++)
             {
-                this.Debris.Items.Add(new Sprite(new[] { this.Ascii[c] }, new Coordinate(this.XY.X + c, this.XY.Y), new Trajectory(this.DebrisRange)));
+                this.Debris.Items.Add(new Sprite(new[] { this.Ascii[c] }, new Point(this.XY.dX + c, this.XY.dY), new Trajectory(this.DebrisRange)));
             }
         }
     }
@@ -53,12 +53,12 @@ public class BadGuy : Sprite
         if (this.Alive)
         {
             // reverse direction
-            if (Numbers.Random.NextDouble() < this.ReverseFactor) { this.Trajectory.Run *= -1; }
+            if (Abacus.Random.NextDouble() < this.ReverseFactor) { this.Trajectory.Run *= -1; }
 
             // fire
-            if (this.Missiles.Items.Count < this.MissileConfig.MaxCount && this.XY.Y > Screen.BottomEdge - MissileConfig.Range && this.HP > 0)
+            if (this.Missiles.Items.Count < this.MissileConfig.MaxCount && this.XY.dY > Screen.BottomEdge - MissileConfig.Range && this.HP > 0)
             {
-                this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Ascii }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(1, 0, MissileConfig.Range)));
+                this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Ascii }, new Point(this.XY.dX + this.Width / 2, this.XY.dY), new Trajectory(1, 0, MissileConfig.Range)));
             }
         }
 
@@ -89,7 +89,7 @@ public class BadGuy : Sprite
                 break;
             case eBadGuyType.TieBomber:
                 this.Ascii = "{—o-o—}".ToCharArray();
-                this.FlyZone = new FlyZoneClass(Numbers.Round(Screen.Height * .5), Numbers.Round(Screen.Height * .25), Numbers.Round(Screen.Width * -.25), Numbers.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
+                this.FlyZone = new FlyZoneClass(Abacus.Round(Screen.Height * .5), Abacus.Round(Screen.Height * .25), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 2;
                 this.MissileConfig = new MissileStructure('@', Screen.Height * .66, 2);
                 this.DebrisRange = 8;
@@ -98,7 +98,7 @@ public class BadGuy : Sprite
                 break;
             case eBadGuyType.TieInterceptor:
                 this.Ascii = "<—o—>".ToCharArray();
-                this.FlyZone = new FlyZoneClass(0, Numbers.Round(Screen.Height * -.15), 0, 0, FlyZoneClass.eEdgeMode.Bounce);
+                this.FlyZone = new FlyZoneClass(0, Abacus.Round(Screen.Height * -.15), 0, 0, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 2;
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .33, 1);
                 this.DebrisRange = 4;
@@ -125,9 +125,9 @@ public class BadGuy : Sprite
                 break;
         }
 
-        this.Trail = new Trail(new Coordinate(Numbers.Random.Next(Screen.LeftEdge - this.Width, Screen.RightEdge + this.Width), Screen.TopEdge));
+        this.Trail = new Trail(new Point(Abacus.Random.Next(Screen.LeftEdge - this.Width, Screen.RightEdge + this.Width), Screen.TopEdge));
 
-        if (Numbers.Random.NextDouble() < .5) { Run *= -1; }
+        if (Abacus.RandomTrue) { Run *= -1; }
         this.Trajectory = new Trajectory(DropsPerRow / System.Convert.ToDouble(this.FlyZone.Width), Run);
 
     }
@@ -174,7 +174,7 @@ public class BadGuyField : Swarm
     {
         while (this.Items.Count < this.MaxBadGuys)
         {
-            switch (Numbers.Random.Next(0, this.MaxBadGuys))
+            switch (Abacus.Random.Next(0, this.MaxBadGuys))
             {
                 case 0:
                     this.Items.Add(new BadGuy(BadGuy.eBadGuyType.TieFighter));

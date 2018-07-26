@@ -15,7 +15,7 @@ public class TieFighterGame
         {
             Console.CursorVisible = false;
             Screen.Countdown(5);
-            Easy.Keys.EatKeys();
+            Easy.Keyboard.EatKeys();
             this.Play();
             Console.CursorVisible = true;
         }
@@ -55,6 +55,8 @@ public class TieFighterGame
         bool debug = false;
         int SkipFrames = 0;
 
+        // testing
+        AsciiEngine.Fx.Explosion boom = null;
 
         do
         {
@@ -65,6 +67,7 @@ public class TieFighterGame
             player.CheckBadGuyHits(badguys);
             player.CheckHitByBadGuys(badguys);
             badguys.Animate();
+            if (boom != null) { boom.Animate(); }
 
             if (debug)
             {
@@ -132,6 +135,9 @@ public class TieFighterGame
                         break;
                     case ConsoleKey.D:
                         debug = !debug;
+                        break;
+                    case ConsoleKey.T:
+                        boom = new AsciiEngine.Fx.Explosion("#$%".ToCharArray(), new AsciiEngine.Coordinates.Point(10, 10), 5, true, true, true, true, true);
                         break;
                 }
 
