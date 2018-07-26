@@ -12,7 +12,7 @@ public class TieFighterGame
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
 
-        if (Screen.TrySetSize(40, 30))
+        if (Screen.TrySetSize(45, 35))
         {
             Console.CursorVisible = false;
             Screen.Countdown(5);

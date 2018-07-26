@@ -20,31 +20,18 @@ public class Player : Sprite
         this.HP = 1;
     }
 
-    public void MakeDebris()
+    public void BigExplosion()
     {
-        for (int i = 0; i < 5; i++)
+        foreach (char c in "\x00d7*#-".ToCharArray())
         {
-            double Rise = -2 * Numbers.Random.NextDouble();
-            double Run = 2 * Numbers.Random.NextDouble();
-            if (Numbers.Random.NextDouble() < .5) { Run *= -1; }
-            Debris.Items.Add(new Sprite(new[] { '\x00d7' }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(Rise, Run, 10)));
+            for (int i = 0; i < 10; i++)
+            {
+                double Rise = -2 * Numbers.Random.NextDouble();
+                double Run = 2 * Numbers.Random.NextDouble();
+                if (Numbers.Random.NextDouble() < .5) { Run *= -1; }
+                Debris.Items.Add(new Sprite(new[] { c }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(Rise, Run, 20)));
+            }
         }
-        for (int i = 0; i < 5; i++)
-        {
-            double Rise = -2 * Numbers.Random.NextDouble();
-            double Run = 2 * Numbers.Random.NextDouble();
-            if (Numbers.Random.NextDouble() < .5) { Run *= -1; }
-            Debris.Items.Add(new Sprite(new[] { '*' }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(Rise, Run, 10)));
-        }
-        for (int c = 0; c < this.Width; c++)
-        {
-            double Rise = -2 * Numbers.Random.NextDouble();
-            double Run = 2 * Numbers.Random.NextDouble();
-            if (Numbers.Random.NextDouble() < .5) { Run *= -1; }
-            this.Debris.Items.Add(new Sprite(new[] { this.Ascii[c] }, new Screen.Coordinate(this.XY.X + c, this.XY.Y), new Screen.Trajectory(Rise, Run, 10)));
-        }
-
-
     }
 
     public void Fire()
@@ -69,6 +56,13 @@ public class Player : Sprite
 
             }
         }
+
+        if (this.MaxMissiles < badguys.MaxBadGuys / 3)
+        {
+            this.MaxMissiles++;
+            this.Messages.Items.Add(new Sprite("Extra Missile".ToCharArray(), this.XY, new Screen.Trajectory(-1, 0, Screen.Height / 2)));
+        }
+
     }
 
     override public void DoActivities()
@@ -89,7 +83,7 @@ public class Player : Sprite
                 if (this.Hit(missile.XY))
                 {
                     missile.Terminate();
-                    this.MakeDebris();
+                    this.BigExplosion();
                 }
 
             }
