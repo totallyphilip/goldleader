@@ -7,6 +7,7 @@ public class Player : Sprite
 
     public SpriteField Missiles = new SpriteField();
     public SpriteField Messages = new SpriteField();
+    public int Score = 0;
 
     public int MaxMissiles = 1;
     SpriteField Debris = new SpriteField();
@@ -26,7 +27,7 @@ public class Player : Sprite
         {
             for (int i = 0; i < 10; i++)
             {
-                double Rise = -2 * Numbers.Random.NextDouble();
+                double Rise = -2 * (Numbers.Random.NextDouble() + .1);
                 double Run = 2 * Numbers.Random.NextDouble();
                 if (Numbers.Random.NextDouble() < .5) { Run *= -1; }
                 Debris.Items.Add(new Sprite(new[] { c }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(Rise, Run, 20)));
@@ -52,6 +53,8 @@ public class Player : Sprite
                 {
                     missile.Terminate();
                     badguy.MakeDebris();
+                    this.Score++;
+                    Console.Title = "Score: " + this.Score;
                 }
 
             }

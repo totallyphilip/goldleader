@@ -81,7 +81,7 @@ public class BadGuy : Sprite
         {
             case eBadGuyType.TieFighter:
                 this.Ascii = "|—o—|".ToCharArray();
-                this.FlyZone = new FlyZoneClass(0, 0, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
+                this.FlyZone = new FlyZoneClass(0, 2, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 1;
                 this.MissileConfig = new MissileStructure('|', 7, 1);
                 this.DebrisRange = 4;
