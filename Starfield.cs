@@ -1,6 +1,9 @@
 using AsciiEngine;
+using AsciiEngine.Coordinates;
+using AsciiEngine.Sprites;
 using Easy;
-public class Starfield : SpriteField
+
+public class Starfield : Swarm
 {
     double Speed;
     double RowCoverageFactor;
@@ -23,8 +26,8 @@ public class Starfield : SpriteField
             int x = Numbers.Random.Next(Screen.LeftEdge, Screen.RightEdge);
             int y = Screen.TopEdge - 1;
             if (randomly) { y = Numbers.Random.Next(Screen.TopEdge - 1, Screen.Height); }
-            Screen.Coordinate xy = new Screen.Coordinate(x, y);
-            this.Items.Add(new AsciiEngine.Sprite(new[] { '.' }, xy, new Screen.Trajectory(this.Speed, 0, Screen.Height - y)));
+            Coordinate xy = new Coordinate(x, y);
+            this.Items.Add(new Sprite(new[] { '.' }, xy, new Trajectory(this.Speed, 0, Screen.Height - y)));
         }
 
     }

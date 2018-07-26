@@ -1,5 +1,4 @@
 using System;
-using AsciiEngine;
 
 namespace Easy
 {
@@ -7,7 +6,7 @@ namespace Easy
     {
         public static Random Random = new Random();
 
-        public static double Distance(Screen.Coordinate c1, Screen.Coordinate c2)
+        public static double Distance(AsciiEngine.Coordinates.Coordinate c1, AsciiEngine.Coordinates.Coordinate c2)
         {
             return Math.Sqrt(Math.Pow(c1.X - c2.X, 2) + Math.Pow(c1.Y - c2.Y, 2));
         }

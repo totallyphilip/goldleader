@@ -1,8 +1,7 @@
-// this is my first attempt to extend the sprite classes
-
 using AsciiEngine;
+using AsciiEngine.Coordinates;
+using AsciiEngine.Sprites;
 using Easy;
-using System.Collections.Generic;
 
 public class BadGuy : Sprite
 {
@@ -27,23 +26,23 @@ public class BadGuy : Sprite
     }
     MissileStructure MissileConfig;
 
-    public SpriteField Missiles = new SpriteField();
+    public Swarm Missiles = new Swarm();
 
-    SpriteField Debris = new SpriteField();
+    Swarm Debris = new Swarm();
     double DebrisRange;
 
     public void MakeDebris()
     {
         for (int i = 0; i < Numbers.Random.Next(1, 4); i++)
         {
-            Debris.Items.Add(new Sprite(new[] { '\x00d7' }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(2)));
+            Debris.Items.Add(new Sprite(new[] { '\x00d7' }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(2)));
         }
 
         if (!this.Alive)
         {
             for (int c = 0; c < this.Width; c++)
             {
-                this.Debris.Items.Add(new Sprite(new[] { this.Ascii[c] }, new Screen.Coordinate(this.XY.X + c, this.XY.Y), new Screen.Trajectory(this.DebrisRange)));
+                this.Debris.Items.Add(new Sprite(new[] { this.Ascii[c] }, new Coordinate(this.XY.X + c, this.XY.Y), new Trajectory(this.DebrisRange)));
             }
         }
     }
@@ -59,7 +58,7 @@ public class BadGuy : Sprite
             // fire
             if (this.Missiles.Items.Count < this.MissileConfig.MaxCount && this.XY.Y > Screen.BottomEdge - MissileConfig.Range && this.HP > 0)
             {
-                this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Ascii }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(1, 0, MissileConfig.Range)));
+                this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Ascii }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(1, 0, MissileConfig.Range)));
             }
         }
 
@@ -126,10 +125,10 @@ public class BadGuy : Sprite
                 break;
         }
 
-        this.Trail = new Screen.CoordinateHistory(new Screen.Coordinate(Numbers.Random.Next(Screen.LeftEdge - this.Width, Screen.RightEdge + this.Width), Screen.TopEdge));
+        this.Trail = new Trail(new Coordinate(Numbers.Random.Next(Screen.LeftEdge - this.Width, Screen.RightEdge + this.Width), Screen.TopEdge));
 
         if (Numbers.Random.NextDouble() < .5) { Run *= -1; }
-        this.Trajectory = new Screen.Trajectory(DropsPerRow / System.Convert.ToDouble(this.FlyZone.Width), Run);
+        this.Trajectory = new Trajectory(DropsPerRow / System.Convert.ToDouble(this.FlyZone.Width), Run);
 
     }
 
@@ -149,7 +148,7 @@ public class BadGuy : Sprite
 
 
 
-public class BadGuyField : SpriteField
+public class BadGuyField : Swarm
 {
 
     System.DateTime starttime = System.DateTime.Now;

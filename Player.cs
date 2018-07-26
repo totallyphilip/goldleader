@@ -1,23 +1,24 @@
 using AsciiEngine;
+using AsciiEngine.Coordinates;
+using AsciiEngine.Sprites;
 using Easy;
-using System;
 
 public class Player : Sprite
 {
 
-    public SpriteField Missiles = new SpriteField();
-    public SpriteField Messages = new SpriteField();
+    public Swarm Missiles = new Swarm();
+    public Swarm Messages = new Swarm();
     public int Score = 0;
 
     public int MaxMissiles = 1;
-    SpriteField Debris = new SpriteField();
+    Swarm Debris = new Swarm();
 
     public Player()
     {
         this.Ascii = ":><:".ToCharArray();
         this.FlyZone = new FlyZoneClass(0, 0, 0, 0, FlyZoneClass.eEdgeMode.Stop);
-        this.Trajectory = new Screen.Trajectory(0, 0);
-        this.Trail = new Screen.CoordinateHistory(new Screen.Coordinate(Screen.Width / 2 - this.Width / 2, Screen.BottomEdge));
+        this.Trajectory = new Trajectory(0, 0);
+        this.Trail = new Trail(new Coordinate(Screen.Width / 2 - this.Width / 2, Screen.BottomEdge));
         this.HP = 1;
     }
 
@@ -30,7 +31,7 @@ public class Player : Sprite
                 double Rise = -2 * (Numbers.Random.NextDouble() + .1);
                 double Run = 2 * Numbers.Random.NextDouble();
                 if (Numbers.Random.NextDouble() < .5) { Run *= -1; }
-                Debris.Items.Add(new Sprite(new[] { c }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(Rise, Run, 20)));
+                Debris.Items.Add(new Sprite(new[] { c }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(Rise, Run, 20)));
             }
         }
     }
@@ -39,7 +40,7 @@ public class Player : Sprite
     {
         if (this.Missiles.Items.Count < this.MaxMissiles)
         {
-            this.Missiles.Items.Add(new Sprite(new[] { '|' }, new Screen.Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Screen.Trajectory(-1, 0, this.XY.Y)));
+            this.Missiles.Items.Add(new Sprite(new[] { '|' }, new Coordinate(this.XY.X + this.Width / 2, this.XY.Y), new Trajectory(-1, 0, this.XY.Y)));
         }
     }
 
@@ -54,7 +55,7 @@ public class Player : Sprite
                     missile.Terminate();
                     badguy.MakeDebris();
                     this.Score++;
-                    Console.Title = "Score: " + this.Score;
+                    System.Console.Title = "Score: " + this.Score;
                 }
 
             }
@@ -63,7 +64,7 @@ public class Player : Sprite
         if (this.MaxMissiles < badguys.MaxBadGuys / 3 && this.Alive)
         {
             this.MaxMissiles++;
-            this.Messages.Items.Add(new Sprite("Extra Missile".ToCharArray(), this.XY, new Screen.Trajectory(-1, 0, Screen.Height / 2)));
+            this.Messages.Items.Add(new Sprite("Extra Missile".ToCharArray(), this.XY, new Trajectory(-1, 0, Screen.Height / 2)));
         }
 
     }

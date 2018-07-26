@@ -1,217 +1,212 @@
-using AsciiEngine;
 using System;
 using System.Collections.Generic;
 
 namespace AsciiEngine
 {
-    #region " Sprites "
-
-    public class Sprite
+    namespace Sprites
     {
-
-        #region " Fly Zone "
-
-        public class FlyZoneClass
-
+        public class Sprite
         {
-            public enum eEdgeMode { Ignore, Bounce, Stop }
-            public eEdgeMode EdgeMode = eEdgeMode.Ignore;
 
-            public int TopMargin = 0;
-            public int BottomMargin = 0;
-            public int LeftMargin = 0;
-            public int RightMargin = 0;
+            #region " Fly Zone "
 
-            public int TopEdge { get { return Screen.TopEdge + this.TopMargin; } }
-            public int BottomEdge { get { return Screen.BottomEdge - this.BottomMargin; } }
-            public int LeftEdge { get { return Screen.LeftEdge + this.LeftMargin; } }
-            public int RightEdge { get { return Screen.RightEdge - this.RightMargin; } }
-            public int Width { get { return this.RightEdge - this.LeftEdge + 1; } }
+            public class FlyZoneClass
 
-
-
-            public FlyZoneClass(int topmargin, int bottommargin, int leftmargin, int rightmargin) : this(topmargin, bottommargin, leftmargin, rightmargin, eEdgeMode.Ignore) { }
-
-            public FlyZoneClass(int topmargin, int bottommargin, int leftmargin, int rightmargin, eEdgeMode edgemode)
             {
-                this.TopMargin = topmargin;
-                this.BottomMargin = bottommargin;
-                this.LeftMargin = leftmargin;
-                this.RightMargin = rightmargin;
-                this.EdgeMode = edgemode;
-            }
-        }
+                public enum eEdgeMode { Ignore, Bounce, Stop }
+                public eEdgeMode EdgeMode = eEdgeMode.Ignore;
 
-        protected FlyZoneClass FlyZone = new FlyZoneClass(0, 0, 0, 0);
+                public int TopMargin = 0;
+                public int BottomMargin = 0;
+                public int LeftMargin = 0;
+                public int RightMargin = 0;
 
-        #endregion
+                public int TopEdge { get { return Screen.TopEdge + this.TopMargin; } }
+                public int BottomEdge { get { return Screen.BottomEdge - this.BottomMargin; } }
+                public int LeftEdge { get { return Screen.LeftEdge + this.LeftMargin; } }
+                public int RightEdge { get { return Screen.RightEdge - this.RightMargin; } }
+                public int Width { get { return this.RightEdge - this.LeftEdge + 1; } }
 
-        #region " Locations "
 
-        public Screen.CoordinateHistory Trail;
-        public Screen.Trajectory Trajectory;
-        public Screen.Coordinate XY { get { return this.Trail.XY; } }
 
-        #endregion
+                public FlyZoneClass(int topmargin, int bottommargin, int leftmargin, int rightmargin) : this(topmargin, bottommargin, leftmargin, rightmargin, eEdgeMode.Ignore) { }
 
-        #region " Status "
-
-        public int HP = int.MaxValue;
-        public bool Active = true;
-        bool Terminated = false;
-        protected int Width { get { return this.Ascii.Length; } }
-
-        public bool Alive
-        {
-            get
-            {
-                bool alive = !this.Terminated && this.HP > 0;
-                if (alive && Trajectory != null)
+                public FlyZoneClass(int topmargin, int bottommargin, int leftmargin, int rightmargin, eEdgeMode edgemode)
                 {
-                    alive = Easy.Numbers.Distance(this.Trail.XY, this.Trail.InitialXY) < Trajectory.Range;
+                    this.TopMargin = topmargin;
+                    this.BottomMargin = bottommargin;
+                    this.LeftMargin = leftmargin;
+                    this.RightMargin = rightmargin;
+                    this.EdgeMode = edgemode;
                 }
-                return alive && AliveOverride;
             }
-        }
 
-        protected virtual bool AliveOverride { get { return true; } } // optional additional code in overriding property
+            protected FlyZoneClass FlyZone = new FlyZoneClass(0, 0, 0, 0);
 
-        public bool Hit(Screen.Coordinate coord) { return this.Hit(coord, -1); } // default 1 damage
-        public bool Hit(Screen.Coordinate coord, int HealthEffect)
-        {
-            // Hits are only detected if:
-            // * the sprite is still alive
-            // * the sprite is active (i.e. still doing something else even if dead)
-            // * the given coordinate is within the sprite body
-            bool HitDetected = this.Alive && this.Active && coord.X >= this.XY.X && coord.X < this.XY.X + this.Width && Easy.Numbers.Round(coord.Y) == Easy.Numbers.Round(this.XY.Y);
-            if (HitDetected) { this.HP += HealthEffect; }
-            return HitDetected;
-        }
+            #endregion
 
-        public void Terminate() { this.Terminated = true; }
+            #region " Locations "
 
-        #endregion
+            public Coordinates.Trail Trail;
+            public Coordinates.Trajectory Trajectory;
+            public Coordinates.Coordinate XY { get { return this.Trail.XY; } }
 
-        #region " Animation "
+            #endregion
 
-        public char[] Ascii;
+            #region " Status "
 
-        public void Hide()
-        {
-            Screen.TryWrite(this.XY, new String(' ', this.Width));
-        }
+            public int HP = int.MaxValue;
+            public bool Active = true;
+            bool Terminated = false;
+            protected int Width { get { return this.Ascii.Length; } }
 
-        public void Animate()
-        {
-            this.Hide();
-            this.Trail.Items.Add(this.NextCoordinate());
-            Screen.TryWrite(this.XY, new String(this.Ascii));
-        }
-
-        protected virtual Screen.Coordinate NextCoordinate()
-        {
-            if (this.XY.Y + this.Trajectory.Rise < this.FlyZone.TopEdge)
+            public bool Alive
             {
-                if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise); }
-                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Rise = 0; }
-                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
-            }
-            else if (this.XY.Y + this.Trajectory.Rise > this.FlyZone.BottomEdge)
-            {
-                if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise) * (-1); }
-                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Rise = 0; }
-                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
-            }
-
-            if (this.XY.X + this.Trajectory.Run < this.FlyZone.LeftEdge)
-            {
-                if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run); }
-                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Run = 0; }
-                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+                get
+                {
+                    bool alive = !this.Terminated && this.HP > 0;
+                    if (alive && Trajectory != null)
+                    {
+                        alive = Easy.Numbers.Distance(this.Trail.XY, this.Trail.InitialXY) < Trajectory.Range;
+                    }
+                    return alive && AliveOverride;
+                }
             }
 
-            if (this.XY.X + this.Trajectory.Run + this.Width > this.FlyZone.RightEdge)
+            protected virtual bool AliveOverride { get { return true; } } // optional additional code in overriding property
+
+            public bool Hit(Coordinates.Coordinate coord) { return this.Hit(coord, -1); } // default 1 damage
+            public bool Hit(Coordinates.Coordinate coord, int HealthEffect)
             {
-                if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run) * (-1); }
-                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Run = 0; }
-                else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+                // Hits are only detected if:
+                // * the sprite is still alive
+                // * the sprite is active (i.e. still doing something else even if dead)
+                // * the given coordinate is within the sprite body
+                bool HitDetected = this.Alive && this.Active && coord.X >= this.XY.X && coord.X < this.XY.X + this.Width && Easy.Numbers.Round(coord.Y) == Easy.Numbers.Round(this.XY.Y);
+                if (HitDetected) { this.HP += HealthEffect; }
+                return HitDetected;
             }
 
-            return new Screen.Coordinate(this.Trail.XY.X + this.Trajectory.Run, this.Trail.XY.Y + this.Trajectory.Rise);
+            public void Terminate() { this.Terminated = true; }
+
+            #endregion
+
+            #region " Animation "
+
+            public char[] Ascii;
+
+            public void Hide()
+            {
+                Screen.TryWrite(this.XY, new String(' ', this.Width));
+            }
+
+            public void Animate()
+            {
+                this.Hide();
+                this.Trail.Items.Add(this.NextCoordinate());
+                Screen.TryWrite(this.XY, new String(this.Ascii));
+            }
+
+            protected virtual Coordinates.Coordinate NextCoordinate()
+            {
+                if (this.XY.Y + this.Trajectory.Rise < this.FlyZone.TopEdge)
+                {
+                    if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise); }
+                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Rise = 0; }
+                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+                }
+                else if (this.XY.Y + this.Trajectory.Rise > this.FlyZone.BottomEdge)
+                {
+                    if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise) * (-1); }
+                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Rise = 0; }
+                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+                }
+
+                if (this.XY.X + this.Trajectory.Run < this.FlyZone.LeftEdge)
+                {
+                    if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run); }
+                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Run = 0; }
+                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+                }
+
+                if (this.XY.X + this.Trajectory.Run + this.Width > this.FlyZone.RightEdge)
+                {
+                    if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run) * (-1); }
+                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Run = 0; }
+                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+                }
+
+                return new Coordinates.Coordinate(this.Trail.XY.X + this.Trajectory.Run, this.Trail.XY.Y + this.Trajectory.Rise);
+
+            }
+
+            public virtual void DoActivities() // add more complex code in inherited tasks if needed
+            {
+                if (this.Alive)
+                {
+                    // stuff to do while alive
+                }
+
+                // stuff to do regardless
+
+                if (!this.Alive) { this.Active = false; } // set false when no more stuff to do
+            }
+
+
+            #endregion
+
+            #region  " Constructor "
+
+            public Sprite() { }
+
+            public Sprite(Coordinates.Coordinate xy, Coordinates.Trajectory t)
+            {
+                this.Ascii = "sprite".ToCharArray();
+                this.Trail = new Coordinates.Trail(xy);
+                this.Trajectory = t;
+            }
+
+            public Sprite(char[] c, Coordinates.Coordinate xy, Coordinates.Trajectory t)
+            {
+                this.Ascii = new List<char>(c).ToArray();
+                this.Trail = new Coordinates.Trail(xy);
+                this.Trajectory = t;
+            }
+
+            #endregion
 
         }
 
-        public virtual void DoActivities() // add more complex code in inherited tasks if needed
+        public class Swarm
         {
-            if (this.Alive)
+
+            public List<Sprite> Items = new List<Sprite>();
+
+            public void Animate()
             {
-                // stuff to do while alive
+
+                foreach (Sprite s in this.Items.FindAll(x => !x.Alive && !x.Active))
+                {
+                    s.Hide();
+                    this.Items.Remove(s);
+                }
+
+                foreach (Sprite s in this.Items.FindAll(x => x.Alive)) { s.Animate(); }
+                foreach (Sprite s in this.Items.FindAll(x => x.Active)) { s.DoActivities(); }
+
+                this.Spawn();
+
             }
 
-            // stuff to do regardless
+            protected virtual void Spawn() { } // do nothing unless inherited class overrides this
 
-            if (!this.Alive) { this.Active = false; } // set false when no more stuff to do
+            public Swarm() { }
+
         }
-
-
-        #endregion
-
-        #region  " Constructor "
-
-        public Sprite() { }
-
-        public Sprite(Screen.Coordinate xy, Screen.Trajectory t)
-        {
-            this.Ascii = "sprite".ToCharArray();
-            this.Trail = new Screen.CoordinateHistory(xy);
-            this.Trajectory = t;
-        }
-
-        public Sprite(char[] c, Screen.Coordinate xy, Screen.Trajectory t)
-        {
-            this.Ascii = new List<char>(c).ToArray();
-            this.Trail = new Screen.CoordinateHistory(xy);
-            this.Trajectory = t;
-        }
-
-        #endregion
-
     }
 
-    public class SpriteField
+    namespace Coordinates
     {
-
-        public List<Sprite> Items = new List<Sprite>();
-
-        public void Animate()
-        {
-
-            foreach (Sprite s in this.Items.FindAll(x => !x.Alive && !x.Active))
-            {
-                s.Hide();
-                this.Items.Remove(s);
-            }
-
-            foreach (Sprite s in this.Items.FindAll(x => x.Alive)) { s.Animate(); }
-            foreach (Sprite s in this.Items.FindAll(x => x.Active)) { s.DoActivities(); }
-
-            this.Spawn();
-
-        }
-
-        protected virtual void Spawn() { } // do nothing unless inherited class overrides this
-
-        public SpriteField() { }
-
-    }
-
-    #endregion
-
-    #region " Screen "
-
-    public class Screen
-    {
-        #region " Coordinates "
 
         public class Coordinate
         {
@@ -228,7 +223,7 @@ namespace AsciiEngine
 
         }
 
-        public class CoordinateHistory
+        public class Trail
         {
 
             public List<Coordinate> Items = new List<Coordinate>();
@@ -243,15 +238,11 @@ namespace AsciiEngine
                 Items.Add(xy);
             }
 
-            public CoordinateHistory(Coordinate xy)
+            public Trail(Coordinate xy)
             {
                 Items.Add(xy);
             }
         }
-
-        #endregion
-
-        #region " Trajectory "
 
         public class Trajectory
         {
@@ -287,9 +278,9 @@ namespace AsciiEngine
 
             #endregion
         }
-
-
-        #endregion
+    }
+    public class Screen
+    {
 
         #region " Dimensions "
 
@@ -305,9 +296,9 @@ namespace AsciiEngine
 
         public static int Height { get { return Console.WindowHeight; } }
 
-        public static Screen.Coordinate GetCenterCoordinate()
+        public static Coordinates.Coordinate GetCenterCoordinate()
         {
-            return new Screen.Coordinate(Easy.Numbers.Round(Screen.Width / 2), Easy.Numbers.Round(Screen.Height / 2));
+            return new Coordinates.Coordinate(Easy.Numbers.Round(Screen.Width / 2), Easy.Numbers.Round(Screen.Height / 2));
         }
 
         public static bool TrySetSize(int targetwidth, int targetheight)
@@ -374,12 +365,12 @@ namespace AsciiEngine
 
         #region " Writing "
 
-        public static void TryWrite(Screen.Coordinate xy, char[] s)
+        public static void TryWrite(Coordinates.Coordinate xy, char[] s)
         {
             TryWrite(xy.X, xy.Y, s.ToString());
         }
 
-        public static void TryWrite(Screen.Coordinate xy, string s)
+        public static void TryWrite(Coordinates.Coordinate xy, string s)
         {
             TryWrite(xy.X, xy.Y, s);
         }
@@ -410,7 +401,7 @@ namespace AsciiEngine
             catch { }
         }
 
-        public static void TryWrite(Screen.Coordinate xy, char c)
+        public static void TryWrite(Coordinates.Coordinate xy, char c)
         {
             TryWrite(xy.X, xy.Y, c);
         }
@@ -434,7 +425,7 @@ namespace AsciiEngine
         public static void Countdown(int start)
         {
             Easy.Keys.EatKeys();
-            Screen.Coordinate xy = Screen.GetCenterCoordinate();
+            Coordinates.Coordinate xy = Screen.GetCenterCoordinate();
 
             for (int n = start; n > 0; n--)
             {
@@ -446,7 +437,5 @@ namespace AsciiEngine
 
         #endregion
     }
-
-    #endregion 
 
 }
