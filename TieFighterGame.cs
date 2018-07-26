@@ -137,7 +137,7 @@ public class TieFighterGame
                         debug = !debug;
                         break;
                     case ConsoleKey.T:
-                        boom = new AsciiEngine.Fx.Explosion("#$%".ToCharArray(), new AsciiEngine.Coordinates.Point(10, 10), 5, true, true, true, true, true);
+                        boom = new AsciiEngine.Fx.Explosion("Hello World".ToCharArray(), new AsciiEngine.Coordinates.Point(10, 10), 5, false);
                         break;
                 }
 

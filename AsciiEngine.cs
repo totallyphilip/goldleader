@@ -7,12 +7,23 @@ namespace AsciiEngine
     {
         public class Explosion : Sprites.Swarm
         {
+
             public Explosion(char[] ascii, Coordinates.Point coord, double range, bool centered, bool up, bool down, bool left, bool right)
+            {
+                constructor(ascii, coord, range, centered, up, down, left, right);
+            }
+
+            public Explosion(char[] ascii, Coordinates.Point coord, double range, bool centered)
+            {
+                constructor(ascii, coord, range, centered, true, true, true, true);
+            }
+
+            void constructor(char[] ascii, Coordinates.Point coord, double range, bool centered, bool up, bool down, bool left, bool right)
             {
                 for (int i = 0; i < ascii.Length; i++)
                 {
-                    double rise = Easy.Abacus.Random.NextDouble() + .01; // right (at least slightly)
-                    double run = Easy.Abacus.Random.NextDouble() + .01; // down (at least slightly)
+                    double rise = Easy.Abacus.Random.NextDouble() + .1; // right (at least slightly)
+                    double run = Easy.Abacus.Random.NextDouble() + .1; // down (at least slightly)
 
                     if (!up && !down) { rise = 0; } // no rise
                     if (up && !down) { rise *= -1; } // go up
