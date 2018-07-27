@@ -34,7 +34,11 @@ public class TieFighterGame
 
     public void Play()
     {
-
+        Console.Clear();
+        Console.WriteLine("Scoring:");
+        Console.WriteLine("Hit = 1 X altitude bonus");
+        Console.WriteLine("Kill = 2 X altitude bonus");
+        Console.ReadKey();
         Console.Clear();
 
         // Star fields
@@ -60,6 +64,8 @@ public class TieFighterGame
 
         // testing
         AsciiEngine.Fx.Explosion boom = null;
+
+        Easy.Keyboard.EatKeys();
 
         do
         {
