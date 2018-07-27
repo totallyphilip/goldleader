@@ -1,4 +1,5 @@
 using AsciiEngine;
+using AsciiEngine.Fx;
 using AsciiEngine.Coordinates;
 using AsciiEngine.Sprites;
 using Easy;
@@ -28,22 +29,17 @@ public class BadGuy : Sprite
 
     public Swarm Missiles = new Swarm();
 
-    Swarm Debris = new Swarm();
+    Explosion Sparks = new Explosion();
+    Explosion Debris = new Explosion();
     double DebrisRange;
 
-    public void MakeDebris()
+    override protected void OnHit()
     {
-        for (int i = 0; i < Abacus.Random.Next(1, 4); i++)
-        {
-            Debris.Items.Add(new Sprite(new[] { '\x00d7' }, new Point(this.XY.dX + this.Width / 2, this.XY.dY), new Trajectory(2)));
-        }
-
+        this.HP--;
+        Sparks = new Explosion(new string('\x00d7', Abacus.Random.Next(2, 5)).ToCharArray(), this.XY, 0, 2, 1, true, true, true, true);
         if (!this.Alive)
         {
-            for (int c = 0; c < this.Width; c++)
-            {
-                this.Debris.Items.Add(new Sprite(new[] { this.Ascii[c] }, new Point(this.XY.dX + c, this.XY.dY), new Trajectory(this.DebrisRange)));
-            }
+            Debris = new Explosion(this.Ascii, this.XY, this.Width, DebrisRange, 1, true, true, true, true);
         }
     }
 
@@ -63,9 +59,10 @@ public class BadGuy : Sprite
         }
 
         this.Missiles.Animate();
+        this.Sparks.Animate();
         this.Debris.Animate();
 
-        if (!this.Alive && this.Debris.Items.Count < 1 && this.Missiles.Items.Count < 1) { this.Active = false; }
+        if (!this.Alive && this.Debris.Items.Count < 1 && this.Sparks.Items.Count < 1 && this.Missiles.Items.Count < 1) { this.Active = false; }
 
     }
 

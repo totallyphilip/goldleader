@@ -8,10 +8,12 @@ public class TieFighterGame
     public void TryPlay()
     {
 
+        bool LinuxDevMode = true;
+
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
 
-        if (Screen.TrySetSize(45, 35))
+        if (LinuxDevMode || Screen.TrySetSize(45, 35))
         {
             Console.CursorVisible = false;
             Screen.Countdown(5);
@@ -137,7 +139,7 @@ public class TieFighterGame
                         debug = !debug;
                         break;
                     case ConsoleKey.T:
-                        boom = new AsciiEngine.Fx.Explosion("Hello World".ToCharArray(), new AsciiEngine.Coordinates.Point(10, 10), 5, false);
+
                         break;
                 }
 

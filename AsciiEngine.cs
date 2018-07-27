@@ -8,22 +8,22 @@ namespace AsciiEngine
         public class Explosion : Sprites.Swarm
         {
 
-            public Explosion(char[] ascii, Coordinates.Point coord, double range, bool centered, bool up, bool down, bool left, bool right)
+            public Explosion() { }
+
+            public Explosion(char[] ascii, Coordinates.Point coord, int width, double range, double force, bool up, bool down, bool left, bool right)
             {
-                constructor(ascii, coord, range, centered, up, down, left, right);
+                constructor(ascii, coord, width, range, force, up, down, left, right);
             }
 
-            public Explosion(char[] ascii, Coordinates.Point coord, double range, bool centered)
+            void constructor(char[] ascii, Coordinates.Point coord, int width, double range, double force, bool up, bool down, bool left, bool right)
             {
-                constructor(ascii, coord, range, centered, true, true, true, true);
-            }
 
-            void constructor(char[] ascii, Coordinates.Point coord, double range, bool centered, bool up, bool down, bool left, bool right)
-            {
-                for (int i = 0; i < ascii.Length; i++)
+                int position = 0;
+
+                foreach (char c in ascii)
                 {
-                    double rise = Easy.Abacus.Random.NextDouble() + .1; // right (at least slightly)
-                    double run = Easy.Abacus.Random.NextDouble() + .1; // down (at least slightly)
+                    double rise = force * (Easy.Abacus.Random.NextDouble() + .1); // right (at least slightly)
+                    double run = force * (Easy.Abacus.Random.NextDouble() + .1); // down (at least slightly)
 
                     if (!up && !down) { rise = 0; } // no rise
                     if (up && !down) { rise *= -1; } // go up
@@ -34,11 +34,13 @@ namespace AsciiEngine
                     if (left && right) { if (Easy.Abacus.RandomTrue) { run *= -1; } } // surprise me
 
                     Coordinates.Trajectory t = new Coordinates.Trajectory(rise, run, range);
-                    Coordinates.Point xy = new Coordinates.Point(coord.dY, coord.dY);
+                    Coordinates.Point xy = new Coordinates.Point(coord.dX, coord.dY);
 
-                    if (centered) { xy.dX = coord.dX + ascii.Length / 2; } else { xy.dX += i; }
+                    xy.dX += position;
+                    position++;
+                    if (position > width) { position = 0; }
 
-                    this.Items.Add(new Sprites.Sprite(new[] { ascii[i] }, xy, t));
+                    this.Items.Add(new Sprites.Sprite(new[] { c }, xy, t));
                 }
 
             }
@@ -119,17 +121,21 @@ namespace AsciiEngine
 
             protected virtual bool AliveOverride { get { return true; } } // optional additional code in overriding property
 
-            public bool Hit(Coordinates.Point coord) { return this.Hit(coord, -1); } // default 1 damage
-            public bool Hit(Coordinates.Point coord, int HealthEffect)
+            public bool Hit(Coordinates.Point coord)
             {
                 // Hits are only detected if:
                 // * the sprite is still alive
                 // * the sprite is active (i.e. still doing something else even if dead)
                 // * the given coordinate is within the sprite body
+
                 bool HitDetected = this.Alive && this.Active && coord.dX >= this.XY.dX && coord.dX < this.XY.dX + this.Width && Easy.Abacus.Round(coord.dY) == Easy.Abacus.Round(this.XY.dY);
-                if (HitDetected) { this.HP += HealthEffect; }
+
+                if (HitDetected) { OnHit(); }
+
                 return HitDetected;
             }
+
+            protected virtual void OnHit() { }
 
             public void Terminate() { this.Terminated = true; }
 

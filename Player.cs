@@ -2,6 +2,7 @@ using AsciiEngine;
 using AsciiEngine.Coordinates;
 using AsciiEngine.Sprites;
 using Easy;
+using System.Collections.Generic;
 
 public class Player : Sprite
 {
@@ -11,7 +12,7 @@ public class Player : Sprite
     public int Score = 0;
 
     public int MaxMissiles = 1;
-    Swarm Debris = new Swarm();
+    AsciiEngine.Fx.Explosion Debris;
 
     public Player()
     {
@@ -24,16 +25,7 @@ public class Player : Sprite
 
     public void BigExplosion()
     {
-        foreach (char c in "\x00d7*#-".ToCharArray())
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                double Rise = -2 * (Abacus.Random.NextDouble() + .1);
-                double Run = 2 * Abacus.Random.NextDouble();
-                if (Abacus.RandomTrue) { Run *= -1; }
-                Debris.Items.Add(new Sprite(new[] { c }, new Point(this.XY.dX + this.Width / 2, this.XY.dY), new Trajectory(Rise, Run, 20)));
-            }
-        }
+        Debris = new AsciiEngine.Fx.Explosion(Textify.Repeat("\x00d7*#-", 10).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true);
     }
 
     public void Fire()
@@ -53,7 +45,6 @@ public class Player : Sprite
                 if (badguy.Hit(missile.XY))
                 {
                     missile.Terminate();
-                    badguy.MakeDebris();
                     this.Score++;
                     System.Console.Title = "Score: " + this.Score;
                 }
@@ -73,7 +64,7 @@ public class Player : Sprite
     {
         Missiles.Animate();
         Messages.Animate();
-        Debris.Animate();
+        if (Debris != null) { Debris.Animate(); }
 
         if (!this.Alive && this.Debris.Items.Count < 1 && this.Missiles.Items.Count < 1) { this.Active = false; }
     }

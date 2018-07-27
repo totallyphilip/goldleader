@@ -24,6 +24,16 @@ namespace Easy
         }
     }
 
+    public class Textify
+    {
+        public static string Repeat(string s, int n)
+        {
+            string result = "";
+            for (int i = 0; i < n; i++) { result += s; }
+            return result;
+        }
+    }
+
     public class Clock
     {
         public static Int64 LastTick = 0;
