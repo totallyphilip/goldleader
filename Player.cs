@@ -38,7 +38,7 @@ public class Player : Sprite
 
     void AddMessage(string s)
     {
-        this.Messages.Items.Add(new Sprite(s.ToCharArray(), this.XY, new Trajectory(-.5, 0, Screen.Height / 2)));
+        this.Messages.Items.Add(new Sprite(s.ToCharArray(), new Point(Screen.Width / 2 - s.Length / 2, this.XY.iY), new Trajectory(-.5, 0, Screen.Height / 2)));
     }
 
     public void CheckBadGuyHits(BadGuyField badguys)
@@ -52,7 +52,7 @@ public class Player : Sprite
                     missile.Terminate();
                     if (!FirstBlood)
                     {
-                        this.AddMessage("   Great kid.");
+                        this.AddMessage("Great kid.");
                         Messages.Animate();
                         Messages.Animate();
                         this.AddMessage("Don't get cocky!");

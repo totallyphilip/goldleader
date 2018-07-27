@@ -9,7 +9,7 @@ public class TieFighterGame
     public void TryPlay()
     {
 
-        bool LinuxDevMode = true;
+        bool LinuxDevMode = false;
 
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;

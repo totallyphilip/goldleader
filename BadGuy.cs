@@ -49,7 +49,7 @@ public class BadGuy : Sprite
         }
         TieFighterGame.Score += points * scorefactor;
 
-        this.Messages.Items.Add(new Sprite(("+" + points * scorefactor).ToCharArray(), this.XY, new Trajectory(-.5, 0, this.XY.iY)));
+        this.Messages.Items.Add(new Sprite(("+" + points * scorefactor).ToCharArray(), this.XY, new Trajectory(-.5, 0, 4)));
     }
 
     override public void DoActivities()
