@@ -248,6 +248,8 @@ namespace AsciiEngine
 
             }
 
+            public bool Empty { get { return this.Items.Count < 1; } }
+
             protected virtual void Spawn() { } // do nothing unless inherited class overrides this
 
             public Swarm() { }

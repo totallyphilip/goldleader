@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class TieFighterGame
 {
 
+    public static int Score;
     public void TryPlay()
     {
 
@@ -70,6 +71,7 @@ public class TieFighterGame
             player.CheckHitByBadGuys(badguys);
             badguys.Animate();
             if (boom != null) { boom.Animate(); }
+            System.Console.Title = "Score: " + TieFighterGame.Score;
 
             if (debug)
             {

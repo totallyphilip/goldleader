@@ -12,7 +12,7 @@ public class BadGuy : Sprite
     }
 
     double ReverseFactor;
-
+    public Swarm Messages = new Swarm();
     struct MissileStructure
     {
         public char Ascii;
@@ -36,11 +36,20 @@ public class BadGuy : Sprite
     override protected void OnHit()
     {
         this.HP--;
+
+        int scorefactor = (Screen.Height - this.XY.iY) / 4;
+        int points = 1;
+
         Sparks = new Explosion(new string('\x00d7', Abacus.Random.Next(2, 5)).ToCharArray(), this.XY, 0, 2, 1, true, true, true, true);
         if (!this.Alive)
         {
             Debris = new Explosion(this.Ascii, this.XY, this.Width, DebrisRange, 1, true, true, true, true);
+
+            points = 2;
         }
+        TieFighterGame.Score += points * scorefactor;
+
+        this.Messages.Items.Add(new Sprite(("+" + points * scorefactor).ToCharArray(), this.XY, new Trajectory(-.5, 0, this.XY.iY)));
     }
 
     override public void DoActivities()
@@ -61,8 +70,9 @@ public class BadGuy : Sprite
         this.Missiles.Animate();
         this.Sparks.Animate();
         this.Debris.Animate();
+        Messages.Animate();
 
-        if (!this.Alive && this.Debris.Items.Count < 1 && this.Sparks.Items.Count < 1 && this.Missiles.Items.Count < 1) { this.Active = false; }
+        if (!this.Alive && this.Debris.Empty && this.Sparks.Empty && this.Messages.Empty && this.Missiles.Empty) { this.Active = false; }
 
     }
 

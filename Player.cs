@@ -9,7 +9,7 @@ public class Player : Sprite
 
     public Swarm Missiles = new Swarm();
     public Swarm Messages = new Swarm();
-    public int Score = 0;
+    bool FirstBlood = false;
 
     public int MaxMissiles = 1;
     AsciiEngine.Fx.Explosion Debris;
@@ -36,6 +36,11 @@ public class Player : Sprite
         }
     }
 
+    void AddMessage(string s)
+    {
+        this.Messages.Items.Add(new Sprite(s.ToCharArray(), this.XY, new Trajectory(-.5, 0, Screen.Height / 2)));
+    }
+
     public void CheckBadGuyHits(BadGuyField badguys)
     {
         foreach (Sprite missile in this.Missiles.Items.FindAll(x => x.Alive))
@@ -45,8 +50,14 @@ public class Player : Sprite
                 if (badguy.Hit(missile.XY))
                 {
                     missile.Terminate();
-                    this.Score++;
-                    System.Console.Title = "Score: " + this.Score;
+                    if (!FirstBlood)
+                    {
+                        this.AddMessage("   Great kid.");
+                        Messages.Animate();
+                        Messages.Animate();
+                        this.AddMessage("Don't get cocky!");
+                        FirstBlood = true;
+                    }
                 }
 
             }
@@ -55,7 +66,7 @@ public class Player : Sprite
         if (this.MaxMissiles < badguys.MaxBadGuys / 3 && this.Alive)
         {
             this.MaxMissiles++;
-            this.Messages.Items.Add(new Sprite("Extra Missile".ToCharArray(), this.XY, new Trajectory(-1, 0, Screen.Height / 2)));
+            this.AddMessage("Extra Missile");
         }
 
     }
@@ -66,7 +77,7 @@ public class Player : Sprite
         Messages.Animate();
         if (Debris != null) { Debris.Animate(); }
 
-        if (!this.Alive && this.Debris.Items.Count < 1 && this.Missiles.Items.Count < 1) { this.Active = false; }
+        if (!this.Alive && this.Debris.Empty && this.Missiles.Empty) { this.Active = false; }
     }
 
     public void CheckHitByBadGuys(BadGuyField badguys)
@@ -79,6 +90,7 @@ public class Player : Sprite
                 {
                     missile.Terminate();
                     this.BigExplosion();
+                    this.HP--;
                 }
 
             }
