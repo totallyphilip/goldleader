@@ -1,4 +1,5 @@
 using System;
+using AsciiEngine;
 
 namespace Easy
 {
@@ -31,6 +32,18 @@ namespace Easy
             string result = "";
             for (int i = 0; i < n; i++) { result += s; }
             return result;
+        }
+
+        public static void WriteLineCentered(string s)
+        {
+            WriteCentered(s);
+            Console.WriteLine();
+        }
+        public static void WriteCentered(string s)
+        {
+
+            Console.Write(new string(' ', Abacus.Round(Screen.Width / 2) - Abacus.Round(s.Length / 2)));
+            Console.Write(s);
         }
     }
 

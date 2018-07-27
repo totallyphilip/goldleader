@@ -1,4 +1,6 @@
 using AsciiEngine;
+using AsciiEngine.Coordinates;
+using AsciiEngine.Sprites;
 using System;
 using System.Collections.Generic;
 
@@ -17,9 +19,8 @@ public class TieFighterGame
         if (LinuxDevMode || Screen.TrySetSize(45, 35))
         {
             Console.CursorVisible = false;
-            Screen.Countdown(5);
             Easy.Keyboard.EatKeys();
-            this.Play();
+            this.Looper();
             Console.CursorVisible = true;
         }
         else
@@ -32,14 +33,123 @@ public class TieFighterGame
 
     }
 
-    public void Play()
+    void AddMessage(string s, ref Swarm messages)
+    {
+        messages.Items.Add(new Sprite(s.ToCharArray(), new Point(Screen.Width / 2 - s.Length / 2, Screen.Height), new Trajectory(-.5, 0, Screen.Height / 2)));
+    }
+
+    public void Demo()
     {
         Console.Clear();
-        Console.WriteLine("Scoring:");
-        Console.WriteLine("Hit = 1 X altitude bonus");
-        Console.WriteLine("Kill = 2 X altitude bonus");
-        Console.ReadKey();
+        Swarm Messages = new Swarm();
+        Swarm badguys = new Swarm();
+        List<string> messagetext = new List<string>();
+
+        int m = 0;
+
+        messagetext.Add("A S C I I   W A R S");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("- Enemies -");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+
+        foreach (BadGuy.eBadGuyType shiptype in (BadGuy.eBadGuyType[])System.Enum.GetValues(typeof(BadGuy.eBadGuyType)))
+        {
+            BadGuy bg = new BadGuy(shiptype);
+            badguys.Items.Add(bg);
+            messagetext.Add(new string(bg.Ascii) + " " + Enum.GetName(typeof(BadGuy.eBadGuyType), shiptype) + " (" + bg.HP + " HP)");
+            messagetext.Add("");
+            messagetext.Add("");
+            messagetext.Add("");
+
+
+        }
+
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("- Scoring -");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("Hit = 1 X Altitude Bonus");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("Kill = 2 X Altitude Bonus");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("- Controls -");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("Esc = Quit");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("Up/Down = Faster/Slower");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("Tab = Hyperdrive");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("Space = Fire");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("Left/Right = Move");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+        messagetext.Add("");
+
+        do
+        {
+            badguys.Animate();
+            Messages.Animate();
+            AddMessage(messagetext[m], ref Messages);
+            m++;
+            if (m == messagetext.Count) { m = 0; }
+
+            Easy.Clock.FpsThrottle(4);
+
+        } while (!Console.KeyAvailable);
+
+
+    }
+
+    void Looper()
+    {
+        do
+        {
+            Demo();
+        } while (Play());
+    }
+
+    public bool Play()
+    {
+        Demo();
         Console.Clear();
+
+        Score = 0;
 
         // Star fields
         List<Starfield> starfields = new List<Starfield>();
@@ -64,8 +174,6 @@ public class TieFighterGame
 
         // testing
         AsciiEngine.Fx.Explosion boom = null;
-
-        Easy.Keyboard.EatKeys();
 
         do
         {
@@ -154,8 +262,6 @@ public class TieFighterGame
             }
 
         } while (!UserQuit && player.Active);
-
-        if (!UserQuit) { Screen.Countdown(5); }
-
+        return !UserQuit;
     }
 }

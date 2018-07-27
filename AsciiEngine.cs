@@ -479,19 +479,6 @@ namespace AsciiEngine
             }
         }
 
-        public static void Countdown(int start)
-        {
-            Easy.Keyboard.EatKeys();
-            Coordinates.Point xy = Screen.GetCenterCoordinate();
-
-            for (int n = start; n > 0; n--)
-            {
-                Screen.TryWrite(xy.dX, xy.dY, n + " ");
-                if (Console.KeyAvailable) { n = 0; }
-                else { System.Threading.Thread.Sleep(1000); }
-            }
-        }
-
         #endregion
     }
 

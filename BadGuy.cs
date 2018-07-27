@@ -8,7 +8,7 @@ public class BadGuy : Sprite
 {
     public enum eBadGuyType
     {
-        TieFighter, TieBomber, TieInterceptor, Vader, Squadron
+        Fighter, Bomber, Interceptor, Master, Squadron
     }
 
     double ReverseFactor;
@@ -82,10 +82,9 @@ public class BadGuy : Sprite
 
         double Run = 1;
         double DropsPerRow = 0; // initialized to avoid unassigned variable warning
-
         switch (badguytype)
         {
-            case eBadGuyType.TieFighter:
+            case eBadGuyType.Fighter:
                 this.Ascii = "|—o—|".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, 2, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 1;
@@ -94,7 +93,7 @@ public class BadGuy : Sprite
                 DropsPerRow = 8;
                 ReverseFactor = .001;
                 break;
-            case eBadGuyType.TieBomber:
+            case eBadGuyType.Bomber:
                 this.Ascii = "{—o-o—}".ToCharArray();
                 this.FlyZone = new FlyZoneClass(Abacus.Round(Screen.Height * .5), Abacus.Round(Screen.Height * .25), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 2;
@@ -103,7 +102,7 @@ public class BadGuy : Sprite
                 DropsPerRow = 1;
                 ReverseFactor = 0;
                 break;
-            case eBadGuyType.TieInterceptor:
+            case eBadGuyType.Interceptor:
                 this.Ascii = "<—o—>".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, Abacus.Round(Screen.Height * -.15), 0, 0, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 2;
@@ -112,10 +111,10 @@ public class BadGuy : Sprite
                 DropsPerRow = 16;
                 ReverseFactor = .05;
                 break;
-            case eBadGuyType.Vader:
+            case eBadGuyType.Master:
                 this.Ascii = "[—o—]".ToCharArray();
                 this.FlyZone = new FlyZoneClass(Screen.Height / 2, 2, 5, 5, FlyZoneClass.eEdgeMode.Bounce);
-                this.HP = 2;
+                this.HP = 3;
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .25, 2);
                 this.DebrisRange = 4;
                 DropsPerRow = 16;
@@ -184,22 +183,22 @@ public class BadGuyField : Swarm
             switch (Abacus.Random.Next(0, this.MaxBadGuys))
             {
                 case 0:
-                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.TieFighter));
+                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Fighter));
                     break;
                 case 1:
-                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.TieBomber));
+                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Bomber));
                     break;
                 case 3:
-                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.TieInterceptor));
+                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Interceptor));
                     break;
                 case 4:
-                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Vader));
+                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Master));
                     break;
                 case 5:
                     this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Squadron));
                     break;
                 default:
-                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.TieFighter));
+                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Fighter));
                     break;
             }
         }

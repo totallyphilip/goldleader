@@ -66,7 +66,7 @@ public class Player : Sprite
         if (this.MaxMissiles < badguys.MaxBadGuys / 3 && this.Alive)
         {
             this.MaxMissiles++;
-            this.AddMessage("Extra Missile");
+            this.AddMessage("Blaster Upgraded");
         }
 
     }
