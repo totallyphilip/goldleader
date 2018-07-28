@@ -161,7 +161,8 @@ public class TieFighterGame
             Easy.Clock.FpsThrottle(FPS);
 
 
-            if (starttime.AddSeconds(90) < System.DateTime.Now)
+            // if (starttime.AddSeconds(90) < System.DateTime.Now)
+            if (player.MaxMissiles < badguys.MaxBadGuys / 3 && player.MaxMissiles < 4)
             {
                 Scroller.AddMessage("Blaster Upgraded");
                 player.MaxMissiles++;
