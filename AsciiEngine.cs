@@ -121,21 +121,29 @@ namespace AsciiEngine
 
             protected virtual bool AliveOverride { get { return true; } } // optional additional code in overriding property
 
-            public bool Hit(Coordinates.Point coord)
+            public bool Hit(Sprite thatone)
             {
                 // Hits are only detected if:
                 // * the sprite is still alive
                 // * the sprite is active (i.e. still doing something else even if dead)
                 // * the given coordinate is within the sprite body
 
-                bool HitDetected = this.Alive && this.Active && coord.dX >= this.XY.dX && coord.dX < this.XY.dX + this.Width && Easy.Abacus.Round(coord.dY) == Easy.Abacus.Round(this.XY.dY);
+                bool HitDetected =
+                    (this.Alive && this.Active)
+                    && (thatone.Alive && thatone.Active)
+                    && thatone.XY.iY == this.XY.iY
+                    && (
+                        (thatone.XY.iX >= this.XY.iX && thatone.XY.iX < this.XY.iX + this.Width) // [(]
+                        || (thatone.XY.iX + thatone.Width >= this.XY.iX && thatone.XY.iX + thatone.Width < this.XY.iX + this.Width) // [)]
+                        || (thatone.XY.iX <= this.XY.iX && thatone.XY.iX + thatone.Width > this.XY.iX + this.Width) // ([])
+                    );
 
                 if (HitDetected) { OnHit(); }
 
                 return HitDetected;
             }
 
-            protected virtual void OnHit() { }
+            public virtual void OnHit() { }
 
             public void Terminate() { this.Terminated = true; }
 
@@ -250,7 +258,26 @@ namespace AsciiEngine
 
             public bool Empty { get { return this.Items.Count < 1; } }
 
+            public bool Alive { get { return this.Items.Exists(x => x.Alive); } }
+
             protected virtual void Spawn() { } // do nothing unless inherited class overrides this
+
+            public void CheckCollision(Sprite thatone)
+            {
+                foreach (Sprite thisone in this.Items.FindAll(x => x.Alive))
+                {
+                    if (thisone.Hit(thatone)) { thatone.OnHit(); }
+                }
+
+            }
+
+            public void CheckCollisions(Swarm otherswarm)
+            {
+                foreach (Sprite thatone in otherswarm.Items.FindAll(x => x.Alive))
+                {
+                    this.CheckCollision(thatone);
+                }
+            }
 
             public Swarm() { }
 

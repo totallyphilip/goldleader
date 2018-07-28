@@ -4,15 +4,40 @@ using AsciiEngine.Sprites;
 using Easy;
 using System.Collections.Generic;
 
+
+public class PlayerMissile : Sprite
+{
+    override public void OnHit() { this.HP--; }
+    public PlayerMissile(AsciiEngine.Coordinates.Point xy, AsciiEngine.Coordinates.Trajectory t)
+    {
+        this.Ascii = "|".ToCharArray();
+        this.Trail = new AsciiEngine.Coordinates.Trail(xy);
+        this.Trajectory = t;
+    }
+}
+
 public class Player : Sprite
 {
 
     public Swarm Missiles = new Swarm();
     public Swarm Messages = new Swarm();
-    bool FirstBlood = false;
 
     public int MaxMissiles = 1;
     AsciiEngine.Fx.Explosion Debris;
+
+    override public void OnHit()
+    {
+        this.HP--;
+        if (this.HP > 0)
+        {
+            Debris = new AsciiEngine.Fx.Explosion(new string('\x00d7', Abacus.Random.Next(2, 5)).ToCharArray(), this.XY, 0, 2, 1, true, false, true, true);
+        }
+        else
+        {
+            Debris = new AsciiEngine.Fx.Explosion(Textify.Repeat("\x00d7*#-", 10).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true);
+        }
+
+    }
 
     public Player()
     {
@@ -23,52 +48,14 @@ public class Player : Sprite
         this.HP = 1;
     }
 
-    public void BigExplosion()
-    {
-        Debris = new AsciiEngine.Fx.Explosion(Textify.Repeat("\x00d7*#-", 10).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true);
-    }
-
     public void Fire()
     {
         if (this.Missiles.Items.Count < this.MaxMissiles)
         {
-            this.Missiles.Items.Add(new Sprite(new[] { '|' }, new Point(this.XY.dX + this.Width / 2, this.XY.dY), new Trajectory(-1, 0, this.XY.dY)));
+            PlayerMissile missile = new PlayerMissile(new Point(this.XY.dX + this.Width / 2, this.XY.dY), new Trajectory(-1, 0, this.XY.dY));
+            missile.HP = 1;
+            this.Missiles.Items.Add(missile);
         }
-    }
-
-    void AddMessage(string s)
-    {
-        this.Messages.Items.Add(new Sprite(s.ToCharArray(), new Point(Screen.Width / 2 - s.Length / 2, this.XY.iY), new Trajectory(-.5, 0, Screen.Height / 2)));
-    }
-
-    public void CheckBadGuyHits(BadGuyField badguys)
-    {
-        foreach (Sprite missile in this.Missiles.Items.FindAll(x => x.Alive))
-        {
-            foreach (BadGuy badguy in badguys.Items.FindAll(x => x.Alive))
-            {
-                if (badguy.Hit(missile.XY))
-                {
-                    missile.Terminate();
-                    if (!FirstBlood)
-                    {
-                        this.AddMessage("Great kid.");
-                        Messages.Animate();
-                        Messages.Animate();
-                        this.AddMessage("Don't get cocky!");
-                        FirstBlood = true;
-                    }
-                }
-
-            }
-        }
-
-        if (this.MaxMissiles < badguys.MaxBadGuys / 3 && this.Alive)
-        {
-            this.MaxMissiles++;
-            this.AddMessage("Blaster Upgraded");
-        }
-
     }
 
     override public void DoActivities()
@@ -79,23 +66,5 @@ public class Player : Sprite
 
         if (!this.Alive && this.Debris.Empty && this.Missiles.Empty) { this.Active = false; }
     }
-
-    public void CheckHitByBadGuys(BadGuyField badguys)
-    {
-        foreach (BadGuy badguy in badguys.Items)
-        {
-            foreach (Sprite missile in badguy.Missiles.Items)
-            {
-                if (this.Hit(missile.XY))
-                {
-                    missile.Terminate();
-                    this.BigExplosion();
-                    this.HP--;
-                }
-
-            }
-        }
-    }
-
 
 }

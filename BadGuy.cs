@@ -33,7 +33,7 @@ public class BadGuy : Sprite
     Explosion Debris = new Explosion();
     double DebrisRange;
 
-    override protected void OnHit()
+    override public void OnHit()
     {
         this.HP--;
 
@@ -168,13 +168,7 @@ public class BadGuyField : Swarm
         }
     }
 
-    public BadGuyField()
-    {
-
-        // foreach (BadGuy.eBadGuyType ship in (BadGuy.eBadGuyType[])System.Enum.GetValues(typeof(BadGuy.eBadGuyType))) { }
-
-
-    }
+    public BadGuyField() { }
 
     protected override void Spawn()
     {

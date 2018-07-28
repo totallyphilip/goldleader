@@ -33,106 +33,51 @@ public class TieFighterGame
 
     }
 
-    void AddMessage(string s, ref Swarm messages)
-    {
-        messages.Items.Add(new Sprite(s.ToCharArray(), new Point(Screen.Width / 2 - s.Length / 2, Screen.Height), new Trajectory(-.5, 0, Screen.Height / 2)));
-    }
-
     public void Demo()
     {
         Console.Clear();
-        Swarm Messages = new Swarm();
         Swarm badguys = new Swarm();
-        List<string> messagetext = new List<string>();
 
-        int m = 0;
+        List<string> Messages = new List<string>();
 
-        messagetext.Add("A S C I I   W A R S");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("- Enemies -");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
+        Messages.Add("A S C I I   W A R S");
+        Messages.Add("");
+        Messages.Add("- Enemies -");
 
         foreach (BadGuy.eBadGuyType shiptype in (BadGuy.eBadGuyType[])System.Enum.GetValues(typeof(BadGuy.eBadGuyType)))
         {
             BadGuy bg = new BadGuy(shiptype);
             badguys.Items.Add(bg);
-            messagetext.Add(new string(bg.Ascii) + " " + Enum.GetName(typeof(BadGuy.eBadGuyType), shiptype) + " (" + bg.HP + " HP)");
-            messagetext.Add("");
-            messagetext.Add("");
-            messagetext.Add("");
-
-
+            Messages.Add(new string(bg.Ascii) + " " + Enum.GetName(typeof(BadGuy.eBadGuyType), shiptype) + " (" + bg.HP + " HP)");
         }
+        Messages.Add("");
 
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("- Scoring -");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("Hit = 1 X Altitude Bonus");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("Kill = 2 X Altitude Bonus");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("- Controls -");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("Esc = Quit");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("Up/Down = Faster/Slower");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("Tab = Hyperdrive");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("Space = Fire");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("Left/Right = Move");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
-        messagetext.Add("");
+        Messages.Add("- Scoring -");
+        Messages.Add("Hit = 1 X Altitude Bonus");
+        Messages.Add("Kill = 2 X Altitude Bonus");
+        Messages.Add("");
+        Messages.Add("- Controls -");
+        Messages.Add("Esc = Quit");
+        Messages.Add("Up/Down = Faster/Slower");
+        Messages.Add("Tab = Hyperdrive");
+        Messages.Add("Space = Fire");
+        Messages.Add("Left/Right = Move");
 
+
+        MessageScroller Scroller = new MessageScroller();
         do
         {
+            if (Scroller.Empty)
+            {
+                foreach (string s in Messages)
+                {
+                    Scroller.AddMessage(s);
+                }
+            }
             badguys.Animate();
-            Messages.Animate();
-            AddMessage(messagetext[m], ref Messages);
-            m++;
-            if (m == messagetext.Count) { m = 0; }
-
-            Easy.Clock.FpsThrottle(4);
-
+            Scroller.Animate();
+            Easy.Clock.FpsThrottle(8);
         } while (!Console.KeyAvailable);
-
 
     }
 
@@ -148,8 +93,10 @@ public class TieFighterGame
     {
         Demo();
         Console.Clear();
+        MessageScroller Scroller = new MessageScroller();
 
         Score = 0;
+        bool FirstBlood = false;
 
         // Star fields
         List<Starfield> starfields = new List<Starfield>();
@@ -161,6 +108,7 @@ public class TieFighterGame
 
         // The player
         Player player = new Player();
+        player.HP = 3;
 
         // keyboard buffer
         List<ConsoleKeyInfo> keybuffer = new List<ConsoleKeyInfo>();
@@ -172,29 +120,39 @@ public class TieFighterGame
         bool debug = false;
         int SkipFrames = 0;
 
-        // testing
-        AsciiEngine.Fx.Explosion boom = null;
-
         do
         {
 
             foreach (Starfield starfield in starfields) { starfield.Animate(); }
             if (player.Alive) { player.Animate(); }
             if (player.Active) { player.DoActivities(); }
-            player.CheckBadGuyHits(badguys);
-            player.CheckHitByBadGuys(badguys);
+
+            badguys.CheckCollisions(player.Missiles);
             badguys.Animate();
-            if (boom != null) { boom.Animate(); }
+            badguys.CheckCollisions(player.Missiles);
+
+            foreach (BadGuy bg in badguys.Items)
+            {
+                bg.Missiles.CheckCollision(player);
+            }
+
+            if (!FirstBlood && !badguys.Alive)
+            {
+                FirstBlood = true;
+                Scroller.AddMessage("Great, kid!");
+                Scroller.AddMessage("Don't get cocky.");
+            }
+
+            //if (boom != null) { boom.Animate(); }
             System.Console.Title = "Score: " + TieFighterGame.Score;
+
+            Scroller.Animate();
 
             if (debug)
             {
                 int x = Screen.LeftEdge;
                 int y = Screen.TopEdge;
                 Screen.TryWrite(x, y, "[fps: " + FPS + " ships: " + badguys.Items.Count + ']');
-
-
-
             }
 
             if (SkipFrames < 1) { FPS = MasterFPS; }
@@ -253,9 +211,6 @@ public class TieFighterGame
                         break;
                     case ConsoleKey.D:
                         debug = !debug;
-                        break;
-                    case ConsoleKey.T:
-
                         break;
                 }
 
