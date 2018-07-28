@@ -1,5 +1,5 @@
 using AsciiEngine;
-using AsciiEngine.Coordinates;
+using AsciiEngine.Grid;
 using AsciiEngine.Sprites;
 using Easy;
 using System.Collections.Generic;
@@ -8,10 +8,10 @@ using System.Collections.Generic;
 public class PlayerMissile : Sprite
 {
     override public void OnHit() { this.HP--; }
-    public PlayerMissile(AsciiEngine.Coordinates.Point xy, AsciiEngine.Coordinates.Trajectory t)
+    public PlayerMissile(AsciiEngine.Grid.Point xy, AsciiEngine.Grid.Trajectory t)
     {
         this.Ascii = "|".ToCharArray();
-        this.Trail = new AsciiEngine.Coordinates.Trail(xy);
+        this.Trail = new AsciiEngine.Grid.Trail(xy);
         this.Trajectory = t;
     }
 }

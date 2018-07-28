@@ -1,5 +1,5 @@
 using AsciiEngine;
-using AsciiEngine.Coordinates;
+using AsciiEngine.Grid;
 using AsciiEngine.Sprites;
 using Easy;
 

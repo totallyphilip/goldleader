@@ -1,6 +1,6 @@
 using AsciiEngine;
 using AsciiEngine.Fx;
-using AsciiEngine.Coordinates;
+using AsciiEngine.Grid;
 using AsciiEngine.Sprites;
 using Easy;
 

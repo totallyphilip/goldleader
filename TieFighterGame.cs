@@ -1,5 +1,6 @@
 using AsciiEngine;
-using AsciiEngine.Coordinates;
+using AsciiEngine.Fx;
+using AsciiEngine.Grid;
 using AsciiEngine.Sprites;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ public class TieFighterGame
     public void TryPlay()
     {
 
-        bool LinuxDevMode = false;
+        bool LinuxDevMode = true;
 
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
@@ -64,14 +65,14 @@ public class TieFighterGame
         Messages.Add("Left/Right = Move");
 
 
-        MessageScroller Scroller = new MessageScroller();
+        Scroller Scroller = new Scroller(2, Screen.Height / 2, .5);
         do
         {
             if (Scroller.Empty)
             {
                 foreach (string s in Messages)
                 {
-                    Scroller.AddMessage(s);
+                    Scroller.NewLine(s);
                 }
             }
             badguys.Animate();
@@ -93,7 +94,7 @@ public class TieFighterGame
     {
         Demo();
         Console.Clear();
-        MessageScroller Scroller = new MessageScroller();
+        Scroller Scroller = new Scroller(2, Screen.Height / 3, .33);
         System.DateTime starttime = System.DateTime.Now;
 
         Score = 0;
@@ -140,8 +141,8 @@ public class TieFighterGame
             if (!FirstBlood && !badguys.Alive)
             {
                 FirstBlood = true;
-                Scroller.AddMessage("Great, kid!");
-                Scroller.AddMessage("Don't get cocky.");
+                Scroller.NewLine("Great, kid!");
+                Scroller.NewLine("Don't get cocky.");
             }
 
             //if (boom != null) { boom.Animate(); }
@@ -164,7 +165,7 @@ public class TieFighterGame
             // if (starttime.AddSeconds(90) < System.DateTime.Now)
             if (player.MaxMissiles < badguys.MaxBadGuys / 3 && player.MaxMissiles < 4)
             {
-                Scroller.AddMessage("Blaster Upgraded");
+                Scroller.NewLine("Blaster Upgraded");
                 player.MaxMissiles++;
                 starttime = System.DateTime.Now;
             }

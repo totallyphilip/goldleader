@@ -8,7 +8,7 @@ namespace Easy
         public static Random Random = new Random();
         public static bool RandomTrue { get { return Abacus.Random.NextDouble() < .5; } }
 
-        public static double Distance(AsciiEngine.Coordinates.Point c1, AsciiEngine.Coordinates.Point c2)
+        public static double Distance(AsciiEngine.Grid.Point c1, AsciiEngine.Grid.Point c2)
         {
             return Math.Sqrt(Math.Pow(c1.dX - c2.dX, 2) + Math.Pow(c1.dY - c2.dY, 2));
         }

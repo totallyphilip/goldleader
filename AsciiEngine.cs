@@ -10,12 +10,12 @@ namespace AsciiEngine
 
             public Explosion() { }
 
-            public Explosion(char[] ascii, Coordinates.Point coord, int width, double range, double force, bool up, bool down, bool left, bool right)
+            public Explosion(char[] ascii, Grid.Point coord, int width, double range, double force, bool up, bool down, bool left, bool right)
             {
                 constructor(ascii, coord, width, range, force, up, down, left, right);
             }
 
-            void constructor(char[] ascii, Coordinates.Point coord, int width, double range, double force, bool up, bool down, bool left, bool right)
+            void constructor(char[] ascii, Grid.Point coord, int width, double range, double force, bool up, bool down, bool left, bool right)
             {
 
                 int position = 0;
@@ -33,8 +33,8 @@ namespace AsciiEngine
                     if (left && !right) { run *= -1; } // go left
                     if (left && right) { if (Easy.Abacus.RandomTrue) { run *= -1; } } // surprise me
 
-                    Coordinates.Trajectory t = new Coordinates.Trajectory(rise, run, range);
-                    Coordinates.Point xy = new Coordinates.Point(coord.dX, coord.dY);
+                    Grid.Trajectory t = new Grid.Trajectory(rise, run, range);
+                    Grid.Point xy = new Grid.Point(coord.dX, coord.dY);
 
                     xy.dX += position;
                     position++;
@@ -43,6 +43,45 @@ namespace AsciiEngine
                     this.Items.Add(new Sprites.Sprite(new[] { c }, xy, t));
                 }
 
+            }
+
+        }
+
+        public class Scroller : Sprites.Swarm
+        {
+
+            public int Range = 0;
+            public int LineSpacing = 1;
+            public double Speed = 1;
+
+            public void NewLine() { NewLine(""); }
+
+            public void NewLine(string s)
+            {
+                int y = Screen.Height;
+
+                int range = Screen.Height; // default range
+
+                if (this.Range > 0) { range = this.Range; }
+
+                foreach (Sprites.Sprite message in Items)
+                {
+                    if (message.XY.iY >= y) { y = message.XY.iY + this.LineSpacing; }
+                }
+
+                this.Items.Add(new Sprites.Sprite(s.ToCharArray(), new Grid.Point(Screen.Width / 2 - s.Length / 2, y), new Grid.Trajectory(-1 * this.Speed, 0, range + (y - Screen.Height))));
+
+            }
+
+            public Scroller(int spacing) { this.constructor(spacing, 0, 1); }
+            public Scroller(int spacing, int distance) { this.constructor(spacing, distance, 1); }
+            public Scroller(int spacing, int distance, double speed) { this.constructor(spacing, distance, speed); }
+
+            public void constructor(int spacing, int distance, double speed)
+            {
+                this.LineSpacing = spacing;
+                this.Range = distance;
+                this.Speed = speed;
             }
 
         }
@@ -93,9 +132,9 @@ namespace AsciiEngine
 
             #region " Locations "
 
-            public Coordinates.Trail Trail;
-            public Coordinates.Trajectory Trajectory;
-            public Coordinates.Point XY { get { return this.Trail.XY; } }
+            public Grid.Trail Trail;
+            public Grid.Trajectory Trajectory;
+            public Grid.Point XY { get { return this.Trail.XY; } }
 
             #endregion
 
@@ -165,7 +204,7 @@ namespace AsciiEngine
                 Screen.TryWrite(this.XY, new String(this.Ascii));
             }
 
-            protected virtual Coordinates.Point NextCoordinate()
+            protected virtual Grid.Point NextCoordinate()
             {
                 if (this.XY.dY + this.Trajectory.Rise < this.FlyZone.TopEdge)
                 {
@@ -194,7 +233,7 @@ namespace AsciiEngine
                     else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
                 }
 
-                return new Coordinates.Point(this.Trail.XY.dX + this.Trajectory.Run, this.Trail.XY.dY + this.Trajectory.Rise);
+                return new Grid.Point(this.Trail.XY.dX + this.Trajectory.Run, this.Trail.XY.dY + this.Trajectory.Rise);
 
             }
 
@@ -217,17 +256,17 @@ namespace AsciiEngine
 
             public Sprite() { }
 
-            public Sprite(Coordinates.Point xy, Coordinates.Trajectory t)
+            public Sprite(Grid.Point xy, Grid.Trajectory t)
             {
                 this.Ascii = "sprite".ToCharArray();
-                this.Trail = new Coordinates.Trail(xy);
+                this.Trail = new Grid.Trail(xy);
                 this.Trajectory = t;
             }
 
-            public Sprite(char[] c, Coordinates.Point xy, Coordinates.Trajectory t)
+            public Sprite(char[] c, Grid.Point xy, Grid.Trajectory t)
             {
                 this.Ascii = new List<char>(c).ToArray();
-                this.Trail = new Coordinates.Trail(xy);
+                this.Trail = new Grid.Trail(xy);
                 this.Trajectory = t;
             }
 
@@ -287,7 +326,7 @@ namespace AsciiEngine
         #endregion
     }
 
-    namespace Coordinates
+    namespace Grid
     {
 
         public class Point
@@ -380,9 +419,9 @@ namespace AsciiEngine
 
         public static int Height { get { return Console.WindowHeight; } }
 
-        public static Coordinates.Point GetCenterCoordinate()
+        public static Grid.Point GetCenterCoordinate()
         {
-            return new Coordinates.Point(Easy.Abacus.Round(Screen.Width / 2), Easy.Abacus.Round(Screen.Height / 2));
+            return new Grid.Point(Easy.Abacus.Round(Screen.Width / 2), Easy.Abacus.Round(Screen.Height / 2));
         }
 
         public static bool TrySetSize(int targetwidth, int targetheight)
@@ -449,12 +488,12 @@ namespace AsciiEngine
 
         #region " Writing "
 
-        public static void TryWrite(Coordinates.Point xy, char[] s)
+        public static void TryWrite(Grid.Point xy, char[] s)
         {
             TryWrite(xy.dX, xy.dY, s.ToString());
         }
 
-        public static void TryWrite(Coordinates.Point xy, string s)
+        public static void TryWrite(Grid.Point xy, string s)
         {
             TryWrite(xy.dX, xy.dY, s);
         }
@@ -485,7 +524,7 @@ namespace AsciiEngine
             catch { }
         }
 
-        public static void TryWrite(Coordinates.Point xy, char c)
+        public static void TryWrite(Grid.Point xy, char c)
         {
             TryWrite(xy.dX, xy.dY, c);
         }
