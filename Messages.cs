@@ -10,7 +10,7 @@ public class MessageScroller : Swarm
 
     public void AddMessage(string s)
     {
-        int y = Screen.Height - 1;
+        int y = Screen.Height;
         foreach (Sprite message in Items)
         {
             if (message.XY.iY >= y) { y = message.XY.iY + 2; }

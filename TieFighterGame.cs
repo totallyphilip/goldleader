@@ -94,6 +94,7 @@ public class TieFighterGame
         Demo();
         Console.Clear();
         MessageScroller Scroller = new MessageScroller();
+        System.DateTime starttime = System.DateTime.Now;
 
         Score = 0;
         bool FirstBlood = false;
@@ -158,6 +159,14 @@ public class TieFighterGame
             if (SkipFrames < 1) { FPS = MasterFPS; }
             else { FPS = int.MaxValue; SkipFrames--; }
             Easy.Clock.FpsThrottle(FPS);
+
+
+            if (starttime.AddSeconds(90) < System.DateTime.Now)
+            {
+                Scroller.AddMessage("Blaster Upgraded");
+                player.MaxMissiles++;
+                starttime = System.DateTime.Now;
+            }
 
 
             // wipe the keyboard buffer if a priority key is pressed
