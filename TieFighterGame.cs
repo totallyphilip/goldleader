@@ -8,6 +8,10 @@ using System.Collections.Generic;
 public class TieFighterGame
 {
 
+    public static bool GetTheFkOut = false;
+    public static bool ShowDebugInfo = false;
+    int FramesPerSecond = 8;
+
     public static int Score;
     public void TryPlay()
     {
@@ -78,7 +82,7 @@ public class TieFighterGame
             badguys.Animate();
             Scroller.Animate();
             Easy.Clock.FpsThrottle(8);
-        } while (!Console.KeyAvailable);
+        } while (!Console.KeyAvailable && !GetTheFkOut);
 
     }
 
@@ -87,147 +91,160 @@ public class TieFighterGame
         do
         {
             Demo();
-        } while (Play());
+            PlayTheGame();
+        } while (!GetTheFkOut);
     }
 
-    public bool Play()
+    void PlayTheGame()
     {
-        Demo();
-        Console.Clear();
-        Scroller Scroller = new Scroller(2, Screen.Height / 3, .33);
-        System.DateTime starttime = System.DateTime.Now;
 
-        Score = 0;
-        bool FirstBlood = false;
-
-        // Star fields
+        // starfield
         List<Starfield> starfields = new List<Starfield>();
         starfields.Add(new Starfield(.1, .75)); // slow
         starfields.Add(new Starfield(1, .2)); // fast
-
-        // Make baddies
-        BadGuyField badguys = new BadGuyField();
 
         // The player
         Player player = new Player();
         player.HP = 3;
 
-        // keyboard buffer
-        List<ConsoleKeyInfo> keybuffer = new List<ConsoleKeyInfo>();
+        // misc
+        int Hyperdrive = 0;
 
-        // Main loop
-        int MasterFPS = 8;
-        int FPS = MasterFPS;
-        bool UserQuit = false;
-        bool debug = false;
-        int SkipFrames = 0;
 
-        do
+        List<EnemyWave> waves = new List<EnemyWave>();
+
+        EnemyWave newwave;
+
+        newwave = new EnemyWave(3, "Ready!", "Like bull's-eying womp rats in a T-16.", "Maybe you should stay on the farm.");
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 3));
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
+
+        newwave = new EnemyWave(3, "Ready!", "Nice.", "You should have gone to Tosche Station.");
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Bomber, 3));
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
+
+        newwave = new EnemyWave(3, "Ready?", "You lived.", "I think somebody up there doesn't like you.");
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 3));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 3));
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
+
+
+        foreach (EnemyWave wave in waves)
         {
 
-            foreach (Starfield starfield in starfields) { starfield.Animate(); }
-            if (player.Alive) { player.Animate(); }
-            if (player.Active) { player.DoActivities(); }
+            Console.Clear();
+            Scroller Scroller = new Scroller(2, Screen.Height / 2, .25);
 
-            badguys.CheckCollisions(player.Missiles);
-            badguys.Animate();
-            badguys.CheckCollisions(player.Missiles);
+            Scroller.NewLine(wave.ReadyMessage);
 
-            foreach (BadGuy bg in badguys.Items)
+            // keyboard buffer
+            List<ConsoleKeyInfo> keybuffer = new List<ConsoleKeyInfo>();
+
+            do
             {
-                bg.Missiles.CheckCollision(player);
-            }
-
-            if (!FirstBlood && !badguys.Alive)
-            {
-                FirstBlood = true;
-                Scroller.NewLine("Great, kid!");
-                Scroller.NewLine("Don't get cocky.");
-            }
-
-            //if (boom != null) { boom.Animate(); }
-            System.Console.Title = "Score: " + TieFighterGame.Score;
-
-            Scroller.Animate();
-
-            if (debug)
-            {
-                int x = Screen.LeftEdge;
-                int y = Screen.TopEdge;
-                Screen.TryWrite(x, y, "[fps: " + FPS + " ships: " + badguys.Items.Count + ']');
-            }
-
-            if (SkipFrames < 1) { FPS = MasterFPS; }
-            else { FPS = int.MaxValue; SkipFrames--; }
-            Easy.Clock.FpsThrottle(FPS);
 
 
-            // if (starttime.AddSeconds(90) < System.DateTime.Now)
-            if (player.MaxMissiles < badguys.MaxBadGuys / 3 && player.MaxMissiles < 4)
-            {
-                Scroller.NewLine("Blaster Upgraded");
-                player.MaxMissiles++;
-                starttime = System.DateTime.Now;
-            }
 
+                foreach (Starfield starfield in starfields) { starfield.Animate(); }
 
-            // wipe the keyboard buffer if a priority key is pressed
-            while (Console.KeyAvailable)
-            {
-                ConsoleKeyInfo k = Console.ReadKey(true);
-                if (
-                    k.Key == ConsoleKey.LeftArrow
-                        || k.Key == ConsoleKey.RightArrow
-                        || k.Key == ConsoleKey.Escape
-                        || k.Key == ConsoleKey.UpArrow
-                        || k.Key == ConsoleKey.DownArrow
-                 )
+                if (player.Alive) { player.Animate(); }
+                if (player.Active) { player.DoActivities(); }
+
+                wave.CheckCollisions(player.Missiles);
+                wave.Animate();
+                wave.CheckCollisions(player.Missiles);
+
+                foreach (BadGuy bg in wave.Items)
                 {
-                    keybuffer = new List<ConsoleKeyInfo>(keybuffer.RemoveAll(x => x.Key == ConsoleKey.RightArrow || x.Key == ConsoleKey.LeftArrow));
-                    keybuffer.Insert(0, k);
-                }
-                else
-                {
-                    keybuffer.Add(k);
-                }
-            }
-
-            if (keybuffer.Count > 0)
-            {
-
-                ConsoleKeyInfo k = keybuffer[0];
-                keybuffer.Remove(k);
-                switch (k.Key)
-                {
-                    case ConsoleKey.Tab:
-                        SkipFrames = 20;
-                        break;
-                    case ConsoleKey.UpArrow:
-                        MasterFPS++;
-                        break;
-                    case ConsoleKey.DownArrow:
-                        if (MasterFPS - 1 > 0) { MasterFPS--; }
-                        break;
-                    case ConsoleKey.LeftArrow:
-                        player.Trajectory.Run = -1;
-                        break;
-                    case ConsoleKey.RightArrow:
-                        player.Trajectory.Run = 1;
-                        break;
-                    case ConsoleKey.Spacebar:
-                        player.Fire();
-                        break;
-                    case ConsoleKey.Escape:
-                        UserQuit = true;
-                        break;
-                    case ConsoleKey.D:
-                        debug = !debug;
-                        break;
+                    bg.Missiles.CheckCollision(player);
                 }
 
-            }
+                // throttle the cpu
+                if (Hyperdrive > 0) { Hyperdrive--; }
+                else { Easy.Clock.FpsThrottle(FramesPerSecond); }
 
-        } while (!UserQuit && player.Active);
-        return !UserQuit;
+
+                // wipe the keyboard buffer if a priority key is pressed
+                while (Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo k = Console.ReadKey(true);
+                    if (
+                        k.Key == ConsoleKey.LeftArrow
+                            || k.Key == ConsoleKey.RightArrow
+                            || k.Key == ConsoleKey.Escape
+                            || k.Key == ConsoleKey.UpArrow
+                            || k.Key == ConsoleKey.DownArrow
+                     )
+                    {
+                        keybuffer = new List<ConsoleKeyInfo>(keybuffer.RemoveAll(x => x.Key == ConsoleKey.RightArrow || x.Key == ConsoleKey.LeftArrow));
+                        keybuffer.Insert(0, k);
+                    }
+                    else
+                    {
+                        keybuffer.Add(k);
+                    }
+                }
+
+                if (keybuffer.Count > 0)
+                {
+
+                    ConsoleKeyInfo k = keybuffer[0];
+                    keybuffer.Remove(k);
+                    switch (k.Key)
+                    {
+                        case ConsoleKey.Tab:
+                            Hyperdrive = 20;
+                            break;
+                        case ConsoleKey.UpArrow:
+                            FramesPerSecond++;
+                            break;
+                        case ConsoleKey.DownArrow:
+                            FramesPerSecond--;
+                            if (FramesPerSecond < 1) { FramesPerSecond = 1; }
+                            break;
+                        case ConsoleKey.LeftArrow:
+                            player.Trajectory.Run = -1;
+                            break;
+                        case ConsoleKey.RightArrow:
+                            player.Trajectory.Run = 1;
+                            break;
+                        case ConsoleKey.Spacebar:
+                            player.Fire();
+                            break;
+                        case ConsoleKey.Escape:
+                            GetTheFkOut = true;
+                            break;
+                        case ConsoleKey.D:
+                            ShowDebugInfo = !ShowDebugInfo;
+                            break;
+                    }
+
+                }
+
+                // display messages
+                Scroller.Animate();
+                if (Scroller.Empty) { wave.StartAttackRun(); }
+                if (!player.Alive && !wave.Humiliated)
+                {
+                    wave.Humiliated = true;
+                    Scroller.NewLine(wave.LoseMessage);
+                }
+                if (wave.WaveDefeated() && !wave.Congratulated)
+                {
+                    wave.Congratulated = true;
+                    Scroller.NewLine(wave.WinMessage);
+                }
+
+
+            } while (!GetTheFkOut && (!Scroller.Empty || (player.Active && !wave.WaveDefeated())));
+
+            if (!player.Alive) { break; }
+
+        }
+
+
     }
 }

@@ -8,10 +8,17 @@ public class BadGuy : Sprite
 {
     public enum eBadGuyType
     {
-        Fighter, Bomber, Interceptor, Master, Squadron
+        Fighter = 0
+        , Bomber = 1
+        , Interceptor = 2
+        , Master = 3
+        , Squadron = 4
+        , Cylon = 5
+
     }
 
     double ReverseFactor;
+    public bool Flown = false;
     public Swarm Messages = new Swarm();
     struct MissileStructure
     {
@@ -129,73 +136,21 @@ public class BadGuy : Sprite
                 DropsPerRow = 2;
                 ReverseFactor = 0;
                 break;
+            case eBadGuyType.Cylon:
+                this.Ascii = "(\\=/)".ToCharArray();
+                this.FlyZone = new FlyZoneClass(Screen.Height / 2, 2, 1, 1, FlyZoneClass.eEdgeMode.Bounce);
+                this.HP = 3;
+                this.MissileConfig = new MissileStructure('*', Screen.Height * .33, 3);
+                this.DebrisRange = 4;
+                DropsPerRow = 16;
+                ReverseFactor = .01;
+                break;
         }
 
         this.Trail = new Trail(new Point(Abacus.Random.Next(Screen.LeftEdge - this.Width, Screen.RightEdge + this.Width), Screen.TopEdge));
 
         if (Abacus.RandomTrue) { Run *= -1; }
         this.Trajectory = new Trajectory(DropsPerRow / System.Convert.ToDouble(this.FlyZone.Width), Run);
-
-    }
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-public class BadGuyField : Swarm
-{
-
-    System.DateTime starttime = System.DateTime.Now;
-    public int MaxBadGuys
-    {
-        get
-        {
-            System.DateTime rightnow = System.DateTime.Now;
-            System.TimeSpan span = rightnow.Subtract(starttime);
-            return 1 + System.Convert.ToInt32(span.TotalSeconds) / 30; // another bad guy every N seconds
-        }
-    }
-
-    public BadGuyField() { }
-
-    protected override void Spawn()
-    {
-        while (this.Items.Count < this.MaxBadGuys)
-        {
-            switch (Abacus.Random.Next(0, this.MaxBadGuys))
-            {
-                case 0:
-                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Fighter));
-                    break;
-                case 1:
-                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Bomber));
-                    break;
-                case 3:
-                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Interceptor));
-                    break;
-                case 4:
-                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Master));
-                    break;
-                case 5:
-                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Squadron));
-                    break;
-                default:
-                    this.Items.Add(new BadGuy(BadGuy.eBadGuyType.Fighter));
-                    break;
-            }
-        }
 
     }
 
