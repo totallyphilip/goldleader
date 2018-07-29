@@ -26,6 +26,15 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
     public bool Congratulated = false;
     public string LoseMessage;
     public bool Humiliated = false;
+    public bool Infinite = false;
+
+    public EnemyWave(string ready, string lose)
+    {
+        this.AirTrafficMax = 20;
+        this.ReadyMessage = ready;
+        this.LoseMessage = lose;
+        this.Infinite = true;
+    }
 
     public EnemyWave(int max, string ready, string win, string lose)
     {
@@ -37,7 +46,8 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
 
     public bool WaveDefeated()
     {
-        return IncomingShips.FindAll(x => x.Flown).Count > 0 && this.Empty;
+        if (this.Infinite) { return false; }
+        else { return IncomingShips.FindAll(x => x.Flown).Count > 0 && this.Empty; }
     }
 
     public void CreateIncomingFleet()
@@ -54,14 +64,27 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
 
     protected override void Spawn()
     {
-        if (this.Attack && this.Items.Count < this.AirTrafficMax && this.IncomingShips.FindAll(x => !x.Flown).Count > 0)
+
+        if (this.Infinite)
         {
-            // pick a ship at random
-            BadGuy randbg = IncomingShips.Find(x => !x.Flown && Easy.Abacus.RandomTrue);
-            if (randbg != null)
+            if (this.Items.Count < this.AirTrafficMax)
             {
-                randbg.Flown = true;
-                this.Items.Add(randbg);
+                System.Array values = System.Enum.GetValues(typeof(BadGuy.eBadGuyType));
+                BadGuy.eBadGuyType someone = (BadGuy.eBadGuyType)values.GetValue(Easy.Abacus.Random.Next(values.Length));
+                this.Items.Add(new BadGuy(someone));
+            }
+        }
+        else
+        {
+            if (this.Attack && this.Items.Count < this.AirTrafficMax && this.IncomingShips.FindAll(x => !x.Flown).Count > 0)
+            {
+                // pick a ship at random
+                BadGuy randbg = IncomingShips.Find(x => !x.Flown && Easy.Abacus.RandomTrue);
+                if (randbg != null)
+                {
+                    randbg.Flown = true;
+                    this.Items.Add(randbg);
+                }
             }
         }
 

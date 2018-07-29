@@ -13,8 +13,6 @@ public class BadGuy : Sprite
         , Interceptor = 2
         , Master = 3
         , Squadron = 4
-        , Cylon = 5
-
     }
 
     double ReverseFactor;
@@ -135,15 +133,6 @@ public class BadGuy : Sprite
                 this.DebrisRange = 8;
                 DropsPerRow = 2;
                 ReverseFactor = 0;
-                break;
-            case eBadGuyType.Cylon:
-                this.Ascii = "(\\=/)".ToCharArray();
-                this.FlyZone = new FlyZoneClass(Screen.Height / 2, 2, 1, 1, FlyZoneClass.eEdgeMode.Bounce);
-                this.HP = 3;
-                this.MissileConfig = new MissileStructure('*', Screen.Height * .33, 3);
-                this.DebrisRange = 4;
-                DropsPerRow = 16;
-                ReverseFactor = .01;
                 break;
         }
 

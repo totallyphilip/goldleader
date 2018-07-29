@@ -131,6 +131,11 @@ public class TieFighterGame
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
+        newwave = new EnemyWave("Ready? LOL!", "Say hello to Yoda for me.");
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
+
+
 
         foreach (EnemyWave wave in waves)
         {
@@ -161,10 +166,6 @@ public class TieFighterGame
                 {
                     bg.Missiles.CheckCollision(player);
                 }
-
-                // throttle the cpu
-                if (Hyperdrive > 0) { Hyperdrive--; }
-                else { Easy.Clock.FpsThrottle(FramesPerSecond); }
 
 
                 // wipe the keyboard buffer if a priority key is pressed
@@ -237,6 +238,10 @@ public class TieFighterGame
                     wave.Congratulated = true;
                     Scroller.NewLine(wave.WinMessage);
                 }
+
+                // throttle the cpu
+                if (Hyperdrive > 0) { Hyperdrive--; }
+                else { Easy.Clock.FpsThrottle(FramesPerSecond); }
 
 
             } while (!GetTheFkOut && (!Scroller.Empty || (player.Active && !wave.WaveDefeated())));
