@@ -11,7 +11,7 @@ public class BadGuy : Sprite
         Fighter = 0
         , Bomber = 1
         , Interceptor = 2
-        , Master = 3
+        , Leader = 3
         , Squadron = 4
     }
 
@@ -116,7 +116,7 @@ public class BadGuy : Sprite
                 DropsPerRow = 16;
                 ReverseFactor = .05;
                 break;
-            case eBadGuyType.Master:
+            case eBadGuyType.Leader:
                 this.Ascii = "[—o—]".ToCharArray();
                 this.FlyZone = new FlyZoneClass(Screen.Height / 2, 2, 5, 5, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 3;
@@ -127,11 +127,11 @@ public class BadGuy : Sprite
                 break;
             case eBadGuyType.Squadron:
                 this.Ascii = "|—o—|[—o—]|—o—|".ToCharArray();
-                this.FlyZone = new FlyZoneClass(0, 5, Screen.Width / 4, Screen.Width / 4, FlyZoneClass.eEdgeMode.Bounce);
+                this.FlyZone = new FlyZoneClass(0, 5, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 6;
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .5, 6);
                 this.DebrisRange = 8;
-                DropsPerRow = 2;
+                DropsPerRow = 8;
                 ReverseFactor = 0;
                 break;
         }

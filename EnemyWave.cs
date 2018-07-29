@@ -17,31 +17,28 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
     }
 
     public int AirTrafficMax;
-    bool Attack = false;
-    public void StartAttackRun() { this.Attack = true; }
+    bool AttackRunStarted = false;
+    public void StartAttackRun() { this.AttackRunStarted = true; }
     public List<Squadron> Fleet = new List<Squadron>();
     List<BadGuy> IncomingShips = new List<BadGuy>();
-    public string ReadyMessage;
     public string WinMessage;
     public bool Congratulated = false;
-    public string LoseMessage;
     public bool Humiliated = false;
     public bool Infinite = false;
+    public bool WeaponsUpgrade = false;
 
-    public EnemyWave(string ready, string lose)
+    public EnemyWave(bool moreguns)
     {
-        this.AirTrafficMax = 20;
-        this.ReadyMessage = ready;
-        this.LoseMessage = lose;
+        this.AirTrafficMax = 10;
         this.Infinite = true;
+        this.WeaponsUpgrade = moreguns;
     }
 
-    public EnemyWave(int max, string ready, string win, string lose)
+    public EnemyWave(int max, string win, bool moreguns)
     {
         this.AirTrafficMax = max;
-        this.ReadyMessage = ready;
         this.WinMessage = win;
-        this.LoseMessage = lose;
+        this.WeaponsUpgrade = moreguns;
     }
 
     public bool WaveDefeated()
@@ -64,30 +61,30 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
 
     protected override void Spawn()
     {
-
-        if (this.Infinite)
+        if (this.AttackRunStarted)
         {
-            if (this.Items.Count < this.AirTrafficMax)
+            if (this.Infinite)
             {
-                System.Array values = System.Enum.GetValues(typeof(BadGuy.eBadGuyType));
-                BadGuy.eBadGuyType someone = (BadGuy.eBadGuyType)values.GetValue(Easy.Abacus.Random.Next(values.Length));
-                this.Items.Add(new BadGuy(someone));
-            }
-        }
-        else
-        {
-            if (this.Attack && this.Items.Count < this.AirTrafficMax && this.IncomingShips.FindAll(x => !x.Flown).Count > 0)
-            {
-                // pick a ship at random
-                BadGuy randbg = IncomingShips.Find(x => !x.Flown && Easy.Abacus.RandomTrue);
-                if (randbg != null)
+                if (this.Items.Count < this.AirTrafficMax)
                 {
-                    randbg.Flown = true;
-                    this.Items.Add(randbg);
+                    System.Array values = System.Enum.GetValues(typeof(BadGuy.eBadGuyType));
+                    BadGuy.eBadGuyType someone = (BadGuy.eBadGuyType)values.GetValue(Easy.Abacus.Random.Next(values.Length));
+                    this.Items.Add(new BadGuy(someone));
+                }
+            }
+            else
+            {
+                if (this.Items.Count < this.AirTrafficMax && this.IncomingShips.FindAll(x => !x.Flown).Count > 0)
+                {
+                    // pick a ship at random
+                    BadGuy randbg = IncomingShips.Find(x => !x.Flown && Easy.Abacus.RandomTrue);
+                    if (randbg != null)
+                    {
+                        randbg.Flown = true;
+                        this.Items.Add(randbg);
+                    }
                 }
             }
         }
-
     }
-
 }

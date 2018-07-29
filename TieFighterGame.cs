@@ -16,7 +16,7 @@ public class TieFighterGame
     public void TryPlay()
     {
 
-        bool LinuxDevMode = true;
+        bool LinuxDevMode = false;
 
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
@@ -67,6 +67,11 @@ public class TieFighterGame
         Messages.Add("Tab = Hyperdrive");
         Messages.Add("Space = Fire");
         Messages.Add("Left/Right = Move");
+        Messages.Add("");
+        Messages.Add("- Rounds -");
+        Messages.Add("You can survive two hits per round.");
+        Messages.Add("");
+        Messages.Add("PRESS ANY KEY TO BEGIN");
 
 
         Scroller Scroller = new Scroller(2, Screen.Height / 2, .5);
@@ -109,29 +114,71 @@ public class TieFighterGame
 
         // misc
         int Hyperdrive = 0;
-
+        int Round = 0;
 
         List<EnemyWave> waves = new List<EnemyWave>();
 
         EnemyWave newwave;
 
-        newwave = new EnemyWave(3, "Ready!", "Like bull's-eying womp rats in a T-16.", "Maybe you should stay on the farm.");
+        newwave = new EnemyWave(3, "Great, Kid! Don't get cocky.", false);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 1));
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
+
+        newwave = new EnemyWave(3, "Like bull's-eying womp rats in a T-16.", false);
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 3));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(3, "Ready!", "Nice.", "You should have gone to Tosche Station.");
+        newwave = new EnemyWave(3, "You are the bomb!", false);
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Bomber, 3));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(3, "Ready?", "You lived.", "I think somebody up there doesn't like you.");
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 3));
+        newwave = new EnemyWave(4, "Keep going!", false);
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 3));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 1));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave("Ready? LOL!", "Say hello to Yoda for me.");
+        newwave = new EnemyWave(6, "Keep going!", false);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 2));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 4));
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
+
+        newwave = new EnemyWave(4, "The Force is with you.", false);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 2));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 4));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 2));
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
+
+        newwave = new EnemyWave(5, "The Force is with you.", true);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 8));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Squadron, 2));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 1));
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
+
+        newwave = new EnemyWave(6, "Keep going!", true);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 8));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Squadron, 2));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 2));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Bomber, 6));
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
+
+        newwave = new EnemyWave(8, "Rebel scum. Time to die.", false);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 4));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Bomber, 4));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 4));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 4));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Squadron, 4));
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
+
+        newwave = new EnemyWave(true);
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
@@ -141,17 +188,25 @@ public class TieFighterGame
         {
 
             Console.Clear();
-            Scroller Scroller = new Scroller(2, Screen.Height / 2, .25);
+            Scroller Scroller = new Scroller(2, Screen.Height / 3, .25);
 
-            Scroller.NewLine(wave.ReadyMessage);
+
+            Round++;
+            Scroller.NewLine("Round " + Round);
+            Scroller.NewLine("");
+            if (wave.WeaponsUpgrade)
+            {
+                player.MaxMissiles++;
+                Scroller.NewLine("Blaster upgraded!");
+                Scroller.NewLine("");
+            }
+            player.HP = 3;
 
             // keyboard buffer
             List<ConsoleKeyInfo> keybuffer = new List<ConsoleKeyInfo>();
 
             do
             {
-
-
 
                 foreach (Starfield starfield in starfields) { starfield.Animate(); }
 
@@ -231,7 +286,7 @@ public class TieFighterGame
                 if (!player.Alive && !wave.Humiliated)
                 {
                     wave.Humiliated = true;
-                    Scroller.NewLine(wave.LoseMessage);
+                    Scroller.NewLine("G A M E   O V E R");
                 }
                 if (wave.WaveDefeated() && !wave.Congratulated)
                 {
