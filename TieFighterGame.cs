@@ -116,6 +116,9 @@ public class TieFighterGame
         int Hyperdrive = 0;
         int Round = 0;
         bool Paused = false;
+        bool HyperdriveSpent = false;
+
+        #region  " Waves "
 
         // define the waves of bad guys
 
@@ -208,12 +211,12 @@ public class TieFighterGame
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
+        #endregion
+
         foreach (EnemyWave wave in waves)
         {
 
             Scroller Scroller = new Scroller(2, Screen.Height / 3, .25);
-
-            bool HyperdriveSpent = false;
 
             // display instructions
             if (Round == 0)
@@ -224,11 +227,11 @@ public class TieFighterGame
                 Scroller.NewLine("Tab = Hyperdrive");
                 Scroller.NewLine("Enter = Pause");
                 Scroller.NewLine("Esc = Quit");
-                Scroller.NewLine("");
-                Scroller.NewLine("");
-                Scroller.NewLine("");
-                Scroller.NewLine("");
-                Scroller.NewLine("");
+                Scroller.NewLine();
+                Scroller.NewLine();
+                Scroller.NewLine();
+                Scroller.NewLine();
+                Scroller.NewLine();
             }
 
             // display round number
@@ -243,9 +246,15 @@ public class TieFighterGame
             // display shields message
             Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (InitialShields - 1)) * 100 + "% charged.");
 
+            if (HyperdriveSpent)
+            {
+                HyperdriveSpent = false;
+                Scroller.NewLine("Navicomputer coordinates recalculated.");
+
+            }
             if (wave.WeaponsUpgrade)
             {
-                Scroller.NewLine("");
+                Scroller.NewLine();
                 player.MaxMissiles++;
                 Scroller.NewLine("Blaster upgraded!");
             }
@@ -367,7 +376,7 @@ public class TieFighterGame
                             player.Trajectory.Run = 1;
                             break;
                         case ConsoleKey.Spacebar:
-                            player.Fire();
+                            if (Hyperdrive < 1) { player.Fire(); }
                             break;
                         case ConsoleKey.Escape:
                             GetTheFkOut = true;
@@ -408,11 +417,11 @@ public class TieFighterGame
                     if (HyperdriveSpent)
                     {
                         Scroller.NewLine("Traveling through hyperspace");
-                        Scroller.NewLine("ain't like dusting crops, farm boy.");
+                        Scroller.NewLine("ain't like dusting crops, boy.");
                     }
                     else
                     {
-                        Scroller.NewLine("+" + hyperdrivebonus + " Hyperdrive bonus");
+                        Scroller.NewLine("+" + hyperdrivebonus + " Navicomputer bonus");
                         Score += hyperdrivebonus;
                     }
                 }
