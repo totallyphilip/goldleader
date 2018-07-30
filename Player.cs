@@ -20,10 +20,10 @@ public class Player : Sprite
 {
 
     public Swarm Missiles = new Swarm();
-    public Swarm Messages = new Swarm();
+    //    public Swarm Messages = new Swarm();
 
     public int MaxMissiles = 1;
-    AsciiEngine.Fx.Explosion Debris;
+    public AsciiEngine.Fx.Explosion Debris;
 
     override public void OnHit()
     {
@@ -61,7 +61,7 @@ public class Player : Sprite
     override public void DoActivities()
     {
         Missiles.Animate();
-        Messages.Animate();
+        //        Messages.Animate();
         if (Debris != null) { Debris.Animate(); }
 
         if (!this.Alive && this.Debris.Empty && this.Missiles.Empty) { this.Active = false; }

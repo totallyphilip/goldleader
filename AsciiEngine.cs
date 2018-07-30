@@ -201,6 +201,11 @@ namespace AsciiEngine
             {
                 this.Hide();
                 this.Trail.Items.Add(this.NextCoordinate());
+                this.Redraw();
+            }
+
+            public void Redraw()
+            {
                 Screen.TryWrite(this.XY, new String(this.Ascii));
             }
 
@@ -294,6 +299,8 @@ namespace AsciiEngine
                 this.Spawn();
 
             }
+
+            public void Redraw() { foreach (Sprite s in this.Items.FindAll(x => x.Alive)) { s.Redraw(); } }
 
             public bool Empty { get { return this.Items.Count < 1; } }
 

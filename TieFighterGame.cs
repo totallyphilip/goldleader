@@ -114,6 +114,7 @@ public class TieFighterGame
         // misc
         int Hyperdrive = 0;
         int Round = 0;
+        bool Paused = false;
 
         // define the waves of bad guys
 
@@ -168,8 +169,8 @@ public class TieFighterGame
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(10, "Stay on target!", true);
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 10));
+        newwave = new EnemyWave(12, "Stay on target!", true);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 60));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
@@ -219,6 +220,7 @@ public class TieFighterGame
                 Scroller.NewLine("Left/Right = Move");
                 Scroller.NewLine("Up/Down = Faster/Slower");
                 Scroller.NewLine("Tab = Hyperdrive");
+                Scroller.NewLine("Enter = Pause");
                 Scroller.NewLine("Esc = Quit");
                 Scroller.NewLine("");
                 Scroller.NewLine("");
@@ -255,17 +257,36 @@ public class TieFighterGame
                 // animate
                 foreach (Starfield starfield in starfields) { starfield.Animate(); }
 
-                if (player.Alive) { player.Animate(); }
-                if (player.Active) { player.DoActivities(); }
-
-                wave.CheckCollisions(player.Missiles);
-                wave.Animate();
-                wave.CheckCollisions(player.Missiles);
-
-                foreach (BadGuy bg in wave.Items)
+                if (Paused)
                 {
-                    bg.Missiles.CheckCollision(player);
+                    player.Redraw();
+                    if (player.Debris != null) { player.Debris.Redraw(); }
+                    player.Missiles.Redraw();
+                    wave.Redraw();
+                    foreach (BadGuy bg in wave.Items)
+                    {
+                        bg.Sparks.Redraw();
+                        bg.Debris.Redraw();
+                        bg.Messages.Redraw();
+                        bg.Missiles.Redraw();
+                    }
+                    if (Scroller.Empty) { Scroller.NewLine("Press Enter to resume."); }
                 }
+                else
+                {
+                    if (player.Alive) { player.Animate(); }
+                    if (player.Active) { player.DoActivities(); }
+
+                    wave.CheckCollisions(player.Missiles);
+                    wave.Animate();
+                    wave.CheckCollisions(player.Missiles);
+
+                    foreach (BadGuy bg in wave.Items)
+                    {
+                        bg.Missiles.CheckCollision(player);
+                    }
+                }
+
 
                 // debugging
                 if (ShowDebugInfo)
@@ -328,6 +349,9 @@ public class TieFighterGame
                         case ConsoleKey.D:
                             ShowDebugInfo = !ShowDebugInfo;
                             break;
+                        case ConsoleKey.Enter:
+                            Paused = !Paused;
+                            break;
                         case ConsoleKey.T:
                             Score = 0;
                             player.HP++;
@@ -344,6 +368,9 @@ public class TieFighterGame
                 {
                     wave.Humiliated = true;
                     Scroller.NewLine("G A M E   O V E R");
+                    Scroller.NewLine("");
+                    Scroller.NewLine("");
+                    Scroller.NewLine("They came from behind!");
                 }
                 if (wave.WaveDefeated() && !wave.Congratulated)
                 {

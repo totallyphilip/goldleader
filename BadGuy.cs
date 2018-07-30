@@ -34,8 +34,8 @@ public class BadGuy : Sprite
 
     public Swarm Missiles = new Swarm();
 
-    Explosion Sparks = new Explosion();
-    Explosion Debris = new Explosion();
+    public Explosion Sparks = new Explosion();
+    public Explosion Debris = new Explosion();
     double DebrisRange;
 
     override public void OnHit()
