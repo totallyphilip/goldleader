@@ -25,7 +25,7 @@ public class TieFighterGame
         {
             Console.CursorVisible = false;
             Easy.Keyboard.EatKeys();
-            this.Looper();
+            this.MainLoop();
             Console.CursorVisible = true;
         }
         else
@@ -36,6 +36,15 @@ public class TieFighterGame
 
         Screen.TrySetSize(oldwidth, oldheight, false);
 
+    }
+
+    void MainLoop()
+    {
+        do
+        {
+            if (!GetTheFkOut) { Demo(); }
+            if (!GetTheFkOut) { PlayTheGame(); }
+        } while (!GetTheFkOut);
     }
 
     public void Demo()
@@ -63,15 +72,7 @@ public class TieFighterGame
         Messages.Add("");
         Messages.Add("- Controls -");
         Messages.Add("Esc = Quit");
-        Messages.Add("Up/Down = Faster/Slower");
-        Messages.Add("Tab = Hyperdrive");
-        Messages.Add("Space = Fire");
-        Messages.Add("Left/Right = Move");
-        Messages.Add("");
-        Messages.Add("- Rounds -");
-        Messages.Add("You can survive two hits per round.");
-        Messages.Add("");
-        Messages.Add("PRESS ANY KEY TO BEGIN");
+        Messages.Add("Enter = Start");
 
 
         Scroller Scroller = new Scroller(2, Screen.Height / 2, .5);
@@ -87,17 +88,10 @@ public class TieFighterGame
             badguys.Animate();
             Scroller.Animate();
             Easy.Clock.FpsThrottle(8);
-        } while (!Console.KeyAvailable && !GetTheFkOut);
+        } while (!Console.KeyAvailable);
 
-    }
+        GetTheFkOut = Console.ReadKey(true).Key == ConsoleKey.Escape;
 
-    void Looper()
-    {
-        do
-        {
-            Demo();
-            PlayTheGame();
-        } while (!GetTheFkOut);
     }
 
     void PlayTheGame()
@@ -110,7 +104,9 @@ public class TieFighterGame
 
         // The player
         Player player = new Player();
-        player.HP = 3;
+        int InitialShields = 5;
+        player.HP = InitialShields;
+        Score = 0;
 
         // misc
         int Hyperdrive = 0;
@@ -120,69 +116,89 @@ public class TieFighterGame
 
         EnemyWave newwave;
 
-        newwave = new EnemyWave(3, "Great, Kid! Don't get cocky.", false);
+        newwave = new EnemyWave(100, "Great, Kid! Don't get cocky.", false);
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 1));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(3, "Like bull's-eying womp rats in a T-16.", false);
+        newwave = new EnemyWave(100, "Like bull's-eying womp rats in a T-16.", false);
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 3));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(3, "You are the bomb!", false);
+        newwave = new EnemyWave(100, "", false);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 4));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Bomber, 2));
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
+
+        newwave = new EnemyWave(2, "", false);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 4));
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
+
+        newwave = new EnemyWave(1, "", false);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 3));
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
+
+        newwave = new EnemyWave(100, "", false);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Squadron, 2));
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Bomber, 3));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(4, "Keep going!", false);
+        newwave = new EnemyWave(6, "", true);
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 3));
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 1));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 3));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 3));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(6, "Keep going!", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 2));
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 4));
+        newwave = new EnemyWave(6, "", false);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 3));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 3));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 3));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Bomber, 3));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(4, "The Force is with you.", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 2));
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 4));
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 2));
+        newwave = new EnemyWave(10, "", true);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 10));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(5, "The Force is with you.", true);
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 8));
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Squadron, 2));
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 1));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
-
-        newwave = new EnemyWave(6, "Keep going!", true);
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 8));
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Squadron, 2));
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 2));
+        newwave = new EnemyWave(6, "", false);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Squadron, 3));
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Bomber, 6));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 4));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(8, "Rebel scum. Time to die.", false);
+        newwave = new EnemyWave(8, "", true);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Squadron, 1));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Bomber, 2));
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 4));
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Bomber, 4));
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 4));
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 4));
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Squadron, 4));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(true);
+        newwave = new EnemyWave(6, "", false);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 6));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 6));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 6));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
+        newwave = new EnemyWave(1, "It's a trap!", false);
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 4));
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
 
+        newwave = new EnemyWave(false);
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
 
         foreach (EnemyWave wave in waves)
         {
@@ -190,17 +206,39 @@ public class TieFighterGame
             Console.Clear();
             Scroller Scroller = new Scroller(2, Screen.Height / 3, .25);
 
-
-            Round++;
-            Scroller.NewLine("Round " + Round);
-            Scroller.NewLine("");
-            if (wave.WeaponsUpgrade)
+            // display instructions
+            if (Round == 0)
             {
-                player.MaxMissiles++;
-                Scroller.NewLine("Blaster upgraded!");
+                Scroller.NewLine("Space = Fire");
+                Scroller.NewLine("Left/Right = Move");
+                Scroller.NewLine("Up/Down = Faster/Slower");
+                Scroller.NewLine("Tab = Hyperdrive");
+                Scroller.NewLine("Esc = Quit");
+                Scroller.NewLine("");
+                Scroller.NewLine("");
+                Scroller.NewLine("");
+                Scroller.NewLine("");
                 Scroller.NewLine("");
             }
-            player.HP = 3;
+
+            // display round number
+            Round++;
+            if (wave.Infinite)
+            {
+                Scroller.NewLine("May the Force be with you!");
+                player.HP = InitialShields;
+            }
+            else { Scroller.NewLine("Round " + Round); }
+
+            // display shields message
+            Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (InitialShields - 1)) * 100 + "% charged.");
+
+            if (wave.WeaponsUpgrade)
+            {
+                Scroller.NewLine("");
+                player.MaxMissiles++;
+                Scroller.NewLine("Blaster upgraded!");
+            }
 
             // keyboard buffer
             List<ConsoleKeyInfo> keybuffer = new List<ConsoleKeyInfo>();
@@ -276,6 +314,11 @@ public class TieFighterGame
                         case ConsoleKey.D:
                             ShowDebugInfo = !ShowDebugInfo;
                             break;
+                        case ConsoleKey.T:
+                            Score = 0;
+                            player.HP++;
+                            Scroller.NewLine("Cheater! No score for you!");
+                            break;
                     }
 
                 }
@@ -291,12 +334,15 @@ public class TieFighterGame
                 if (wave.WaveDefeated() && !wave.Congratulated)
                 {
                     wave.Congratulated = true;
-                    Scroller.NewLine(wave.WinMessage);
+                    if (wave.WinMessage == "") { Scroller.NewLine("Wave cleared."); }
+                    else { Scroller.NewLine(wave.WinMessage); }
                 }
+
+                Console.Title = "Score: " + Score;
 
                 // throttle the cpu
                 if (Hyperdrive > 0) { Hyperdrive--; }
-                else { Easy.Clock.FpsThrottle(FramesPerSecond); }
+                else { if (!GetTheFkOut) { Easy.Clock.FpsThrottle(FramesPerSecond); } }
 
 
             } while (!GetTheFkOut && (!Scroller.Empty || (player.Active && !wave.WaveDefeated())));

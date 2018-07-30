@@ -30,7 +30,7 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
 
     public EnemyWave(bool moreguns)
     {
-        this.AirTrafficMax = 10;
+        this.AirTrafficMax = 8;
         this.Infinite = true;
         this.WeaponsUpgrade = moreguns;
     }
