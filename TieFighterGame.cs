@@ -23,7 +23,6 @@ public class TieFighterGame
 
         if (LinuxDevMode || Screen.TrySetSize(45, 35))
         {
-            Console.CursorVisible = false;
             Easy.Keyboard.EatKeys();
             this.MainLoop();
             Console.CursorVisible = true;
@@ -78,6 +77,8 @@ public class TieFighterGame
         Scroller Scroller = new Scroller(2, Screen.Height / 2, .5);
         do
         {
+            Console.CursorVisible = false;
+
             if (Scroller.Empty)
             {
                 foreach (string s in Messages)
@@ -253,6 +254,7 @@ public class TieFighterGame
 
             do
             {
+                Console.CursorVisible = false; // windows turns the cursor back on when restoring from minimized window
 
                 // animate
                 foreach (Starfield starfield in starfields) { starfield.Animate(); }
@@ -291,7 +293,7 @@ public class TieFighterGame
                 // debugging
                 if (ShowDebugInfo)
                 {
-                    AsciiEngine.Screen.TryWrite(new Point(0, 0), "FPS:" + FramesPerSecond + " ");
+                    AsciiEngine.Screen.TryWrite(new Point(0, 0), "FPS:" + FramesPerSecond + " HP:" + player.HP);
                 }
 
 
@@ -355,7 +357,8 @@ public class TieFighterGame
                         case ConsoleKey.T:
                             Score = 0;
                             player.HP++;
-                            Scroller.NewLine("Cheater! No score for you!");
+                            Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (InitialShields - 1)) * 100 + "% charged.");
+                            Scroller.NewLine("Score reset to zero.");
                             break;
                     }
 
