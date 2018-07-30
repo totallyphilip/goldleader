@@ -28,6 +28,27 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
     public bool Infinite = false;
     public bool WeaponsUpgrade = false;
 
+    public void EnterHyperspace()
+    {
+        foreach (BadGuy bg in this.Items.FindAll(x => x.Alive))
+        {
+            bg.Debris.TerminateAll();
+            bg.Sparks.TerminateAll();
+            bg.Messages.TerminateAll();
+            bg.Missiles.TerminateAll();
+            bg.Hide();
+        }
+    }
+
+    public void ExitHyperspace()
+    {
+        foreach (BadGuy bg in this.Items.FindAll(x => x.Alive))
+        {
+            bg.XY.dY = -1;
+        }
+    }
+
+
     public EnemyWave(bool moreguns)
     {
         this.AirTrafficMax = 8;

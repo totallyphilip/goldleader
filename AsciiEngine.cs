@@ -184,7 +184,11 @@ namespace AsciiEngine
 
             public virtual void OnHit() { }
 
-            public void Terminate() { this.Terminated = true; }
+            public void Terminate()
+            {
+                this.Terminated = true;
+                this.Hide();
+            }
 
             #endregion
 
@@ -299,6 +303,8 @@ namespace AsciiEngine
                 this.Spawn();
 
             }
+
+            public void TerminateAll() { foreach (Sprite s in this.Items) { s.Terminate(); } }
 
             public void Redraw() { foreach (Sprite s in this.Items.FindAll(x => x.Alive)) { s.Redraw(); } }
 

@@ -145,7 +145,8 @@ public class TieFighterGame
         waves.Add(newwave);
 
         newwave = new EnemyWave(1, "", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 3));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 2));
+        newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 2));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
@@ -212,7 +213,7 @@ public class TieFighterGame
 
             Scroller Scroller = new Scroller(2, Screen.Height / 3, .25);
 
-            bool FarmBoyTaunted = false;
+            bool HyperdriveSpent = false;
 
             // display instructions
             if (Round == 0)
@@ -276,17 +277,28 @@ public class TieFighterGame
                 }
                 else
                 {
+
+                    if (Hyperdrive > 0)
+                    {
+                        Hyperdrive--;
+                        foreach (Starfield starfield in starfields) { starfield.Animate(); }
+                        if (Hyperdrive == 0) { wave.ExitHyperspace(); }
+                    }
+                    else
+                    {
+                        wave.CheckCollisions(player.Missiles);
+                        wave.Animate();
+                        wave.CheckCollisions(player.Missiles);
+
+                        foreach (BadGuy bg in wave.Items)
+                        {
+                            bg.Missiles.CheckCollision(player);
+                        }
+                    }
+
                     if (player.Alive) { player.Animate(); }
                     if (player.Active) { player.DoActivities(); }
 
-                    wave.CheckCollisions(player.Missiles);
-                    wave.Animate();
-                    wave.CheckCollisions(player.Missiles);
-
-                    foreach (BadGuy bg in wave.Items)
-                    {
-                        bg.Missiles.CheckCollision(player);
-                    }
                 }
 
 
@@ -301,7 +313,12 @@ public class TieFighterGame
                 while (Console.KeyAvailable)
                 {
                     ConsoleKeyInfo k = Console.ReadKey(true);
-                    if (
+                    if (k.Key == ConsoleKey.Tab) // prioritize emergency hyperspace
+                    {
+                        keybuffer.Clear();
+                        keybuffer.Add(k);
+                    }
+                    else if (
                         k.Key == ConsoleKey.LeftArrow
                             || k.Key == ConsoleKey.RightArrow
                             || k.Key == ConsoleKey.Escape
@@ -326,7 +343,14 @@ public class TieFighterGame
                     switch (k.Key)
                     {
                         case ConsoleKey.Tab:
-                            Hyperdrive = 20;
+                            if (!HyperdriveSpent)
+                            {
+                                player.Trajectory.Run = 0;
+                                player.Missiles.TerminateAll();
+                                wave.EnterHyperspace();
+                                Hyperdrive = 500;
+                                HyperdriveSpent = true;
+                            }
                             break;
                         case ConsoleKey.UpArrow:
                             FramesPerSecond++;
@@ -380,24 +404,23 @@ public class TieFighterGame
                     wave.Congratulated = true;
                     if (wave.WinMessage == "") { Scroller.NewLine("Wave cleared."); }
                     else { Scroller.NewLine(wave.WinMessage); }
+                    int hyperdrivebonus = Round * 10;
+                    if (HyperdriveSpent)
+                    {
+                        Scroller.NewLine("Traveling through hyperspace");
+                        Scroller.NewLine("ain't like dusting crops, farm boy.");
+                    }
+                    else
+                    {
+                        Scroller.NewLine("+" + hyperdrivebonus + " Hyperdrive bonus");
+                        Score += hyperdrivebonus;
+                    }
                 }
 
                 Console.Title = "Score: " + Score;
 
                 // throttle the cpu
-                if (Hyperdrive > 0)
-                {
-                    Hyperdrive--;
-                    if (Hyperdrive == 0 && !FarmBoyTaunted)
-                    {
-                        Scroller.NewLine("Traveling through hyperspace");
-                        Scroller.NewLine("ain't like dusting crops, farm boy.");
-                        FarmBoyTaunted = true;
-                    }
-
-                }
-                else { if (!GetTheFkOut) { Easy.Clock.FpsThrottle(FramesPerSecond); } }
-
+                if (Hyperdrive < 1 & !GetTheFkOut) { Easy.Clock.FpsThrottle(FramesPerSecond); }
 
             } while (!GetTheFkOut && (!Scroller.Empty || (player.Active && !wave.WaveDefeated())));
 
