@@ -17,6 +17,7 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
     }
 
     public int AirTrafficMax;
+    int UnflownCount = 0;
     bool AttackRunStarted = false;
     public void StartAttackRun() { this.AttackRunStarted = true; }
     public List<Squadron> Fleet = new List<Squadron>();
@@ -44,7 +45,7 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
     public bool WaveDefeated()
     {
         if (this.Infinite) { return false; }
-        else { return IncomingShips.FindAll(x => x.Flown).Count > 0 && this.Empty; }
+        else { return this.UnflownCount == 0 && IncomingShips.FindAll(x => x.Alive).Count == 0; }
     }
 
     public void CreateIncomingFleet()
@@ -55,6 +56,7 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
             for (int i = 0; i < squad.Count; i++)
             {
                 IncomingShips.Add(new BadGuy(squad.BadGuyType));
+                UnflownCount++;
             }
         }
     }
@@ -82,6 +84,7 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
                     {
                         randbg.Flown = true;
                         this.Items.Add(randbg);
+                        UnflownCount--;
                     }
                 }
             }
