@@ -18,8 +18,8 @@ public class TieFighterGame
 
         bool LinuxDevMode = false;
 
-        int oldwidth = Console.WindowWidth;
-        int oldheight = Console.WindowHeight;
+        // int oldwidth = Console.WindowWidth;
+        // int oldheight = Console.WindowHeight;
 
         if (LinuxDevMode || Screen.TrySetSize(45, 35))
         {
@@ -34,7 +34,7 @@ public class TieFighterGame
             Console.ReadKey();
         }
 
-        Screen.TrySetSize(oldwidth, oldheight, false);
+        // Screen.TrySetSize(oldwidth, oldheight, false);
 
     }
 
@@ -42,15 +42,16 @@ public class TieFighterGame
     {
         do
         {
-            if (!GetTheFkOut) { Demo(); }
+            if (!GetTheFkOut) { Attract(); }
             if (!GetTheFkOut) { PlayTheGame(); }
         } while (!GetTheFkOut);
     }
 
-    public void Demo()
+    public void Attract()
     {
         Console.Clear();
         Swarm badguys = new Swarm();
+        Starfield stars = new Starfield(.2, .5);
 
         List<string> Messages = new List<string>();
 
@@ -70,9 +71,8 @@ public class TieFighterGame
         Messages.Add("Hit = 1 X Altitude Bonus");
         Messages.Add("Kill = 2 X Altitude Bonus");
         Messages.Add("");
-        Messages.Add("- Controls -");
-        Messages.Add("Esc = Quit");
-        Messages.Add("Enter = Start");
+        Messages.Add("Press Esc to Quit");
+        Messages.Add("Press Enter to Begin");
 
 
         Scroller Scroller = new Scroller(2, Screen.Height / 2, .5);
@@ -86,6 +86,7 @@ public class TieFighterGame
                 }
             }
             badguys.Animate();
+            stars.Animate();
             Scroller.Animate();
             Easy.Clock.FpsThrottle(8);
         } while (!Console.KeyAvailable);
@@ -97,12 +98,14 @@ public class TieFighterGame
     void PlayTheGame()
     {
 
+        Console.Clear();
+
         // starfield
         List<Starfield> starfields = new List<Starfield>();
         starfields.Add(new Starfield(.1, .75)); // slow
         starfields.Add(new Starfield(1, .2)); // fast
 
-        // The player
+        // the user
         Player player = new Player();
         int InitialShields = 5;
         player.HP = InitialShields;
@@ -111,6 +114,8 @@ public class TieFighterGame
         // misc
         int Hyperdrive = 0;
         int Round = 0;
+
+        // define the waves of bad guys
 
         List<EnemyWave> waves = new List<EnemyWave>();
 
@@ -142,13 +147,13 @@ public class TieFighterGame
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(100, "", false);
+        newwave = new EnemyWave(100, "That armor's too strong for blasters!", false);
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Squadron, 2));
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Bomber, 3));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(6, "", true);
+        newwave = new EnemyWave(6, "Never tell me the odds!", true);
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 3));
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 3));
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 3));
@@ -163,7 +168,7 @@ public class TieFighterGame
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(10, "", true);
+        newwave = new EnemyWave(10, "Stay on target!", true);
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 10));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
@@ -184,14 +189,14 @@ public class TieFighterGame
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(6, "", false);
+        newwave = new EnemyWave(6, "It's a trap!", false);
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 6));
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Interceptor, 6));
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Leader, 6));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
-        newwave = new EnemyWave(1, "It's a trap!", false);
+        newwave = new EnemyWave(1, "Now, young Skywalker, you will die.", false);
         newwave.Fleet.Add(new EnemyWave.Squadron(BadGuy.eBadGuyType.Fighter, 4));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
@@ -203,8 +208,9 @@ public class TieFighterGame
         foreach (EnemyWave wave in waves)
         {
 
-            Console.Clear();
             Scroller Scroller = new Scroller(2, Screen.Height / 3, .25);
+
+            bool FarmBoyTaunted = false;
 
             // display instructions
             if (Round == 0)
@@ -246,6 +252,7 @@ public class TieFighterGame
             do
             {
 
+                // animate
                 foreach (Starfield starfield in starfields) { starfield.Animate(); }
 
                 if (player.Alive) { player.Animate(); }
@@ -258,6 +265,12 @@ public class TieFighterGame
                 foreach (BadGuy bg in wave.Items)
                 {
                     bg.Missiles.CheckCollision(player);
+                }
+
+                // debugging
+                if (ShowDebugInfo)
+                {
+                    AsciiEngine.Screen.TryWrite(new Point(0, 0), "FPS:" + FramesPerSecond + " ");
                 }
 
 
@@ -294,10 +307,11 @@ public class TieFighterGame
                             break;
                         case ConsoleKey.UpArrow:
                             FramesPerSecond++;
+                            if (FramesPerSecond > 60) { FramesPerSecond = 60; }
                             break;
                         case ConsoleKey.DownArrow:
                             FramesPerSecond--;
-                            if (FramesPerSecond < 1) { FramesPerSecond = 1; }
+                            if (FramesPerSecond < 2) { FramesPerSecond = 2; }
                             break;
                         case ConsoleKey.LeftArrow:
                             player.Trajectory.Run = -1;
@@ -341,7 +355,17 @@ public class TieFighterGame
                 Console.Title = "Score: " + Score;
 
                 // throttle the cpu
-                if (Hyperdrive > 0) { Hyperdrive--; }
+                if (Hyperdrive > 0)
+                {
+                    Hyperdrive--;
+                    if (Hyperdrive == 0 && !FarmBoyTaunted)
+                    {
+                        Scroller.NewLine("Traveling through hyperspace");
+                        Scroller.NewLine("ain't like dusting crops, farm boy.");
+                        FarmBoyTaunted = true;
+                    }
+
+                }
                 else { if (!GetTheFkOut) { Easy.Clock.FpsThrottle(FramesPerSecond); } }
 
 
