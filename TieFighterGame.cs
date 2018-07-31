@@ -113,8 +113,8 @@ public class TieFighterGame
 
         // the user
         Player player = new Player();
-        int InitialShields = 5;
-        player.HP = InitialShields;
+        int ShieldMax = 5;
+        player.HP = 1;
         Score = 0;
 
         // hyperdrive
@@ -161,6 +161,12 @@ public class TieFighterGame
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
+        newwave = new EnemyWave(8, "", false);
+        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.BomberII, 2));
+        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 4));
+        newwave.CreateIncomingFleet();
+        waves.Add(newwave);
+
         newwave = new EnemyWave(100, "That armor's too strong for blasters!", false);
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Squadron, 2));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Bomber, 3));
@@ -178,7 +184,7 @@ public class TieFighterGame
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 3));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Interceptor, 3));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Leader, 3));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Bomber, 3));
+        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.BomberII, 1));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
@@ -195,7 +201,7 @@ public class TieFighterGame
         waves.Add(newwave);
 
         newwave = new EnemyWave(8, "", true);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Squadron, 1));
+        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.BomberII, 1));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Bomber, 2));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 4));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Interceptor, 4));
@@ -226,6 +232,7 @@ public class TieFighterGame
 
             Scroller Scroller = new Scroller(2, Screen.Height / 3, .25);
             bool ClosingWordsStated = false;
+            player.HP++;
 
             // display instructions
             if (Round == 0)
@@ -234,13 +241,9 @@ public class TieFighterGame
                 Scroller.NewLine("Left/Right = Move");
                 //Scroller.NewLine("PgUp/PgDn = Faster/Slower");
                 Scroller.NewLine("Up = Hyperdrive");
-                Scroller.NewLine("Enter = Pause");
+                //Scroller.NewLine("Enter = Pause");
                 Scroller.NewLine("Esc = Quit");
-                Scroller.NewLine();
-                Scroller.NewLine();
-                Scroller.NewLine();
-                Scroller.NewLine();
-                Scroller.NewLine();
+                Scroller.NewLine(4);
             }
 
             // display round number
@@ -248,17 +251,17 @@ public class TieFighterGame
             if (wave.Infinite)
             {
                 Scroller.NewLine("May the Force be with you!");
-                player.HP = InitialShields;
+                player.HP = ShieldMax;
             }
             else { Scroller.NewLine("Round " + Round); }
 
             // display shields message
-            Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (InitialShields - 1)) * 100 + "% charged.");
+            Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (ShieldMax - 1)) * 100 + "% charged.");
 
             // reset hyperdrive
             if (HyperdriveMode == eHyperdriveMode.Disengaged) { Scroller.NewLine("Navicomputer coordinates recalculated."); }
             HyperdriveMode = eHyperdriveMode.Unused;
-            if (hyperbonus < 10) { hyperbonus = 10; } else { hyperbonus = hyperbonus + hyperbonus / 2; }
+            if (hyperbonus < 1) { hyperbonus = Round * 10; } else { hyperbonus += Round * 10; }
 
             // upgrade weapons
             if (wave.WeaponsUpgrade)
@@ -358,7 +361,7 @@ public class TieFighterGame
                     switch (k.Key)
                     {
                         case ConsoleKey.UpArrow:
-                            if (HyperdriveMode == eHyperdriveMode.Unused && !wave.Completed() && player.Alive)
+                            if (HyperdriveMode == eHyperdriveMode.Unused && !wave.Completed() && player.Alive && !wave.Infinite)
                             {
                                 stars.EnterHyperspace();
                                 player.Trajectory.Run = 0;
@@ -395,10 +398,10 @@ public class TieFighterGame
                             break;
                         case ConsoleKey.T:
                             player.OnHit();
-                            //                            Score = 0;
-                            //                          player.HP++;
-                            //                        Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (InitialShields - 1)) * 100 + "% charged.");
-                            //                      Scroller.NewLine("Score reset to zero.");
+                            //Score = 0;
+                            //player.HP++;
+                            //Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (InitialShields - 1)) * 100 + "% charged.");
+                            //Scroller.NewLine("Score reset to zero.");
                             break;
                     }
 
@@ -430,7 +433,7 @@ public class TieFighterGame
                     else { Scroller.NewLine(wave.WinMessage); }
 
 
-                    Scroller.NewLine("+" + hyperbonus + " Navicomputer bonus.");
+                    Scroller.NewLine("+" + hyperbonus + " navicomputer bonus.");
                     Score += hyperbonus;
                 }
 

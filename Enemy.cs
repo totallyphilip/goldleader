@@ -13,6 +13,7 @@ public class Enemy : Sprite
         , Interceptor = 2
         , Leader = 3
         , Squadron = 4
+        , BomberII = 5
     }
 
     double ReverseFactor;
@@ -97,6 +98,7 @@ public class Enemy : Sprite
                 this.DebrisRange = 4;
                 DropsPerRow = 8;
                 ReverseFactor = .001;
+                Run = Abacus.Random.NextDouble() + .5;
                 break;
             case eEnemyType.Bomber:
                 this.Ascii = "{—o-o—}".ToCharArray();
@@ -106,6 +108,7 @@ public class Enemy : Sprite
                 this.DebrisRange = 8;
                 DropsPerRow = 1;
                 ReverseFactor = 0;
+                Run = Abacus.Random.NextDouble() + .5;
                 break;
             case eEnemyType.Interceptor:
                 this.Ascii = "<—o—>".ToCharArray();
@@ -133,6 +136,15 @@ public class Enemy : Sprite
                 this.DebrisRange = 8;
                 DropsPerRow = 8;
                 ReverseFactor = .01;
+                break;
+            case eEnemyType.BomberII:
+                this.Ascii = "{—o-O—}".ToCharArray();
+                this.FlyZone = new FlyZoneClass(Abacus.Round(Screen.Height * .5), Abacus.Round(Screen.Height * .25), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
+                this.HP = 2;
+                this.MissileConfig = new MissileStructure('@', Screen.Height * .9, 4);
+                this.DebrisRange = 10;
+                DropsPerRow = 2;
+                ReverseFactor = .005;
                 break;
         }
 
