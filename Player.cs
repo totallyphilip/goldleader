@@ -58,7 +58,7 @@ public class Player : Sprite
         }
     }
 
-    override public void DoActivities()
+    override public void Activate()
     {
         Missiles.Animate();
         //        Messages.Animate();

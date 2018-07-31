@@ -4,9 +4,9 @@ using AsciiEngine.Grid;
 using AsciiEngine.Sprites;
 using Easy;
 
-public class BadGuy : Sprite
+public class Enemy : Sprite
 {
-    public enum eBadGuyType
+    public enum eEnemyType
     {
         Fighter = 0
         , Bomber = 1
@@ -57,7 +57,7 @@ public class BadGuy : Sprite
         this.Messages.Items.Add(new Sprite(("+" + points * scorefactor).ToCharArray(), this.XY, new Trajectory(-.5, 0, 4)));
     }
 
-    override public void DoActivities()
+    override public void Activate()
     {
 
         if (this.Alive)
@@ -81,15 +81,15 @@ public class BadGuy : Sprite
 
     }
 
-    public BadGuy(eBadGuyType badguytype) : base()
+    public Enemy(eEnemyType et) : base()
     {
         this.FlyZone.EdgeMode = FlyZoneClass.eEdgeMode.Bounce;
 
         double Run = 1;
         double DropsPerRow = 0; // initialized to avoid unassigned variable warning
-        switch (badguytype)
+        switch (et)
         {
-            case eBadGuyType.Fighter:
+            case eEnemyType.Fighter:
                 this.Ascii = "|—o—|".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, 2, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 1;
@@ -98,7 +98,7 @@ public class BadGuy : Sprite
                 DropsPerRow = 8;
                 ReverseFactor = .001;
                 break;
-            case eBadGuyType.Bomber:
+            case eEnemyType.Bomber:
                 this.Ascii = "{—o-o—}".ToCharArray();
                 this.FlyZone = new FlyZoneClass(Abacus.Round(Screen.Height * .5), Abacus.Round(Screen.Height * .25), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 2;
@@ -107,7 +107,7 @@ public class BadGuy : Sprite
                 DropsPerRow = 1;
                 ReverseFactor = 0;
                 break;
-            case eBadGuyType.Interceptor:
+            case eEnemyType.Interceptor:
                 this.Ascii = "<—o—>".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, Abacus.Round(Screen.Height * -.15), 0, 0, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 2;
@@ -116,7 +116,7 @@ public class BadGuy : Sprite
                 DropsPerRow = 16;
                 ReverseFactor = .05;
                 break;
-            case eBadGuyType.Leader:
+            case eEnemyType.Leader:
                 this.Ascii = "[—o—]".ToCharArray();
                 this.FlyZone = new FlyZoneClass(Screen.Height / 2, 2, 5, 5, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 3;
@@ -125,7 +125,7 @@ public class BadGuy : Sprite
                 DropsPerRow = 16;
                 ReverseFactor = .01;
                 break;
-            case eBadGuyType.Squadron:
+            case eEnemyType.Squadron:
                 this.Ascii = "|—o—|[—o—]|—o—|".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, 5, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 6;

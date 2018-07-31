@@ -196,21 +196,26 @@ namespace AsciiEngine
 
             public char[] Ascii;
 
-            public void Hide()
-            {
-                Screen.TryWrite(this.XY, new String(' ', this.Width));
-            }
+            public void Hide() { Screen.TryWrite(this.XY, new String(' ', this.Width)); }
+            public void Refresh() { Screen.TryWrite(this.XY, new String(this.Ascii)); }
 
             public void Animate()
             {
                 this.Hide();
                 this.Trail.Items.Add(this.NextCoordinate());
-                this.Redraw();
+                this.Refresh();
             }
 
-            public void Redraw()
+            public virtual void Activate() // add more complex code in inherited tasks if needed
             {
-                Screen.TryWrite(this.XY, new String(this.Ascii));
+                if (this.Alive)
+                {
+                    // stuff to do if alive
+                }
+
+                // stuff to do regardless
+
+                if (!this.Alive) { this.Active = false; } // set false when no more stuff to do
             }
 
             protected virtual Grid.Point NextCoordinate()
@@ -245,19 +250,6 @@ namespace AsciiEngine
                 return new Grid.Point(this.Trail.XY.dX + this.Trajectory.Run, this.Trail.XY.dY + this.Trajectory.Rise);
 
             }
-
-            public virtual void DoActivities() // add more complex code in inherited tasks if needed
-            {
-                if (this.Alive)
-                {
-                    // stuff to do while alive
-                }
-
-                // stuff to do regardless
-
-                if (!this.Alive) { this.Active = false; } // set false when no more stuff to do
-            }
-
 
             #endregion
 
@@ -298,7 +290,7 @@ namespace AsciiEngine
                 }
 
                 foreach (Sprite s in this.Items.FindAll(x => x.Alive)) { s.Animate(); }
-                foreach (Sprite s in this.Items.FindAll(x => x.Active)) { s.DoActivities(); }
+                foreach (Sprite s in this.Items.FindAll(x => x.Active)) { s.Activate(); }
 
                 this.Spawn();
 
@@ -306,7 +298,15 @@ namespace AsciiEngine
 
             public void TerminateAll() { foreach (Sprite s in this.Items) { s.Terminate(); } }
 
-            public void Redraw() { foreach (Sprite s in this.Items.FindAll(x => x.Alive)) { s.Redraw(); } }
+            public void Refresh()
+            {
+                this.OnRefreshing();
+                foreach (Sprite s in this.Items.FindAll(x => x.Alive)) { s.Refresh(); }
+                this.OnRefreshed();
+            }
+
+            protected virtual void OnRefreshing() { }
+            protected virtual void OnRefreshed() { }
 
             public bool Empty { get { return this.Items.Count < 1; } }
 

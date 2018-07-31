@@ -6,12 +6,12 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
 
     public class Squadron
     {
-        public BadGuy.eBadGuyType BadGuyType;
+        public Enemy.eEnemyType EnemyType;
         public int Count;
 
-        public Squadron(BadGuy.eBadGuyType badguytype, int count)
+        public Squadron(Enemy.eEnemyType enemytype, int count)
         {
-            this.BadGuyType = badguytype;
+            this.EnemyType = enemytype;
             this.Count = count;
         }
     }
@@ -21,16 +21,27 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
     bool AttackRunStarted = false;
     public void StartAttackRun() { this.AttackRunStarted = true; }
     public List<Squadron> Fleet = new List<Squadron>();
-    List<BadGuy> IncomingShips = new List<BadGuy>();
+    List<Enemy> IncomingShips = new List<Enemy>();
     public string WinMessage;
     public bool Congratulated = false;
     public bool Humiliated = false;
     public bool Infinite = false;
     public bool WeaponsUpgrade = false;
 
+    protected override void OnRefreshed()
+    {
+        foreach (Enemy bg in this.Items)
+        {
+            bg.Sparks.Refresh();
+            bg.Debris.Refresh();
+            bg.Messages.Refresh();
+            bg.Missiles.Refresh();
+        }
+    }
+
     public void EnterHyperspace()
     {
-        foreach (BadGuy bg in this.Items.FindAll(x => x.Alive))
+        foreach (Enemy bg in this.Items.FindAll(x => x.Alive))
         {
             bg.Debris.TerminateAll();
             bg.Sparks.TerminateAll();
@@ -42,7 +53,7 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
 
     public void ExitHyperspace()
     {
-        foreach (BadGuy bg in this.Items.FindAll(x => x.Alive))
+        foreach (Enemy bg in this.Items.FindAll(x => x.Alive))
         {
             bg.XY.dY = -1;
         }
@@ -76,7 +87,7 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
         {
             for (int i = 0; i < squad.Count; i++)
             {
-                IncomingShips.Add(new BadGuy(squad.BadGuyType));
+                IncomingShips.Add(new Enemy(squad.EnemyType));
                 UnflownCount++;
             }
         }
@@ -90,9 +101,9 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
             {
                 if (this.Items.Count < this.AirTrafficMax)
                 {
-                    System.Array values = System.Enum.GetValues(typeof(BadGuy.eBadGuyType));
-                    BadGuy.eBadGuyType someone = (BadGuy.eBadGuyType)values.GetValue(Easy.Abacus.Random.Next(values.Length));
-                    this.Items.Add(new BadGuy(someone));
+                    System.Array values = System.Enum.GetValues(typeof(Enemy.eEnemyType));
+                    Enemy.eEnemyType someone = (Enemy.eEnemyType)values.GetValue(Easy.Abacus.Random.Next(values.Length));
+                    this.Items.Add(new Enemy(someone));
                 }
             }
             else
@@ -100,7 +111,7 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
                 if (this.Items.Count < this.AirTrafficMax && this.IncomingShips.FindAll(x => !x.Flown).Count > 0)
                 {
                     // pick a ship at random
-                    BadGuy randbg = IncomingShips.Find(x => !x.Flown && Easy.Abacus.RandomTrue);
+                    Enemy randbg = IncomingShips.Find(x => !x.Flown && Easy.Abacus.RandomTrue);
                     if (randbg != null)
                     {
                         randbg.Flown = true;
