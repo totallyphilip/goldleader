@@ -119,6 +119,7 @@ public class TieFighterGame
         // misc
         int Round = 0;
         bool Paused = false;
+        bool HeroBonusGiven = false;
 
         #region  " Waves "
 
@@ -388,10 +389,11 @@ public class TieFighterGame
                             Paused = !Paused;
                             break;
                         case ConsoleKey.T:
-                            Score = 0;
-                            player.HP++;
-                            Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (InitialShields - 1)) * 100 + "% charged.");
-                            Scroller.NewLine("Score reset to zero.");
+                            player.OnHit();
+                            //                            Score = 0;
+                            //                          player.HP++;
+                            //                        Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (InitialShields - 1)) * 100 + "% charged.");
+                            //                      Scroller.NewLine("Score reset to zero.");
                             break;
                     }
 
@@ -425,6 +427,19 @@ public class TieFighterGame
 
                     Scroller.NewLine("+" + hyperbonus + " Navicomputer bonus.");
                     Score += hyperbonus;
+                }
+
+                if (!player.Alive && wave.Completed() && !HeroBonusGiven)
+                {
+                    int deadherobonus = (Round * 100) / 2;
+                    Scroller.NewLine(3);
+                    Scroller.NewLine("That");
+                    Scroller.NewLine("was");
+                    Scroller.NewLine("awesome.");
+                    Scroller.NewLine(3);
+                    Scroller.NewLine("+" + deadherobonus + " Dead hero bonus.");
+                    Score += deadherobonus;
+                    HeroBonusGiven = true;
                 }
 
                 Console.Title = "Score: " + Score;
