@@ -353,7 +353,7 @@ public class TieFighterGame
                     switch (k.Key)
                     {
                         case ConsoleKey.UpArrow:
-                            if (HyperdriveMode == eHyperdriveMode.Unused)
+                            if (HyperdriveMode == eHyperdriveMode.Unused && !wave.Completed() && player.Alive)
                             {
                                 stars.EnterHyperspace();
                                 player.Trajectory.Run = 0;
