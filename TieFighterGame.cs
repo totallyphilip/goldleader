@@ -113,10 +113,11 @@ public class TieFighterGame
         Score = 0;
 
         // misc
-        int Hyperdrive = 0;
+        bool HyperdriveRunning = false;
         int Round = 0;
         bool Paused = false;
         bool HyperdriveSpent = false;
+        int hyperdrivebonus = 0;
 
         #region  " Waves "
 
@@ -223,8 +224,8 @@ public class TieFighterGame
             {
                 Scroller.NewLine("Space = Fire");
                 Scroller.NewLine("Left/Right = Move");
-                Scroller.NewLine("Up/Down = Faster/Slower");
-                Scroller.NewLine("Tab = Hyperdrive");
+                Scroller.NewLine("PgUp/PgDn = Faster/Slower");
+                Scroller.NewLine("Up = Hyperdrive");
                 Scroller.NewLine("Enter = Pause");
                 Scroller.NewLine("Esc = Quit");
                 Scroller.NewLine();
@@ -287,11 +288,10 @@ public class TieFighterGame
                 else
                 {
 
-                    if (Hyperdrive > 0)
+                    if (HyperdriveRunning)
                     {
-                        Hyperdrive--;
                         foreach (Starfield starfield in starfields) { starfield.Animate(); }
-                        if (Hyperdrive == 0) { wave.ExitHyperspace(); }
+                        if (Easy.Clock.Elapsed(3)) { wave.ExitHyperspace(); HyperdriveRunning = false; }
                     }
                     else
                     {
@@ -351,21 +351,22 @@ public class TieFighterGame
                     keybuffer.Remove(k);
                     switch (k.Key)
                     {
-                        case ConsoleKey.Tab:
+                        case ConsoleKey.UpArrow:
                             if (!HyperdriveSpent)
                             {
                                 player.Trajectory.Run = 0;
                                 player.Missiles.TerminateAll();
                                 wave.EnterHyperspace();
-                                Hyperdrive = 500;
+                                HyperdriveRunning = true;
                                 HyperdriveSpent = true;
+                                Easy.Clock.StartTimer();
                             }
                             break;
-                        case ConsoleKey.UpArrow:
+                        case ConsoleKey.PageUp:
                             FramesPerSecond++;
                             if (FramesPerSecond > 60) { FramesPerSecond = 60; }
                             break;
-                        case ConsoleKey.DownArrow:
+                        case ConsoleKey.PageDown:
                             FramesPerSecond--;
                             if (FramesPerSecond < 2) { FramesPerSecond = 2; }
                             break;
@@ -376,7 +377,7 @@ public class TieFighterGame
                             player.Trajectory.Run = 1;
                             break;
                         case ConsoleKey.Spacebar:
-                            if (Hyperdrive < 1) { player.Fire(); }
+                            if (!HyperdriveRunning) { player.Fire(); }
                             break;
                         case ConsoleKey.Escape:
                             GetTheFkOut = true;
@@ -413,14 +414,15 @@ public class TieFighterGame
                     wave.Congratulated = true;
                     if (wave.WinMessage == "") { Scroller.NewLine("Wave cleared."); }
                     else { Scroller.NewLine(wave.WinMessage); }
-                    int hyperdrivebonus = Round * 10;
                     if (HyperdriveSpent)
                     {
                         Scroller.NewLine("Traveling through hyperspace");
                         Scroller.NewLine("ain't like dusting crops, boy.");
+                        hyperdrivebonus = 0;
                     }
                     else
                     {
+                        if (hyperdrivebonus < 10) { hyperdrivebonus = 10; } else { hyperdrivebonus *= 2; }
                         Scroller.NewLine("+" + hyperdrivebonus + " Navicomputer bonus");
                         Score += hyperdrivebonus;
                     }
@@ -429,7 +431,7 @@ public class TieFighterGame
                 Console.Title = "Score: " + Score;
 
                 // throttle the cpu
-                if (Hyperdrive < 1 & !GetTheFkOut) { Easy.Clock.FpsThrottle(FramesPerSecond); }
+                if (!HyperdriveRunning & !GetTheFkOut) { Easy.Clock.FpsThrottle(FramesPerSecond); }
 
             } while (!GetTheFkOut && (!Scroller.Empty || (player.Active && !wave.WaveDefeated())));
 

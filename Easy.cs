@@ -49,7 +49,9 @@ namespace Easy
 
     public class Clock
     {
-        public static Int64 LastTick = 0;
+        static Int64 LastTick = 0;
+
+        static Int64 StopWatchTick = 0;
 
         public static void FpsThrottle(int slices)
         {
@@ -63,6 +65,10 @@ namespace Easy
 
             Clock.LastTick = DateTime.Now.Ticks;
         }
+
+        public static void StartTimer() { StopWatchTick = DateTime.Now.Ticks; }
+
+        public static bool Elapsed(int seconds) { return DateTime.Now.Ticks > StopWatchTick + seconds * 10000000; }
     }
 }
 
