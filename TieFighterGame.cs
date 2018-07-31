@@ -72,6 +72,11 @@ public class TieFighterGame
         Messages.Add("");
         Messages.Add("Press Esc to Quit");
         Messages.Add("Press Space to Begin");
+        Messages.Add("");
+        Messages.Add("");
+        Messages.Add("");
+        Messages.Add("");
+        Messages.Add("");
 
 
         Scroller Scroller = new Scroller(2, Screen.Height / 2, .5);
@@ -253,7 +258,7 @@ public class TieFighterGame
             // reset hyperdrive
             if (HyperdriveMode == eHyperdriveMode.Disengaged) { Scroller.NewLine("Navicomputer coordinates recalculated."); }
             HyperdriveMode = eHyperdriveMode.Unused;
-            if (hyperbonus < 10) { hyperbonus = 10; } else { hyperbonus *= 2; }
+            if (hyperbonus < 10) { hyperbonus = 10; } else { hyperbonus = hyperbonus + hyperbonus / 2; }
 
             // upgrade weapons
             if (wave.WeaponsUpgrade)

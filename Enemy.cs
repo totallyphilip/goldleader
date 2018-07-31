@@ -66,7 +66,7 @@ public class Enemy : Sprite
             if (Abacus.Random.NextDouble() < this.ReverseFactor) { this.Trajectory.Run *= -1; }
 
             // fire
-            if (this.Missiles.Items.Count < this.MissileConfig.MaxCount && this.XY.dY > Screen.BottomEdge - MissileConfig.Range && this.HP > 0)
+            if (this.Missiles.Items.Count < this.MissileConfig.MaxCount && this.XY.dY > Screen.BottomEdge - MissileConfig.Range && this.HP > 0 && Abacus.RandomTrue)
             {
                 this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Ascii }, new Point(this.XY.dX + this.Width / 2, this.XY.dY), new Trajectory(1, 0, MissileConfig.Range)));
             }
@@ -123,16 +123,16 @@ public class Enemy : Sprite
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .33, 2);
                 this.DebrisRange = 4;
                 DropsPerRow = 16;
-                ReverseFactor = .01;
+                ReverseFactor = .04;
                 break;
             case eEnemyType.Squadron:
                 this.Ascii = "|—o—|[—o—]|—o—|".ToCharArray();
-                this.FlyZone = new FlyZoneClass(0, 5, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
+                this.FlyZone = new FlyZoneClass(Screen.Height / 4, 5, -2, -2, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 6;
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .5, 6);
                 this.DebrisRange = 8;
                 DropsPerRow = 8;
-                ReverseFactor = 0;
+                ReverseFactor = .01;
                 break;
         }
 
