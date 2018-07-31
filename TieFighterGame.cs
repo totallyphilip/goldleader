@@ -10,7 +10,7 @@ public class TieFighterGame
 
     public static bool GetTheFkOut = false;
     public static bool ShowDebugInfo = false;
-    int FramesPerSecond = 8;
+    int FramesPerSecond = 9;
 
     public static int Score;
     public void TryPlay()
@@ -71,7 +71,7 @@ public class TieFighterGame
         Messages.Add("Kill = 2 X Altitude Bonus");
         Messages.Add("");
         Messages.Add("Press Esc to Quit");
-        Messages.Add("Press Enter to Begin");
+        Messages.Add("Press Space to Begin");
 
 
         Scroller Scroller = new Scroller(2, Screen.Height / 2, .5);
@@ -96,15 +96,15 @@ public class TieFighterGame
 
     }
 
+    enum eHyperdriveMode { Unused, Engaged, Disengaged };
+
     void PlayTheGame()
     {
 
         Console.Clear();
 
         // starfield
-        List<Starfield> starfields = new List<Starfield>();
-        starfields.Add(new Starfield(.1, .75)); // slow
-        starfields.Add(new Starfield(1, .2)); // fast
+        Galaxy stars = new Galaxy();
 
         // the user
         Player player = new Player();
@@ -112,12 +112,13 @@ public class TieFighterGame
         player.HP = InitialShields;
         Score = 0;
 
+        // hyperdrive
+        eHyperdriveMode HyperdriveMode = eHyperdriveMode.Unused;
+        int hyperbonus = 0;
+
         // misc
-        bool HyperdriveRunning = false;
         int Round = 0;
         bool Paused = false;
-        bool HyperdriveSpent = false;
-        int hyperdrivebonus = 0;
 
         #region  " Waves "
 
@@ -218,13 +219,14 @@ public class TieFighterGame
         {
 
             Scroller Scroller = new Scroller(2, Screen.Height / 3, .25);
+            bool ClosingWordsStated = false;
 
             // display instructions
             if (Round == 0)
             {
                 Scroller.NewLine("Space = Fire");
                 Scroller.NewLine("Left/Right = Move");
-                Scroller.NewLine("PgUp/PgDn = Faster/Slower");
+                //Scroller.NewLine("PgUp/PgDn = Faster/Slower");
                 Scroller.NewLine("Up = Hyperdrive");
                 Scroller.NewLine("Enter = Pause");
                 Scroller.NewLine("Esc = Quit");
@@ -247,12 +249,12 @@ public class TieFighterGame
             // display shields message
             Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (InitialShields - 1)) * 100 + "% charged.");
 
-            if (HyperdriveSpent)
-            {
-                HyperdriveSpent = false;
-                Scroller.NewLine("Navicomputer coordinates recalculated.");
+            // reset hyperdrive
+            if (HyperdriveMode == eHyperdriveMode.Disengaged) { Scroller.NewLine("Navicomputer coordinates recalculated."); }
+            HyperdriveMode = eHyperdriveMode.Unused;
+            if (hyperbonus < 10) { hyperbonus = 10; } else { hyperbonus *= 2; }
 
-            }
+            // upgrade weapons
             if (wave.WeaponsUpgrade)
             {
                 Scroller.NewLine();
@@ -268,7 +270,7 @@ public class TieFighterGame
                 Console.CursorVisible = false; // windows turns the cursor back on when restoring from minimized window
 
                 // animate
-                foreach (Starfield starfield in starfields) { starfield.Animate(); }
+                stars.Animate();
 
                 if (Paused)
                 {
@@ -281,17 +283,17 @@ public class TieFighterGame
                 else
                 {
 
-                    if (HyperdriveRunning)
+                    if (HyperdriveMode == eHyperdriveMode.Engaged)
                     {
-                        foreach (Starfield starfield in starfields) { starfield.Animate(); }
+                        stars.Animate();
                         if (Easy.Clock.Elapsed(3))
                         {
+                            HyperdriveMode = eHyperdriveMode.Disengaged;
                             wave.ExitHyperspace();
-                            HyperdriveRunning = false;
-                            foreach (Starfield starfield in starfields) { starfield.ExitHyperspace(); }
+                            stars.ExitHyperspace();
                         }
                     }
-                    else
+                    else if (HyperdriveMode == eHyperdriveMode.Unused)
                     {
                         wave.CheckCollisions(player.Missiles);
                         wave.Animate();
@@ -350,14 +352,12 @@ public class TieFighterGame
                     switch (k.Key)
                     {
                         case ConsoleKey.UpArrow:
-                            if (!HyperdriveSpent)
+                            if (HyperdriveMode == eHyperdriveMode.Unused)
                             {
-                                foreach (Starfield starfield in starfields) { starfield.EnterHyperspace(); }
+                                stars.EnterHyperspace();
                                 player.Trajectory.Run = 0;
                                 player.Missiles.TerminateAll();
-                                wave.EnterHyperspace();
-                                HyperdriveRunning = true;
-                                HyperdriveSpent = true;
+                                HyperdriveMode = eHyperdriveMode.Engaged;
                                 Easy.Clock.StartTimer();
                             }
                             break;
@@ -376,7 +376,7 @@ public class TieFighterGame
                             player.Trajectory.Run = 1;
                             break;
                         case ConsoleKey.Spacebar:
-                            if (!HyperdriveRunning) { player.Fire(); }
+                            if (HyperdriveMode != eHyperdriveMode.Engaged) { player.Fire(); }
                             break;
                         case ConsoleKey.Escape:
                             GetTheFkOut = true;
@@ -400,39 +400,39 @@ public class TieFighterGame
                 // display messages
                 Scroller.Animate();
                 if (Scroller.Empty) { wave.StartAttackRun(); }
-                if (!player.Alive && !wave.Humiliated)
+
+                if (!player.Alive && !ClosingWordsStated)
                 {
-                    wave.Humiliated = true;
+                    ClosingWordsStated = true;
                     Scroller.NewLine("G A M E   O V E R");
-                    Scroller.NewLine("");
-                    Scroller.NewLine("");
+                    Scroller.NewLine(3);
                     Scroller.NewLine("They came from behind!");
                 }
-                if (wave.WaveDefeated() && !wave.Congratulated)
+
+                if (player.Alive && wave.Completed() && !ClosingWordsStated)
                 {
-                    wave.Congratulated = true;
-                    if (wave.WinMessage == "") { Scroller.NewLine("Wave cleared."); }
-                    else { Scroller.NewLine(wave.WinMessage); }
-                    if (HyperdriveSpent)
+                    ClosingWordsStated = true;
+
+                    if (HyperdriveMode == eHyperdriveMode.Disengaged)
                     {
                         Scroller.NewLine("Traveling through hyperspace");
                         Scroller.NewLine("ain't like dusting crops, boy.");
-                        hyperdrivebonus = 0;
+                        hyperbonus = 0;
                     }
-                    else
-                    {
-                        if (hyperdrivebonus < 10) { hyperdrivebonus = 10; } else { hyperdrivebonus *= 2; }
-                        Scroller.NewLine("+" + hyperdrivebonus + " Navicomputer bonus");
-                        Score += hyperdrivebonus;
-                    }
+                    else if (wave.WinMessage == "") { Scroller.NewLine("Wave cleared."); }
+                    else { Scroller.NewLine(wave.WinMessage); }
+
+
+                    Scroller.NewLine("+" + hyperbonus + " Navicomputer bonus.");
+                    Score += hyperbonus;
                 }
 
                 Console.Title = "Score: " + Score;
 
                 // throttle the cpu
-                if (!HyperdriveRunning & !GetTheFkOut) { Easy.Clock.FpsThrottle(FramesPerSecond); }
+                if (HyperdriveMode != eHyperdriveMode.Engaged && !GetTheFkOut) { Easy.Clock.FpsThrottle(FramesPerSecond); }
 
-            } while (!GetTheFkOut && (!Scroller.Empty || (player.Active && !wave.WaveDefeated())));
+            } while (!GetTheFkOut && (!Scroller.Empty || (player.Active && !wave.Completed())));
 
             if (!player.Alive) { break; }
 

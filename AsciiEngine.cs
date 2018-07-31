@@ -54,6 +54,7 @@ namespace AsciiEngine
             public int LineSpacing = 1;
             public double Speed = 1;
 
+            public void NewLine(int lines) { for (int i = 0; i < lines; i++) { this.NewLine(); } }
             public void NewLine() { NewLine(""); }
 
             public void NewLine(string s)

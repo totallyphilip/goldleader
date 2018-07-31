@@ -2,6 +2,7 @@ using AsciiEngine;
 using AsciiEngine.Grid;
 using AsciiEngine.Sprites;
 using Easy;
+using System.Collections.Generic;
 
 public class Starfield : Swarm
 {
@@ -50,4 +51,32 @@ public class Starfield : Swarm
 
     public void ExitHyperspace() { RedefineStarlight(false); }
 
+}
+
+
+
+public class Galaxy
+{
+    List<Starfield> starfields = new List<Starfield>();
+
+    public void Animate()
+    {
+        foreach (Starfield s in starfields) { s.Animate(); }
+    }
+
+    public void EnterHyperspace()
+    {
+        System.Console.Clear();
+        foreach (Starfield s in starfields) { s.EnterHyperspace(); }
+    }
+    public void ExitHyperspace()
+    {
+        foreach (Starfield s in starfields) { s.ExitHyperspace(); }
+    }
+
+    public Galaxy()
+    {
+        starfields.Add(new Starfield(.1, .75)); // slow
+        starfields.Add(new Starfield(1, .2)); // fast
+    }
 }

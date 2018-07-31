@@ -23,10 +23,9 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
     public List<Squadron> Fleet = new List<Squadron>();
     List<Enemy> IncomingShips = new List<Enemy>();
     public string WinMessage;
-    public bool Congratulated = false;
-    public bool Humiliated = false;
     public bool Infinite = false;
     public bool WeaponsUpgrade = false;
+    public bool Escaped = false;
 
     protected override void OnRefreshed()
     {
@@ -39,25 +38,7 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
         }
     }
 
-    public void EnterHyperspace()
-    {
-        foreach (Enemy bg in this.Items.FindAll(x => x.Alive))
-        {
-            bg.Debris.TerminateAll();
-            bg.Sparks.TerminateAll();
-            bg.Messages.TerminateAll();
-            bg.Missiles.TerminateAll();
-            bg.Hide();
-        }
-    }
-
-    public void ExitHyperspace()
-    {
-        foreach (Enemy bg in this.Items.FindAll(x => x.Alive))
-        {
-            bg.XY.dY = -1;
-        }
-    }
+    public void ExitHyperspace() { this.Escaped = true; }
 
 
     public EnemyWave(bool moreguns)
@@ -74,10 +55,12 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
         this.WeaponsUpgrade = moreguns;
     }
 
-    public bool WaveDefeated()
+    public bool Completed()
     {
         if (this.Infinite) { return false; }
+        else if (this.Escaped) { return true; }
         else { return this.UnflownCount == 0 && IncomingShips.FindAll(x => x.Alive).Count == 0; }
+        //else { return this.UnflownCount == 0 && IncomingShips.Count == 0; }
     }
 
     public void CreateIncomingFleet()
