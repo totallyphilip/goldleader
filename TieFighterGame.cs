@@ -284,7 +284,12 @@ public class TieFighterGame
                     if (HyperdriveRunning)
                     {
                         foreach (Starfield starfield in starfields) { starfield.Animate(); }
-                        if (Easy.Clock.Elapsed(3)) { wave.ExitHyperspace(); HyperdriveRunning = false; }
+                        if (Easy.Clock.Elapsed(3))
+                        {
+                            wave.ExitHyperspace();
+                            HyperdriveRunning = false;
+                            foreach (Starfield starfield in starfields) { starfield.ExitHyperspace(); }
+                        }
                     }
                     else
                     {
@@ -347,6 +352,7 @@ public class TieFighterGame
                         case ConsoleKey.UpArrow:
                             if (!HyperdriveSpent)
                             {
+                                foreach (Starfield starfield in starfields) { starfield.EnterHyperspace(); }
                                 player.Trajectory.Run = 0;
                                 player.Missiles.TerminateAll();
                                 wave.EnterHyperspace();
