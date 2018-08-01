@@ -313,17 +313,12 @@ public class TieFighterGame
                             bg.Missiles.CheckCollision(player);
                         }
 
-
                         string ShieldMarkers = "";
                         if (player.HP > 0) { ShieldMarkers = new String('X', player.HP - 1); }
                         Screen.TryWrite(new Point(1, player.XY.iY + 1), ShieldMarkers + ' ');
                         string ShotMarkers = " " + new String('|', player.MaxMissiles - player.Missiles.Items.Count);
                         Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, player.XY.iY + 1), ShotMarkers);
 
-                        /*  if (HyperdriveMode == eHyperdriveMode.Unused)
-                         {
-                             Screen.TryWrite(new Point(player.XY.iX, player.XY.iY + 1), " -- ");
-                         } */
                     }
 
                     if (player.Alive) { player.Animate(); }

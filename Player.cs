@@ -52,7 +52,7 @@ public class Player : Sprite
     {
         if (this.Missiles.Items.Count < this.MaxMissiles)
         {
-            PlayerMissile missile = new PlayerMissile(new Point(this.XY.dX + this.Width / 2, this.XY.dY), new Trajectory(-1, 0, this.XY.dY));
+            PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-1, 0, this.XY.dY));
             missile.HP = 1;
             this.Missiles.Items.Add(missile);
         }

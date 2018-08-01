@@ -69,7 +69,7 @@ public class Enemy : Sprite
             // fire
             if (this.Missiles.Items.Count < this.MissileConfig.MaxCount && this.XY.dY > Screen.BottomEdge - MissileConfig.Range && this.HP > 0 && Abacus.RandomTrue)
             {
-                this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Ascii }, new Point(this.XY.dX + this.Width / 2, this.XY.dY), new Trajectory(1, 0, MissileConfig.Range)));
+                this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Ascii }, this.XY.Clone(this.Width / 2, 0), new Trajectory(1, 0, MissileConfig.Range)));
             }
         }
 

@@ -91,7 +91,7 @@ namespace AsciiEngine
 
     namespace Sprites
     {
-        public class Sprite
+        public class Sprite // an independently operating entity
         {
 
             #region " Fly Zone "
@@ -193,6 +193,12 @@ namespace AsciiEngine
 
             #endregion
 
+            #region " Squadron "
+
+            Sprite Leader;
+
+            #endregion
+
             #region " Animation "
 
             public char[] Ascii;
@@ -221,35 +227,40 @@ namespace AsciiEngine
 
             protected virtual Grid.Point NextCoordinate()
             {
-                if (this.XY.dY + this.Trajectory.Rise < this.FlyZone.TopEdge)
-                {
-                    if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise); }
-                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Rise = 0; }
-                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
-                }
-                else if (this.XY.dY + this.Trajectory.Rise > this.FlyZone.BottomEdge)
-                {
-                    if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise) * (-1); }
-                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Rise = 0; }
-                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
-                }
 
-                if (this.XY.dX + this.Trajectory.Run < this.FlyZone.LeftEdge)
+                // only worry about the fly zone if this sprite is a rogue
+                if (this.Leader == null)
                 {
-                    if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run); }
-                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Run = 0; }
-                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+                    if (this.XY.dY + this.Trajectory.Rise < this.FlyZone.TopEdge)
+                    {
+                        if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise); }
+                        else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Rise = 0; }
+                        else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+                    }
+                    else if (this.XY.dY + this.Trajectory.Rise > this.FlyZone.BottomEdge)
+                    {
+                        if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise) * (-1); }
+                        else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Rise = 0; }
+                        else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+                    }
+
+                    if (this.XY.dX + this.Trajectory.Run < this.FlyZone.LeftEdge)
+                    {
+                        if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run); }
+                        else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Run = 0; }
+                        else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+                    }
+
+                    if (this.XY.dX + this.Trajectory.Run + this.Width > this.FlyZone.RightEdge)
+                    {
+                        if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run) * (-1); }
+                        else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Run = 0; }
+                        else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
+                    }
                 }
+                else { this.Trajectory = Leader.Trajectory.Clone(); }
 
-                if (this.XY.dX + this.Trajectory.Run + this.Width > this.FlyZone.RightEdge)
-                {
-                    if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run) * (-1); }
-                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Run = 0; }
-                    else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
-                }
-
-                return new Grid.Point(this.Trail.XY.dX + this.Trajectory.Run, this.Trail.XY.dY + this.Trajectory.Rise);
-
+                return this.Trail.XY.Clone(this.Trajectory);
             }
 
             #endregion
@@ -276,7 +287,7 @@ namespace AsciiEngine
 
         }
 
-        public class Swarm
+        public class Swarm // a collection of sprites
         {
 
             public List<Sprite> Items = new List<Sprite>();
@@ -358,6 +369,10 @@ namespace AsciiEngine
                 this.dY = dy;
             }
 
+            public Point Clone() { return new Point(this.dX, this.dY); }
+            public Point Clone(Trajectory t) { return new Point(this.dX + t.Run, this.dY + t.Rise); }
+            public Point Clone(double x, double y) { return new Point(this.dX + x, this.dY + y); }
+
         }
 
         public class Trail
@@ -412,6 +427,8 @@ namespace AsciiEngine
                 if (Easy.Abacus.RandomTrue) { this._Run *= -1; }
                 if (Easy.Abacus.RandomTrue) { this._Rise *= -1; }
             }
+
+            public Trajectory Clone() { return new Trajectory(this.Rise, this.Run, this.Range); }
 
             #endregion
         }
