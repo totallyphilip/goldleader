@@ -299,7 +299,7 @@ public class TieFighterGame
                         {
                             HyperdriveMode = eHyperdriveMode.Disengaged;
                             wave.ExitHyperspace();
-                            stars.ExitHyperspace();
+                            stars.SetHyperspace(false);
                         }
                     }
                     else if (HyperdriveMode == eHyperdriveMode.Unused)
@@ -370,7 +370,7 @@ public class TieFighterGame
                         case ConsoleKey.UpArrow:
                             if (HyperdriveMode == eHyperdriveMode.Unused && !wave.Completed() && player.Alive && !wave.Infinite)
                             {
-                                stars.EnterHyperspace();
+                                stars.SetHyperspace(true);
                                 player.Trajectory.Run = 0;
                                 player.Missiles.TerminateAll();
                                 HyperdriveMode = eHyperdriveMode.Engaged;

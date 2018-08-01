@@ -209,7 +209,7 @@ namespace AsciiEngine
             public void Animate()
             {
                 this.Hide();
-                this.Trail.Items.Add(this.NextCoordinate());
+                this.Trail.Add(this.NextCoordinate());
                 this.Refresh();
             }
 
@@ -320,10 +320,6 @@ namespace AsciiEngine
             protected virtual void OnRefreshing() { }
             protected virtual void OnRefreshed() { }
 
-            public bool Empty { get { return this.Items.Count < 1; } }
-
-            public bool Alive { get { return this.Items.Exists(x => x.Alive); } }
-
             protected virtual void Spawn() { } // do nothing unless inherited class overrides this
 
             public void CheckCollision(Sprite thatone)
@@ -342,6 +338,18 @@ namespace AsciiEngine
                     this.CheckCollision(thatone);
                 }
             }
+
+            #region " Shortcuts "
+
+            public int Count { get { return this.Items.Count; } }
+
+            public bool Empty { get { return this.Items.Count < 1; } }
+
+            public bool Alive { get { return this.Items.Exists(x => x.Alive); } }
+
+            public void Add(Sprite s) { this.Items.Add(s); }
+
+            #endregion
 
             public Swarm() { }
 
@@ -385,14 +393,15 @@ namespace AsciiEngine
 
             public Point InitialXY { get { return Items[0]; } }
 
-            public void MoveTo(Point xy)
-            {
-                Items.Add(xy);
-            }
+            #region  " Shortcuts "
+
+            public void Add(Point xy) { this.Items.Add(xy); }
+
+            #endregion
 
             public Trail(Point xy)
             {
-                Items.Add(xy);
+                this.Items.Add(xy);
             }
         }
 

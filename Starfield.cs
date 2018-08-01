@@ -6,14 +6,14 @@ using System.Collections.Generic;
 
 public class Starfield : Swarm
 {
+    bool InHyperspace = false;
     double Speed;
     double RowCoverageFactor;
-    bool Hyperspace = false;
     char Starlight
     {
         get
         {
-            if (this.Hyperspace) { return '|'; }
+            if (this.InHyperspace) { return '|'; }
             else { return '.'; }
         }
     }
@@ -30,27 +30,22 @@ public class Starfield : Swarm
 
     public void Spawn(bool randomly)
     {
-        while (this.Items.Count < this.MaxStars)
+        while (this.Count < this.MaxStars)
         {
             int x = Abacus.Random.Next(Screen.LeftEdge, Screen.RightEdge + 1);
             int y = Screen.TopEdge - 1;
             if (randomly) { y = Abacus.Random.Next(Screen.TopEdge - 1, Screen.Height); }
             Point xy = new Point(x, y);
-            this.Items.Add(new Sprite(new[] { this.Starlight }, xy, new Trajectory(this.Speed, 0, Screen.Height - y)));
+            this.Add(new Sprite(new[] { this.Starlight }, xy, new Trajectory(this.Speed, 0, Screen.Height - y)));
         }
 
     }
 
-    void RedefineStarlight(bool hyperspace)
+    public void SetHyperspace(bool inhyperspace)
     {
-        this.Hyperspace = hyperspace;
+        this.InHyperspace = inhyperspace;
         foreach (Sprite star in Items) { star.Ascii = new[] { this.Starlight }; }
     }
-
-    public void EnterHyperspace() { RedefineStarlight(true); }
-
-    public void ExitHyperspace() { RedefineStarlight(false); }
-
 }
 
 
@@ -64,14 +59,10 @@ public class Galaxy
         foreach (Starfield s in starfields) { s.Animate(); }
     }
 
-    public void EnterHyperspace()
+    public void SetHyperspace(bool inhyperspace)
     {
         System.Console.Clear();
-        foreach (Starfield s in starfields) { s.EnterHyperspace(); }
-    }
-    public void ExitHyperspace()
-    {
-        foreach (Starfield s in starfields) { s.ExitHyperspace(); }
+        foreach (Starfield s in starfields) { s.SetHyperspace(inhyperspace); }
     }
 
     public Galaxy()
