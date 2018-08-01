@@ -12,11 +12,12 @@ public class Enemy : Sprite
         , Bomber = 1
         , Interceptor = 2
         , Leader = 3
-        , Squadron = 4
-        , BomberII = 5
+        , HeavyBomber = 5
+        , HeavyFighter = 6
     }
 
     double ReverseFactor;
+    public eEnemyType EnemyType;
     public bool Flown = false;
     public Swarm Messages = new Swarm();
     struct MissileStructure
@@ -121,30 +122,31 @@ public class Enemy : Sprite
                 break;
             case eEnemyType.Leader:
                 this.Ascii = "[—o—]".ToCharArray();
-                this.FlyZone = new FlyZoneClass(Screen.Height / 2, 2, 5, 5, FlyZoneClass.eEdgeMode.Bounce);
-                this.HP = 3;
+                this.FlyZone = new FlyZoneClass(Screen.Height / 4, 5, -2, -2, FlyZoneClass.eEdgeMode.Bounce);
+                this.HP = 2;
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .33, 2);
                 this.DebrisRange = 4;
-                DropsPerRow = 16;
-                ReverseFactor = .04;
-                break;
-            case eEnemyType.Squadron:
-                this.Ascii = "|—o—|[—o—]|—o—|".ToCharArray();
-                this.FlyZone = new FlyZoneClass(Screen.Height / 4, 5, -2, -2, FlyZoneClass.eEdgeMode.Bounce);
-                this.HP = 6;
-                this.MissileConfig = new MissileStructure('|', Screen.Height * .5, 6);
-                this.DebrisRange = 8;
-                DropsPerRow = 8;
+                DropsPerRow = 20;
                 ReverseFactor = .01;
                 break;
-            case eEnemyType.BomberII:
-                this.Ascii = "{—o-O—}".ToCharArray();
+            case eEnemyType.HeavyBomber:
+                this.Ascii = "{=o-o=}".ToCharArray();
                 this.FlyZone = new FlyZoneClass(Abacus.Round(Screen.Height * .5), Abacus.Round(Screen.Height * .25), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
-                this.HP = 2;
+                this.HP = 3;
                 this.MissileConfig = new MissileStructure('@', Screen.Height * .9, 4);
                 this.DebrisRange = 10;
                 DropsPerRow = 2;
                 ReverseFactor = .005;
+                break;
+            case eEnemyType.HeavyFighter:
+                this.Ascii = "|=o=|".ToCharArray();
+                this.FlyZone = new FlyZoneClass(0, 2, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
+                this.HP = 2;
+                this.MissileConfig = new MissileStructure('|', Screen.Height * .25, 1);
+                this.DebrisRange = 4;
+                DropsPerRow = 15;
+                ReverseFactor = .001;
+                Run = Abacus.Random.NextDouble() + .5;
                 break;
         }
 
@@ -152,6 +154,7 @@ public class Enemy : Sprite
 
         if (Abacus.RandomTrue) { Run *= -1; }
         this.Trajectory = new Trajectory(DropsPerRow / System.Convert.ToDouble(this.FlyZone.Width), Run);
+        this.EnemyType = et;
 
     }
 

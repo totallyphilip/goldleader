@@ -8,11 +8,15 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
     {
         public Enemy.eEnemyType EnemyType;
         public int Count;
+        public bool IsSquad = false;
 
-        public Squadron(Enemy.eEnemyType enemytype, int count)
+        public Squadron(Enemy.eEnemyType enemytype, int count) : this(enemytype, count, false) { }
+
+        public Squadron(Enemy.eEnemyType enemytype, int count, bool squad)
         {
             this.EnemyType = enemytype;
             this.Count = count;
+            this.IsSquad = squad;
         }
     }
 
@@ -22,6 +26,7 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
     public void StartAttackRun() { this.AttackRunStarted = true; }
     public List<Squadron> Fleet = new List<Squadron>();
     List<Enemy> IncomingShips = new List<Enemy>();
+    List<Enemy> SquadLeaders = new List<Enemy>();
     public string WinMessage;
     public bool Infinite = false;
     public bool WeaponsUpgrade = false;
@@ -59,8 +64,8 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
     {
         if (this.Infinite) { return false; }
         else if (this.Escaped) { return true; }
-        else { return this.UnflownCount == 0 && IncomingShips.FindAll(x => x.Alive).Count == 0; }
-        //else { return this.UnflownCount == 0 && IncomingShips.Count == 0; }
+        else { return this.UnflownCount == 0 && !this.Alive; }
+        //        else { return this.UnflownCount == 0 && IncomingShips.FindAll(x => x.Alive).Count == 0; }
     }
 
     public void CreateIncomingFleet()
@@ -70,8 +75,10 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
         {
             for (int i = 0; i < squad.Count; i++)
             {
-                IncomingShips.Add(new Enemy(squad.EnemyType));
+                Enemy bg = new Enemy(squad.EnemyType);
+                IncomingShips.Add(bg);
                 UnflownCount++;
+                if (squad.IsSquad) { SquadLeaders.Add(bg); }
             }
         }
     }
@@ -100,6 +107,20 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
                         randbg.Flown = true;
                         this.Items.Add(randbg);
                         UnflownCount--;
+
+
+                        if (SquadLeaders.Exists(x => x.Equals(randbg)))
+                        {
+                            Enemy follower;
+                            follower = new Enemy(Enemy.eEnemyType.HeavyFighter);
+                            follower.Leader = randbg;
+                            follower.Trail.Add(randbg.XY.Clone(-1 * randbg.Width, 0));
+                            this.Add(follower);
+                            follower = new Enemy(Enemy.eEnemyType.HeavyFighter);
+                            follower.Leader = randbg;
+                            follower.Trail.Add(randbg.XY.Clone(randbg.Width, 0));
+                            this.Add(follower);
+                        }
                     }
                 }
             }

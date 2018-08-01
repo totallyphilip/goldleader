@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AsciiEngine
 {
@@ -144,7 +145,7 @@ namespace AsciiEngine
             public int HP = int.MaxValue;
             public bool Active = true;
             bool Terminated = false;
-            protected int Width { get { return this.Ascii.Length; } }
+            public int Width { get { return this.Ascii.Length; } }
 
             public bool Alive
             {
@@ -195,7 +196,9 @@ namespace AsciiEngine
 
             #region " Squadron "
 
-            Sprite Leader;
+            public Sprite Leader;
+            public bool HasLeader { get { return this.Leader != null; } }
+            public bool LeaderEquals(Sprite s) { return this.HasLeader && this.Leader.Equals(s); }
 
             #endregion
 
@@ -206,9 +209,11 @@ namespace AsciiEngine
             public void Hide() { Screen.TryWrite(this.XY, new String(' ', this.Width)); }
             public void Refresh() { Screen.TryWrite(this.XY, new String(this.Ascii)); }
 
-            public void Animate()
+            public void Animate() { this.Animate(true); }
+
+            public void Animate(bool hide)
             {
-                this.Hide();
+                if (hide) { this.Hide(); }
                 this.Trail.Add(this.NextCoordinate());
                 this.Refresh();
             }
@@ -228,8 +233,13 @@ namespace AsciiEngine
             protected virtual Grid.Point NextCoordinate()
             {
 
-                // only worry about the fly zone if this sprite is a rogue
-                if (this.Leader == null)
+                // only worry about the fly zone if this sprite has no leader
+
+                if (this.HasLeader)
+                {
+                    this.Trajectory = Leader.Trajectory.Clone();
+                }
+                else
                 {
                     if (this.XY.dY + this.Trajectory.Rise < this.FlyZone.TopEdge)
                     {
@@ -258,7 +268,6 @@ namespace AsciiEngine
                         else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
                     }
                 }
-                else { this.Trajectory = Leader.Trajectory.Clone(); }
 
                 return this.Trail.XY.Clone(this.Trajectory);
             }
@@ -292,17 +301,50 @@ namespace AsciiEngine
 
             public List<Sprite> Items = new List<Sprite>();
 
+            bool HasFollowers(Sprite s) { return Leaders().Exists(x => x.Equals(s)); }
+            List<Sprite> Followers(Sprite s) { return this.Items.FindAll(x => x.LeaderEquals(s)); }
+
+            List<Sprite> Leaders()
+            {
+                IEnumerable<Sprite> spriteQuery =
+                    from s in this.Items
+                    where s.HasLeader
+                    select s.Leader;
+
+                return spriteQuery.Distinct().ToList();
+            }
+
             public void Animate()
             {
 
-                foreach (Sprite s in this.Items.FindAll(x => !x.Alive && !x.Active))
-                {
-                    s.Hide();
-                    this.Items.Remove(s);
-                }
+                // release any followers of dead leaders
+                this.Items.FindAll(x => !x.Alive && HasFollowers(x)).ForEach(delegate (Sprite s)
+              {
+                  Followers(s).ForEach(delegate (Sprite follower) { follower.Leader = null; });
+              });
 
-                foreach (Sprite s in this.Items.FindAll(x => x.Alive)) { s.Animate(); }
-                foreach (Sprite s in this.Items.FindAll(x => x.Active)) { s.Activate(); }
+                // remove dead sprites
+                this.Items.FindAll(x => !x.Alive && !x.Active).ForEach(delegate (Sprite s)
+               {
+                   s.Hide();
+                   this.Items.Remove(s);
+               });
+
+
+                // animate squads together
+                this.Leaders().ForEach(delegate (Sprite leader)
+                {
+                    // hide the followers, then animate the leader, then animate the followers without hiding them
+                    this.Items.FindAll(x => x.Alive && x.LeaderEquals(leader)).ForEach(delegate (Sprite follower) { follower.Hide(); });
+                    leader.Animate();
+                    this.Items.FindAll(x => x.Alive && x.LeaderEquals(leader)).ForEach(delegate (Sprite follower) { follower.Animate(false); });
+                });
+
+                // animate everyone else
+                this.Items.FindAll(x => x.Alive && !x.HasLeader && !HasFollowers(x)).ForEach(delegate (Sprite s) { s.Animate(); });
+
+                // do this for everybody
+                this.Items.FindAll(x => x.Active).ForEach(delegate (Sprite s) { s.Activate(); });
 
                 this.Spawn();
 

@@ -162,13 +162,13 @@ public class TieFighterGame
         waves.Add(newwave);
 
         newwave = new EnemyWave(8, "", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.BomberII, 2));
+        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.HeavyBomber, 2));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 4));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
         newwave = new EnemyWave(100, "That armor's too strong for blasters!", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Squadron, 2));
+        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Leader, 2, true));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Bomber, 3));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
@@ -184,7 +184,7 @@ public class TieFighterGame
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 3));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Interceptor, 3));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Leader, 3));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.BomberII, 1));
+        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.HeavyBomber, 1));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
@@ -194,14 +194,14 @@ public class TieFighterGame
         waves.Add(newwave);
 
         newwave = new EnemyWave(6, "", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Squadron, 3));
+        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Leader, 3, true));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Bomber, 6));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 4));
         newwave.CreateIncomingFleet();
         waves.Add(newwave);
 
         newwave = new EnemyWave(8, "", true);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.BomberII, 1));
+        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.HeavyBomber, 1));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Bomber, 2));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 4));
         newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Interceptor, 4));
