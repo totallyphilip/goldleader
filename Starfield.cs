@@ -32,7 +32,7 @@ public class Starfield : Swarm
     {
         while (this.Items.Count < this.MaxStars)
         {
-            int x = Abacus.Random.Next(Screen.LeftEdge, Screen.RightEdge);
+            int x = Abacus.Random.Next(Screen.LeftEdge, Screen.RightEdge + 1);
             int y = Screen.TopEdge - 1;
             if (randomly) { y = Abacus.Random.Next(Screen.TopEdge - 1, Screen.Height); }
             Point xy = new Point(x, y);

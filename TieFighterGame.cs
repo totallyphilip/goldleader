@@ -114,7 +114,7 @@ public class TieFighterGame
         // the user
         Player player = new Player();
         int ShieldMax = 5;
-        player.HP = 1;
+        player.HP = 0;
         Score = 0;
 
         // hyperdrive
@@ -312,6 +312,18 @@ public class TieFighterGame
                         {
                             bg.Missiles.CheckCollision(player);
                         }
+
+
+                        string ShieldMarkers = "";
+                        if (player.HP > 0) { ShieldMarkers = new String('X', player.HP - 1); }
+                        Screen.TryWrite(new Point(1, player.XY.iY + 1), ShieldMarkers + ' ');
+                        string ShotMarkers = " " + new String('|', player.MaxMissiles - player.Missiles.Items.Count);
+                        Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, player.XY.iY + 1), ShotMarkers);
+
+                        /*  if (HyperdriveMode == eHyperdriveMode.Unused)
+                         {
+                             Screen.TryWrite(new Point(player.XY.iX, player.XY.iY + 1), " -- ");
+                         } */
                     }
 
                     if (player.Alive) { player.Animate(); }
@@ -453,7 +465,11 @@ public class TieFighterGame
                 Console.Title = "Score: " + Score;
 
                 // throttle the cpu
-                if (HyperdriveMode != eHyperdriveMode.Engaged && !GetTheFkOut) { Easy.Clock.FpsThrottle(FramesPerSecond); }
+                if (!GetTheFkOut)
+                {
+                    if (HyperdriveMode == eHyperdriveMode.Engaged) { Easy.Clock.FpsThrottle(100); }
+                    else { Easy.Clock.FpsThrottle(FramesPerSecond); }
+                }
 
             } while (!GetTheFkOut && (!Scroller.Empty || (player.Active && !wave.Completed())));
 

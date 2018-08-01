@@ -44,7 +44,7 @@ public class Player : Sprite
         this.Ascii = ":><:".ToCharArray();
         this.FlyZone = new FlyZoneClass(0, 0, 0, 0, FlyZoneClass.eEdgeMode.Stop);
         this.Trajectory = new Trajectory(0, 0);
-        this.Trail = new Trail(new Point(Screen.Width / 2 - this.Width / 2, Screen.BottomEdge));
+        this.Trail = new Trail(new Point(Screen.Width / 2 - this.Width / 2, Screen.BottomEdge - 1));
         this.HP = 1;
     }
 
