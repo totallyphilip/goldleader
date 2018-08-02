@@ -154,6 +154,7 @@ public class Enemy : Sprite
 
         if (Abacus.RandomTrue) { Run *= -1; }
         this.Trajectory = new Trajectory(DropsPerRow / System.Convert.ToDouble(this.FlyZone.Width), Run);
+        this.OriginalTrajectory = this.Trajectory.Clone();
         this.EnemyType = et;
 
     }

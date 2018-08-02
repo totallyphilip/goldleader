@@ -136,6 +136,8 @@ namespace AsciiEngine
 
             public Grid.Trail Trail;
             public Grid.Trajectory Trajectory;
+
+            public Grid.Trajectory OriginalTrajectory;
             public Grid.Point XY { get { return this.Trail.XY; } }
 
             #endregion
@@ -199,6 +201,11 @@ namespace AsciiEngine
             public Sprite Leader;
             public bool HasLeader { get { return this.Leader != null; } }
             public bool LeaderEquals(Sprite s) { return this.HasLeader && this.Leader.Equals(s); }
+            public void GoRogue()
+            {
+                this.Leader = null;
+                this.Trajectory = this.OriginalTrajectory;
+            }
 
             #endregion
 
@@ -278,18 +285,12 @@ namespace AsciiEngine
 
             public Sprite() { }
 
-            public Sprite(Grid.Point xy, Grid.Trajectory t)
-            {
-                this.Ascii = "sprite".ToCharArray();
-                this.Trail = new Grid.Trail(xy);
-                this.Trajectory = t;
-            }
-
             public Sprite(char[] c, Grid.Point xy, Grid.Trajectory t)
             {
                 this.Ascii = new List<char>(c).ToArray();
                 this.Trail = new Grid.Trail(xy);
-                this.Trajectory = t;
+                this.Trajectory = t.Clone();
+                this.OriginalTrajectory = t.Clone();
             }
 
             #endregion
@@ -320,7 +321,7 @@ namespace AsciiEngine
                 // release any followers of dead leaders
                 this.Items.FindAll(x => !x.Alive && HasFollowers(x)).ForEach(delegate (Sprite s)
               {
-                  Followers(s).ForEach(delegate (Sprite follower) { follower.Leader = null; });
+                  Followers(s).ForEach(delegate (Sprite follower) { follower.GoRogue(); });
               });
 
                 // remove dead sprites

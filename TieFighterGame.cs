@@ -130,104 +130,89 @@ public class TieFighterGame
 
         // define the waves of bad guys
 
-        List<EnemyWave> waves = new List<EnemyWave>();
+        List<WaveOfShips> Waves = new List<WaveOfShips>();
 
-        EnemyWave newwave;
+        WaveOfShips Wave;
 
-        newwave = new EnemyWave(100, "Great, Kid! Don't get cocky.", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 1));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(100, "Great, Kid! Don't get cocky.", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 1));
+        Waves.Add(Wave);
 
-        newwave = new EnemyWave(100, "Like bull's-eying womp rats in a T-16.", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 3));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(100, "Like bull's-eying womp rats in a T-16.", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 3));
+        Waves.Add(Wave);
 
-        newwave = new EnemyWave(100, "", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 4));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Bomber, 2));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(100, "", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Bomber, 2));
+        Waves.Add(Wave);
 
-        newwave = new EnemyWave(2, "", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Leader, 4));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(2, "", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 4));
+        Waves.Add(Wave);
 
-        newwave = new EnemyWave(1, "", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 2));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Interceptor, 2));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(1, "", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 2));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Interceptor, 2));
+        Waves.Add(Wave);
 
-        newwave = new EnemyWave(8, "", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.HeavyBomber, 2));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 4));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(8, "", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 2));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4));
+        Waves.Add(Wave);
 
-        newwave = new EnemyWave(100, "That armor's too strong for blasters!", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Leader, 2, true));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Bomber, 3));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(100, "That armor's too strong for blasters!", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 2, Enemy.eEnemyType.HeavyFighter));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Bomber, 3));
+        Waves.Add(Wave);
 
-        newwave = new EnemyWave(6, "Never tell me the odds!", true);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 3));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Interceptor, 3));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Leader, 3));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(6, "Never tell me the odds!", true);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 3));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Interceptor, 3));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 3));
+        Waves.Add(Wave);
 
-        newwave = new EnemyWave(6, "", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 3));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Interceptor, 3));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Leader, 3));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.HeavyBomber, 1));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(6, "", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 3));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Interceptor, 3));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 3));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 1));
+        Waves.Add(Wave);
 
-        newwave = new EnemyWave(12, "Stay on target!", true);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 60));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(12, "Stay on target!", true);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 60));
+        Waves.Add(Wave);
 
-        newwave = new EnemyWave(6, "", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Leader, 3, true));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Bomber, 6));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 4));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(6, "", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 3, Enemy.eEnemyType.HeavyFighter));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Bomber, 6));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4));
+        Waves.Add(Wave);
 
-        newwave = new EnemyWave(8, "", true);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.HeavyBomber, 1));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Bomber, 2));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 4));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Interceptor, 4));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Leader, 4));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(8, "", true);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 1));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Bomber, 2));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Interceptor, 4));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 4));
+        Waves.Add(Wave);
 
-        newwave = new EnemyWave(6, "It's a trap!", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 6));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Interceptor, 6));
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Leader, 6));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(6, "It's a trap!", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 6));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Interceptor, 6));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 6));
+        Waves.Add(Wave);
 
-        newwave = new EnemyWave(1, "Now, young Skywalker, you will die.", false);
-        newwave.Fleet.Add(new EnemyWave.Squadron(Enemy.eEnemyType.Fighter, 4));
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(1, "Now, young Skywalker, you will die.", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4));
+        Waves.Add(Wave);
 
-        newwave = new EnemyWave(false);
-        newwave.CreateIncomingFleet();
-        waves.Add(newwave);
+        Wave = new WaveOfShips(false);
+        Waves.Add(Wave);
 
         #endregion
 
-        foreach (EnemyWave wave in waves)
+        foreach (WaveOfShips wave in Waves)
         {
 
             Scroller Scroller = new Scroller(2, Screen.Height / 3, .25);
