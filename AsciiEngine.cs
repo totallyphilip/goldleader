@@ -158,9 +158,17 @@ namespace AsciiEngine
             #region " Status "
 
             public int HP = int.MaxValue;
+            protected int Score = 0;
             public bool Active = true;
             bool Terminated = false;
             public int Width { get { return this.Ascii.Length; } }
+
+            public int CollectScore()
+            {
+                int score = this.Score;
+                this.Score = 0;
+                return score;
+            }
 
             public bool Alive
             {
@@ -367,6 +375,13 @@ namespace AsciiEngine
             }
 
             protected virtual void OnAnimated() { }
+
+            public int CollectScore()
+            {
+                int score = 0;
+                this.Items.ForEach(delegate (Sprite s) { score += s.CollectScore(); });
+                return score;
+            }
 
             public void TerminateAll() { foreach (Sprite s in this.Items) { s.Terminate(); } }
 

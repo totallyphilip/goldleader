@@ -12,7 +12,8 @@
                         System.Console.ReadKey(); */
 
             TieFighterGame game = new TieFighterGame();
-            game.TryPlay();
+            int score = 0;
+            game.TryPlay(ref score);
             System.Environment.Exit(0);
 
         }

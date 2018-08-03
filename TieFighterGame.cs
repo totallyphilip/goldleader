@@ -12,19 +12,19 @@ public class TieFighterGame
     public static bool ShowDebugInfo = false;
     int FramesPerSecond = 9;
 
-    public static int Score;
-    public void TryPlay()
+    //    public static int Score;
+    public void TryPlay(ref int Score)
     {
 
         bool LinuxDevMode = false;
 
-        // int oldwidth = Console.WindowWidth;
-        // int oldheight = Console.WindowHeight;
+        int oldwidth = Console.WindowWidth;
+        int oldheight = Console.WindowHeight;
 
         if (LinuxDevMode || Screen.TrySetSize(50, 40))
         {
             Easy.Keyboard.EatKeys();
-            this.MainLoop();
+            this.MainLoop(ref Score);
             Console.CursorVisible = true;
         }
         else
@@ -33,16 +33,16 @@ public class TieFighterGame
             Console.ReadKey();
         }
 
-        // Screen.TrySetSize(oldwidth, oldheight, false);
+        Screen.TrySetSize(oldwidth, oldheight, false);
 
     }
 
-    void MainLoop()
+    void MainLoop(ref int Score)
     {
         do
         {
             if (!GetTheFkOut) { Attract(); }
-            if (!GetTheFkOut) { PlayTheGame(); }
+            if (!GetTheFkOut) { PlayTheGame(ref Score); }
         } while (!GetTheFkOut);
     }
 
@@ -103,7 +103,7 @@ public class TieFighterGame
 
     enum eHyperdriveMode { Unused, Engaged, Disengaged };
 
-    void PlayTheGame()
+    void PlayTheGame(ref int Score)
     {
 
         Console.Clear();
@@ -339,6 +339,7 @@ public class TieFighterGame
 
                     if (player.Alive) { player.Animate(); }
                     if (player.Active) { player.Activate(); }
+                    Score += wave.CollectScore();
 
                 }
 
@@ -485,7 +486,7 @@ public class TieFighterGame
 
             } while (!GetTheFkOut && (!Scroller.Empty || (player.Active && !wave.Completed())));
 
-            if (!player.Alive) { break; }
+            if (!player.Alive || GetTheFkOut) { break; }
 
         }
 
