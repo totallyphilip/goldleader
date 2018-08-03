@@ -34,7 +34,6 @@ public class WaveOfShips : AsciiEngine.Sprites.Swarm
     public List<EnemyDefinition> Generator = new List<EnemyDefinition>();
     public string IntroMessage;
     public string VictoryMessage;
-    public bool Infinite = false;
     public bool WeaponsUpgrade = false;
     public bool Escaped = false;
 
@@ -55,7 +54,6 @@ public class WaveOfShips : AsciiEngine.Sprites.Swarm
     public WaveOfShips(bool moreguns)
     {
         this.AirTrafficMax = 8;
-        this.Infinite = true;
         this.WeaponsUpgrade = moreguns;
     }
 
@@ -69,8 +67,7 @@ public class WaveOfShips : AsciiEngine.Sprites.Swarm
 
     public bool Completed()
     {
-        if (this.Infinite) { return false; }
-        else if (this.Escaped) { return true; }
+        if (this.Escaped) { return true; }
         else { return this.Generator.Count == 0 && !this.Alive; }
         //else { return this.UnflownCount == 0 && !this.Alive; }
         //        else { return this.UnflownCount == 0 && IncomingShips.FindAll(x => x.Alive).Count == 0; }
@@ -81,41 +78,32 @@ public class WaveOfShips : AsciiEngine.Sprites.Swarm
     {
         if (this.AttackRunStarted)
         {
-            if (this.Infinite)
-            {
-                if (this.Items.Count < this.AirTrafficMax)
-                {
-                    System.Array values = System.Enum.GetValues(typeof(Enemy.eEnemyType));
-                    Enemy.eEnemyType someone = (Enemy.eEnemyType)values.GetValue(Easy.Abacus.Random.Next(values.Length));
-                    this.Items.Add(new Enemy(someone));
-                }
-            }
-            else
-            {
-                if (this.Items.Count < this.AirTrafficMax && this.Generator.Count > 0)
-                {
-                    // get the next ship
-                    Enemy bg = new Enemy(this.Generator[0].EnemyType);
-                    this.Add(bg);
-                    if (this.Generator[0].HasWingman)
-                    {
-                        Enemy wingman;
-                        wingman = new Enemy(this.Generator[0].WingmanType);
-                        wingman.Leader = bg;
-                        wingman.Trail.Add(bg.XY.Clone(-1 * wingman.Width, 0));
-                        this.Add(wingman);
-                        wingman = new Enemy(this.Generator[0].WingmanType);
-                        wingman.Leader = bg;
-                        wingman.Trail.Add(bg.XY.Clone(bg.Width, 0));
-                        this.Add(wingman);
-                    }
 
-                    // decrement the generator
-                    this.Generator[0].Count--;
-                    this.Generator.FindAll(x => x.Count < 1).ForEach(delegate (EnemyDefinition e) { this.Generator.Remove(e); });
 
+            if (this.Items.Count < this.AirTrafficMax && this.Generator.Count > 0)
+            {
+                // get the next ship
+                Enemy bg = new Enemy(this.Generator[0].EnemyType);
+                this.Add(bg);
+                if (this.Generator[0].HasWingman)
+                {
+                    Enemy wingman;
+                    wingman = new Enemy(this.Generator[0].WingmanType);
+                    wingman.Leader = bg;
+                    wingman.Trail.Add(bg.XY.Clone(-1 * wingman.Width, 0));
+                    this.Add(wingman);
+                    wingman = new Enemy(this.Generator[0].WingmanType);
+                    wingman.Leader = bg;
+                    wingman.Trail.Add(bg.XY.Clone(bg.Width, 0));
+                    this.Add(wingman);
                 }
+
+                // decrement the generator
+                this.Generator[0].Count--;
+                this.Generator.FindAll(x => x.Count < 1).ForEach(delegate (EnemyDefinition e) { this.Generator.Remove(e); });
+
             }
+
         }
     }
 }

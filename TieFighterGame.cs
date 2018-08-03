@@ -117,6 +117,7 @@ public class TieFighterGame
         int ShieldMax = 5;
         player.HP = 0;
         Score = 0;
+        bool HyperdriveWorks = true;
 
         // hyperdrive
         eHyperdriveMode HyperdriveMode = eHyperdriveMode.Unused;
@@ -142,6 +143,7 @@ public class TieFighterGame
         Wave = new WaveOfShips(100, "", "Like bull's-eying womp rats in a T-16.", false);
         Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 3));
         Waves.Add(Wave);
+
 
         Wave = new WaveOfShips(6, "", "", false);
         Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 2, Enemy.eEnemyType.Fighter));
@@ -231,11 +233,23 @@ public class TieFighterGame
         Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 6));
         Waves.Add(Wave);
 
-        Wave = new WaveOfShips(1, "", "Now, young Skywalker, you will die.", false);
+        Wave = new WaveOfShips(1, "", "They let us go.", false);
         Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4));
         Waves.Add(Wave);
 
-        Wave = new WaveOfShips(false);
+        Wave = new WaveOfShips(15, "Now, young Skywalker, you will die.", "", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 5, Enemy.eEnemyType.Fighter));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Vanguard, 10));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 20));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.HeavyFighter, 5));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Interceptor, 5));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Bomber, 1));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 1));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Interdictor, 1));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 10, Enemy.eEnemyType.Fighter));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 5));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.HeavyFighter, 20));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Interdictor, 1000)); // not survivable
         Waves.Add(Wave);
 
         #endregion
@@ -246,6 +260,13 @@ public class TieFighterGame
             Scroller Scroller = new Scroller(2, Screen.Height / 3, .25, 1.5);
             bool ClosingWordsStated = false;
             player.HP++;
+
+            if (wave.Equals(Waves.FindLast(x => true)))
+            {
+                HyperdriveWorks = false;
+                player.HP += 4;
+                Scroller.NewLine("May the Force be with you.");
+            }
 
             // display instructions
             if (Round == 0)
@@ -261,16 +282,11 @@ public class TieFighterGame
 
             // display round number
             Round++;
-            if (wave.Infinite)
-            {
-                Scroller.NewLine("May the Force be with you!");
-                player.HP = ShieldMax;
-            }
-            else
-            {
-                Scroller.NewLine("Round " + Round);
-                if (wave.IntroMessage != "") { Scroller.NewLine(wave.IntroMessage); }
-            }
+
+
+            Scroller.NewLine("Round " + Round);
+            if (wave.IntroMessage != "") { Scroller.NewLine(wave.IntroMessage); }
+
 
             // display shields message
             Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (ShieldMax - 1)) * 100 + "% charged.");
@@ -386,13 +402,22 @@ public class TieFighterGame
                     switch (k.Key)
                     {
                         case ConsoleKey.UpArrow:
-                            if (HyperdriveMode == eHyperdriveMode.Unused && !wave.Completed() && player.Alive && !wave.Infinite)
+
+                            if (HyperdriveMode == eHyperdriveMode.Unused && !wave.Completed() && player.Alive)
                             {
-                                stars.SetHyperspace(true);
-                                player.Trajectory.Run = 0;
-                                player.Missiles.TerminateAll();
-                                HyperdriveMode = eHyperdriveMode.Engaged;
-                                Easy.Clock.StartTimer();
+                                if (HyperdriveWorks)
+                                {
+                                    stars.SetHyperspace(true);
+                                    player.Trajectory.Run = 0;
+                                    player.Missiles.TerminateAll();
+                                    HyperdriveMode = eHyperdriveMode.Engaged;
+                                    Easy.Clock.StartTimer();
+                                }
+                                else
+                                {
+                                    Scroller.NewLine("It's not my fault!");
+                                    Scroller.NewLine("They told me they fixed it!");
+                                }
                             }
                             break;
                         case ConsoleKey.PageUp:
