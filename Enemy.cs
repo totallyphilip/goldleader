@@ -160,8 +160,8 @@ public class Enemy : Sprite
                 Run = Abacus.Random.NextDouble() + .5;
                 break;
             case eEnemyType.Interdictor:
-                this.Ascii = "{-8-o-8-}".ToCharArray();
-                this.FlyZone = new FlyZoneClass(Abacus.Round(Screen.Height * .5), Abacus.Round(Screen.Height * .25), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
+                this.Ascii = "{-8o8-}".ToCharArray();
+                this.FlyZone = new FlyZoneClass(0, Abacus.Round(Screen.Height * .75), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 4;
                 this.MissileConfig = new MissileStructure('@', Screen.Height * .9, 6);
                 this.DebrisRange = 10;

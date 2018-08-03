@@ -32,7 +32,8 @@ public class WaveOfShips : AsciiEngine.Sprites.Swarm
     bool AttackRunStarted = false;
     public void StartAttackRun() { this.AttackRunStarted = true; }
     public List<EnemyDefinition> Generator = new List<EnemyDefinition>();
-    public string WinMessage;
+    public string IntroMessage;
+    public string VictoryMessage;
     public bool Infinite = false;
     public bool WeaponsUpgrade = false;
     public bool Escaped = false;
@@ -58,10 +59,11 @@ public class WaveOfShips : AsciiEngine.Sprites.Swarm
         this.WeaponsUpgrade = moreguns;
     }
 
-    public WaveOfShips(int max, string win, bool addblaster)
+    public WaveOfShips(int max, string intro, string victory, bool addblaster)
     {
         this.AirTrafficMax = max;
-        this.WinMessage = win;
+        this.IntroMessage = intro;
+        this.VictoryMessage = victory;
         this.WeaponsUpgrade = addblaster;
     }
 
