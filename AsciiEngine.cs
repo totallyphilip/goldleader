@@ -54,6 +54,8 @@ namespace AsciiEngine
             public int Range = 0;
             public int LineSpacing = 1;
             public double Speed = 1;
+            double NormalSpeed = 1;
+            double ZoomSpeed;
 
             public void NewLine(int lines) { for (int i = 0; i < lines; i++) { this.NewLine(); } }
             public void NewLine() { NewLine(""); }
@@ -75,15 +77,26 @@ namespace AsciiEngine
 
             }
 
-            public Scroller(int spacing) { this.constructor(spacing, 0, 1); }
-            public Scroller(int spacing, int distance) { this.constructor(spacing, distance, 1); }
-            public Scroller(int spacing, int distance, double speed) { this.constructor(spacing, distance, speed); }
+            public void Zoom()
+            {
+                this.Speed = -1 * ZoomSpeed;
+                this.Items.ForEach(delegate (Sprites.Sprite s) { s.Trajectory.Rise = this.Speed; });
+            }
 
-            public void constructor(int spacing, int distance, double speed)
+            protected override void OnAnimated() { if (this.Empty) { this.Speed = this.NormalSpeed; } }
+
+            public Scroller(int spacing) { this.constructor(spacing, 0, 1, 2); }
+            public Scroller(int spacing, int distance) { this.constructor(spacing, distance, 1, 2); }
+            public Scroller(int spacing, int distance, double speed) { this.constructor(spacing, distance, speed, speed * 2); }
+            public Scroller(int spacing, int distance, double speed, double zoomspeed) { this.constructor(spacing, distance, speed, zoomspeed); }
+
+            public void constructor(int spacing, int distance, double speed, double zoomspeed)
             {
                 this.LineSpacing = spacing;
                 this.Range = distance;
                 this.Speed = speed;
+                this.NormalSpeed = speed;
+                this.ZoomSpeed = zoomspeed;
             }
 
         }
@@ -347,9 +360,13 @@ namespace AsciiEngine
                 // do this for everybody
                 this.Items.FindAll(x => x.Active).ForEach(delegate (Sprite s) { s.Activate(); });
 
+                OnAnimated();
+
                 this.Spawn();
 
             }
+
+            protected virtual void OnAnimated() { }
 
             public void TerminateAll() { foreach (Sprite s in this.Items) { s.Terminate(); } }
 

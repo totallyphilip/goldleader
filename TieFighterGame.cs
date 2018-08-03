@@ -142,23 +142,30 @@ public class TieFighterGame
         Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 3));
         Waves.Add(Wave);
 
-        Wave = new WaveOfShips(100, "", false);
-        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4));
+        Wave = new WaveOfShips(6, "", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 2, Enemy.eEnemyType.Fighter));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 2));
+        Waves.Add(Wave);
+
+        Wave = new WaveOfShips(100, "I've got a bad feeling about this.", false);
         Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Bomber, 2));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4));
         Waves.Add(Wave);
 
-        Wave = new WaveOfShips(2, "", false);
-        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 4));
+        Wave = new WaveOfShips(30, "", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 20));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 10));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.HeavyFighter, 50));
         Waves.Add(Wave);
 
-        Wave = new WaveOfShips(1, "", false);
+        Wave = new WaveOfShips(3, "", false);
         Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 2));
         Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Interceptor, 2));
         Waves.Add(Wave);
 
         Wave = new WaveOfShips(8, "", false);
         Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 2));
-        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 6));
         Waves.Add(Wave);
 
         Wave = new WaveOfShips(100, "That armor's too strong for blasters!", false);
@@ -179,14 +186,25 @@ public class TieFighterGame
         Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 1));
         Waves.Add(Wave);
 
+
         Wave = new WaveOfShips(12, "Stay on target!", true);
-        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 60));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4, Enemy.eEnemyType.Fighter));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 12));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4, Enemy.eEnemyType.Fighter));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 12));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4, Enemy.eEnemyType.Fighter));
         Waves.Add(Wave);
 
-        Wave = new WaveOfShips(6, "", false);
-        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 3, Enemy.eEnemyType.HeavyFighter));
-        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Bomber, 6));
-        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4));
+
+        Wave = new WaveOfShips(12, "", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Bomber, 1));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 1, Enemy.eEnemyType.HeavyFighter));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 1));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 1, Enemy.eEnemyType.HeavyFighter));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Bomber, 1));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Leader, 1, Enemy.eEnemyType.HeavyFighter));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Bomber, 1));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 2, Enemy.eEnemyType.Fighter));
         Waves.Add(Wave);
 
         Wave = new WaveOfShips(8, "", true);
@@ -215,7 +233,7 @@ public class TieFighterGame
         foreach (WaveOfShips wave in Waves)
         {
 
-            Scroller Scroller = new Scroller(2, Screen.Height / 3, .25);
+            Scroller Scroller = new Scroller(2, Screen.Height / 3, .25, 1.5);
             bool ClosingWordsStated = false;
             player.HP++;
 
@@ -377,6 +395,7 @@ public class TieFighterGame
                             player.Trajectory.Run = 1;
                             break;
                         case ConsoleKey.Spacebar:
+                            Scroller.Zoom();
                             if (HyperdriveMode != eHyperdriveMode.Engaged) { player.Fire(); }
                             break;
                         case ConsoleKey.Escape:
