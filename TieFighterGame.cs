@@ -16,6 +16,8 @@ public class TieFighterGame
     public void TryPlay(ref int Score)
     {
 
+        GetTheFkOut = false;
+
         bool LinuxDevMode = false;
 
         int oldwidth = Console.WindowWidth;
@@ -34,7 +36,6 @@ public class TieFighterGame
         }
 
         Screen.TrySetSize(oldwidth, oldheight, false);
-
     }
 
     void MainLoop(ref int Score)
@@ -79,7 +80,7 @@ public class TieFighterGame
         Messages.Add("");
 
 
-        Scroller Scroller = new Scroller(2, Screen.Height / 2, .5);
+        Scroller Scroller = new Scroller(2, Screen.Height / 2, .25);
         do
         {
             Console.CursorVisible = false;
@@ -489,7 +490,5 @@ public class TieFighterGame
             if (!player.Alive || GetTheFkOut) { break; }
 
         }
-
-
     }
 }
