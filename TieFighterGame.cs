@@ -16,7 +16,7 @@ public class TieFighterGame
     public void TryPlay()
     {
 
-        bool LinuxDevMode = false;
+        bool LinuxDevMode = true;
 
         // int oldwidth = Console.WindowWidth;
         // int oldheight = Console.WindowHeight;
@@ -149,13 +149,18 @@ public class TieFighterGame
 
         Wave = new WaveOfShips(100, "I've got a bad feeling about this.", false);
         Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Bomber, 2));
-        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 4, Enemy.eEnemyType.Vanguard));
         Waves.Add(Wave);
 
         Wave = new WaveOfShips(30, "", false);
         Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 20));
         Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 10));
         Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.HeavyFighter, 50));
+        Waves.Add(Wave);
+
+        Wave = new WaveOfShips(100, "", false);
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Interdictor, 2, Enemy.eEnemyType.HeavyFighter));
+        Wave.Generator.Add(new WaveOfShips.EnemyDefinition(Enemy.eEnemyType.Fighter, 6));
         Waves.Add(Wave);
 
         Wave = new WaveOfShips(3, "", false);

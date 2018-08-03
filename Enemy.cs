@@ -8,17 +8,18 @@ public class Enemy : Sprite
 {
     public enum eEnemyType
     {
-        Fighter = 0
-        , Bomber = 1
-        , Interceptor = 2
-        , Leader = 3
-        , HeavyBomber = 5
-        , HeavyFighter = 6
+        Fighter
+        , Bomber
+        , Interceptor
+        , Leader
+        , HeavyBomber
+        , HeavyFighter
+        , Vanguard
+        , Interdictor
     }
 
     double ReverseFactor;
     public eEnemyType EnemyType;
-    public bool Flown = false;
     public Swarm Messages = new Swarm();
     struct MissileStructure
     {
@@ -93,7 +94,7 @@ public class Enemy : Sprite
         {
             case eEnemyType.Fighter:
                 this.Ascii = "|—o—|".ToCharArray();
-                this.FlyZone = new FlyZoneClass(0, 2, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
+                this.FlyZone = new FlyZoneClass(0, 7, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 1;
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .33, 1);
                 this.DebrisRange = 4;
@@ -130,7 +131,7 @@ public class Enemy : Sprite
                 ReverseFactor = .01;
                 break;
             case eEnemyType.HeavyBomber:
-                this.Ascii = "{=o-o=}".ToCharArray();
+                this.Ascii = "{-o-8-}".ToCharArray();
                 this.FlyZone = new FlyZoneClass(Abacus.Round(Screen.Height * .5), Abacus.Round(Screen.Height * .25), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
                 this.HP = 3;
                 this.MissileConfig = new MissileStructure('@', Screen.Height * .9, 4);
@@ -147,6 +148,25 @@ public class Enemy : Sprite
                 DropsPerRow = 15;
                 ReverseFactor = .001;
                 Run = Abacus.Random.NextDouble() + .5;
+                break;
+            case eEnemyType.Vanguard:
+                this.Ascii = "\\-o-/".ToCharArray();
+                this.FlyZone = new FlyZoneClass(0, 5, -5, -5, FlyZoneClass.eEdgeMode.Bounce);
+                this.HP = 3;
+                this.MissileConfig = new MissileStructure('|', 6, 1);
+                this.DebrisRange = 4;
+                DropsPerRow = 15;
+                ReverseFactor = .001;
+                Run = Abacus.Random.NextDouble() + .5;
+                break;
+            case eEnemyType.Interdictor:
+                this.Ascii = "{-8-o-8-}".ToCharArray();
+                this.FlyZone = new FlyZoneClass(Abacus.Round(Screen.Height * .5), Abacus.Round(Screen.Height * .25), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
+                this.HP = 4;
+                this.MissileConfig = new MissileStructure('@', Screen.Height * .9, 6);
+                this.DebrisRange = 10;
+                DropsPerRow = 2;
+                ReverseFactor = .005;
                 break;
         }
 
