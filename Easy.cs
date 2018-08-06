@@ -1,5 +1,6 @@
-using System;
 using AsciiEngine;
+using System;
+using System.Collections.Generic;
 
 namespace Easy
 {
@@ -18,6 +19,24 @@ namespace Easy
         public static int LesserOf(int a, int b) { if (a < b) { return a; } else { return b; } }
         public static int GreaterOf(int a, int b) { if (a > b) { return a; } else { return b; } }
 
+        public class Fibonacci
+        {
+            List<int> sequence;
+
+            public void Increment() { sequence.Insert(0, sequence[0] + sequence[1]); }
+
+            public void Reset()
+            {
+                sequence = new List<int>();
+                sequence.Add(1);
+                sequence.Add(1);
+            }
+
+            public int Value { get { return sequence[0]; } }
+
+            public Fibonacci() { this.Reset(); }
+
+        }
     }
 
     public class Keyboard

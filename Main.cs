@@ -95,6 +95,7 @@ public class AsciiWars
             stars.Animate();
             Scroller.Animate();
             Easy.Clock.FpsThrottle(8);
+
         } while (!Console.KeyAvailable);
 
         GetTheFkOut = Console.ReadKey(true).Key == ConsoleKey.Escape;
@@ -116,14 +117,12 @@ public class AsciiWars
         int ShieldMax = 5;
         player.HP = 0;
         Score = 0;
-        bool HyperdriveWorks = true;
 
         // hyperdrive
         eHyperdriveMode HyperdriveMode = eHyperdriveMode.Unused;
-        int hyperbonus = 0;
+        Easy.Abacus.Fibonacci hyperbonus = new Easy.Abacus.Fibonacci();
 
         // misc
-        int Round = 0;
         bool Paused = false;
         bool HeroBonusGiven = false;
 
@@ -145,7 +144,7 @@ public class AsciiWars
 
         Wave = new EnemyWave(6, "", "", false);
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 2, Enemy.eEnemyType.Fighter));
-        Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 2));
+        Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 4));
         Waves.Add(Wave);
 
         Wave = new EnemyWave(100, "", "", false);
@@ -157,10 +156,10 @@ public class AsciiWars
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Interdictor, 1, Enemy.eEnemyType.Fighter));
         Waves.Add(Wave);
 
-        Wave = new EnemyWave(20, "I've got a bad feeling about this.", "You're all clear kid!", false); // too hard, force hyperspace
+        Wave = new EnemyWave(20, "I've got a bad feeling about this.", "WTF? How did you survive that?", true); // too hard, force hyperspace
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 10));
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 10));
-        Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 10));
+        Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 20));
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 1000));
         Waves.Add(Wave);
 
@@ -172,19 +171,15 @@ public class AsciiWars
         Wave = new EnemyWave(3, "", "", false);
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 2));
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Interceptor, 2));
-        Waves.Add(Wave);
-
-        Wave = new EnemyWave(8, "", "", false);
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 2));
-        Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 6));
         Waves.Add(Wave);
 
-        Wave = new EnemyWave(100, "", "That armor's too strong for blasters!", false);
+        Wave = new EnemyWave(100, "", "", false);
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Leader, 2, Enemy.eEnemyType.HeavyFighter));
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Bomber, 3));
         Waves.Add(Wave);
 
-        Wave = new EnemyWave(6, "", "", true);
+        Wave = new EnemyWave(6, "Fighters incoming!", "", true);
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 3));
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Interceptor, 3));
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Leader, 3));
@@ -218,7 +213,7 @@ public class AsciiWars
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 2, Enemy.eEnemyType.Fighter));
         Waves.Add(Wave);
 
-        Wave = new EnemyWave(8, "", "", true);
+        Wave = new EnemyWave(8, "", "", false);
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 1));
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Bomber, 2));
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 4));
@@ -257,51 +252,51 @@ public class AsciiWars
 
         #endregion
 
+        // display instructions
+        Scroller Scroller = new Scroller(2, Screen.Height / 3, .25, 1.5);
+        Scroller.NewLine("Space = Fire");
+        Scroller.NewLine("Left/Right = Move");
+        Scroller.NewLine("Down = Toggle S-foils");
+        //Scroller.NewLine("PgUp/PgDn = Faster/Slower");
+        Scroller.NewLine("Up = Hyperdrive");
+        //Scroller.NewLine("Enter = Pause");
+        Scroller.NewLine("Esc = Quit");
+        Scroller.NewLine(4);
+
         foreach (EnemyWave wave in Waves)
         {
 
-            Scroller Scroller = new Scroller(2, Screen.Height / 3, .25, 1.5);
             bool ClosingWordsStated = false;
             player.HP++;
 
-            if (wave.Equals(Waves.FindLast(x => true)))
+            if (Waves.IndexOf(wave) == Waves.Count - 1)
             {
-                HyperdriveWorks = false;
                 player.HP += 4;
+                Scroller.NewLine("Final wave!");
+                Scroller.NewLine("Deflector shield boosted.");
                 Scroller.NewLine("May the Force be with you.");
             }
-
-            // display instructions
-            if (Round == 0)
+            else
             {
-                Scroller.NewLine("Space = Fire");
-                Scroller.NewLine("Left/Right = Move");
-                Scroller.NewLine("Down = Toggle S-foils");
-                //Scroller.NewLine("PgUp/PgDn = Faster/Slower");
-                Scroller.NewLine("Up = Hyperdrive");
-                //Scroller.NewLine("Enter = Pause");
-                Scroller.NewLine("Esc = Quit");
-                Scroller.NewLine(4);
+                Scroller.NewLine("Wave " + (Waves.IndexOf(wave) + 1));
+                // display shields message
+                Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (ShieldMax - 1)) * 100 + "% charged.");
+                // reset hyperdrive
+                if (HyperdriveMode == eHyperdriveMode.Disengaged) { Scroller.NewLine("Navicomputer coordinates recalculated."); }
+
             }
-
-            // display round number
-            Round++;
-
-
-            Scroller.NewLine("Wave " + Round);
             if (wave.IntroMessage != "") { Scroller.NewLine(wave.IntroMessage); }
 
-
-            // display shields message
-            Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (ShieldMax - 1)) * 100 + "% charged.");
-
-            // reset hyperdrive
-            if (HyperdriveMode == eHyperdriveMode.Disengaged) { Scroller.NewLine("Navicomputer coordinates recalculated."); }
             HyperdriveMode = eHyperdriveMode.Unused;
-            if (hyperbonus < 1) { hyperbonus = Round * 10; } else { hyperbonus += Round * 10; }
+
+
+
+
+
+
 
             // upgrade weapons
-            if (wave.WeaponsUpgrade)
+            if (wave.WeaponsUpgrade && player.MaxMissiles < 4)
             {
                 Scroller.NewLine();
                 player.MaxMissiles++;
@@ -355,7 +350,7 @@ public class AsciiWars
                         string ShieldMarkers = "";
                         if (player.HP > 0) { ShieldMarkers = new String('X', player.HP - 1); }
                         Screen.TryWrite(new Point(1, player.XY.iY + 1), ShieldMarkers + ' ');
-                        string ShotMarkers = "    " + new String('|', player.MaxMissiles - player.Missiles.Items.Count);
+                        string ShotMarkers = new string(' ', player.Missiles.Count) + new String('|', player.MaxMissiles - player.Missiles.Items.Count);
                         Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, player.XY.iY + 1), ShotMarkers);
 
                     }
@@ -411,7 +406,7 @@ public class AsciiWars
 
                             if (HyperdriveMode == eHyperdriveMode.Unused && !wave.Completed() && player.Alive)
                             {
-                                if (HyperdriveWorks)
+                                if (Waves.IndexOf(wave) < Waves.Count - 1)
                                 {
                                     stars.SetHyperspace(true);
                                     player.Trajectory.Run = 0;
@@ -487,19 +482,21 @@ public class AsciiWars
                     {
                         Scroller.NewLine("Traveling through hyperspace");
                         Scroller.NewLine("ain't like dusting crops, boy.");
-                        hyperbonus = 0;
+                        hyperbonus.Reset();
                     }
-                    else if (wave.VictoryMessage == "") { Scroller.NewLine("Wave cleared."); }
-                    else { Scroller.NewLine(wave.VictoryMessage); }
-
-
-                    Scroller.NewLine("+" + hyperbonus + " navicomputer bonus.");
-                    Score += hyperbonus;
+                    else
+                    {
+                        if (wave.VictoryMessage == "") { wave.VictoryMessage = "Wave cleared."; }
+                        Scroller.NewLine(wave.VictoryMessage);
+                        Scroller.NewLine("+" + (hyperbonus.Value * 10) + " navicomputer Fibonacci bonus.");
+                        Score += hyperbonus.Value * 10;
+                        hyperbonus.Increment();
+                    };
                 }
 
                 if (!player.Alive && wave.Completed() && !HeroBonusGiven)
                 {
-                    int deadherobonus = (Round * 100) / 2;
+                    int deadherobonus = 500;
                     Scroller.NewLine(3);
                     Scroller.NewLine("That");
                     Scroller.NewLine("was");
