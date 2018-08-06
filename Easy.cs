@@ -37,6 +37,12 @@ namespace Easy
             return result;
         }
 
+        public static string Pluralize(string s, int i)
+        {
+            if (i == 1) { return s + "s"; }
+            else { return s; }
+        }
+
         public static void WriteLineCentered(string s)
         {
             WriteCentered(s);

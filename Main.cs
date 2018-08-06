@@ -276,6 +276,7 @@ public class AsciiWars
             {
                 Scroller.NewLine("Space = Fire");
                 Scroller.NewLine("Left/Right = Move");
+                Scroller.NewLine("Down = Toggle S-foils");
                 //Scroller.NewLine("PgUp/PgDn = Faster/Slower");
                 Scroller.NewLine("Up = Hyperdrive");
                 //Scroller.NewLine("Enter = Pause");
@@ -304,7 +305,7 @@ public class AsciiWars
             {
                 Scroller.NewLine();
                 player.MaxMissiles++;
-                Scroller.NewLine("Blaster upgraded!");
+                Scroller.NewLine("Blasters upgraded!");
             }
 
             // keyboard buffer
@@ -312,6 +313,7 @@ public class AsciiWars
 
             do
             {
+
                 Console.CursorVisible = false; // windows turns the cursor back on when restoring from minimized window
 
                 // animate
@@ -349,10 +351,11 @@ public class AsciiWars
                             bg.Missiles.CheckCollision(player);
                         }
 
+                        // hud
                         string ShieldMarkers = "";
                         if (player.HP > 0) { ShieldMarkers = new String('X', player.HP - 1); }
                         Screen.TryWrite(new Point(1, player.XY.iY + 1), ShieldMarkers + ' ');
-                        string ShotMarkers = " " + new String('|', player.MaxMissiles - player.Missiles.Items.Count);
+                        string ShotMarkers = "    " + new String('|', player.MaxMissiles - player.Missiles.Items.Count);
                         Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, player.XY.iY + 1), ShotMarkers);
 
                     }

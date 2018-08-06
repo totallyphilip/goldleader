@@ -10,7 +10,7 @@ public class PlayerMissile : Sprite
     override public void OnHit() { this.HP--; }
     public PlayerMissile(AsciiEngine.Grid.Point xy, AsciiEngine.Grid.Trajectory t)
     {
-        this.Ascii = "|".ToCharArray();
+        this.Ascii = new[] { '|' };
         this.Trail = new AsciiEngine.Grid.Trail(xy);
         this.Trajectory = t;
     }
@@ -33,7 +33,8 @@ public class Player : Sprite
     {
         if (this.FlightMode == eFlightMode.Attack) { SetFlightMode(eFlightMode.Maneuver); }
         else { SetFlightMode(eFlightMode.Attack); }
-        if (this.Trajectory.Run < 0) { GoLeft(); } else { GoRight(); }
+        if (this.Trajectory.Run < 0) { GoLeft(); }
+        else if (this.Trajectory.Run > 0) { GoRight(); }
     }
 
     void SetFlightMode(eFlightMode mode)
@@ -48,7 +49,7 @@ public class Player : Sprite
         {
             this.FlightMode = eFlightMode.Attack;
             this.Ascii = ":><:".ToCharArray();
-            this.Run = 1;
+            this.Run = .5;
         }
     }
 
@@ -80,11 +81,28 @@ public class Player : Sprite
 
     public void Fire()
     {
-        if (this.Missiles.Items.Count < this.MaxMissiles)
+        if (this.FlightMode == eFlightMode.Maneuver)
         {
-            PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-1, 0, this.XY.dY));
-            missile.HP = 1;
-            this.Missiles.Items.Add(missile);
+            if (this.Missiles.Items.Count < this.MaxMissiles)
+            {
+                PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-1, 0, this.XY.dY));
+                missile.HP = 1;
+                this.Missiles.Items.Add(missile);
+            }
+        }
+        else
+        {
+            if (this.Missiles.Items.Count == 0)
+            {
+                double x = (this.XY.dX + this.Width / 2) - this.MaxMissiles / 2;
+                for (int i = 0; i < this.MaxMissiles; i++)
+                {
+                    PlayerMissile missile = new PlayerMissile(new Point(x + i, this.XY.iY), new Trajectory(-1, 0, this.XY.dY));
+                    missile.HP = 1;
+                    this.Missiles.Items.Add(missile);
+                }
+            }
+
         }
     }
 
