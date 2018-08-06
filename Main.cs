@@ -11,6 +11,10 @@ public class AsciiWars
     public static bool GetTheFkOut = false;
     public static bool ShowDebugInfo = false;
     int FramesPerSecond = 9;
+    bool ContinuousPlay = true;
+
+    public AsciiWars() { ContinuousPlay = true; }
+    public AsciiWars(bool cp) { ContinuousPlay = cp; }
 
     public void TryPlay(ref int Score)
     {
@@ -43,7 +47,7 @@ public class AsciiWars
         {
             if (!GetTheFkOut) { Attract(); }
             if (!GetTheFkOut) { PlayTheGame(ref Score); }
-        } while (!GetTheFkOut);
+        } while (!GetTheFkOut && ContinuousPlay);
     }
 
     public void Attract()
