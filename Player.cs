@@ -19,11 +19,41 @@ public class PlayerMissile : Sprite
 public class Player : Sprite
 {
 
+    public enum eFlightMode { Maneuver, Attack }
+    eFlightMode FlightMode;
+    double Run;
+
     public Swarm Missiles = new Swarm();
     //    public Swarm Messages = new Swarm();
 
     public int MaxMissiles = 1;
     public AsciiEngine.Fx.Explosion Debris;
+
+    public void ToggleFlightMode()
+    {
+        if (this.FlightMode == eFlightMode.Attack) { SetFlightMode(eFlightMode.Maneuver); }
+        else { SetFlightMode(eFlightMode.Attack); }
+        if (this.Trajectory.Run < 0) { GoLeft(); } else { GoRight(); }
+    }
+
+    void SetFlightMode(eFlightMode mode)
+    {
+        if (mode == eFlightMode.Maneuver)
+        {
+            this.FlightMode = eFlightMode.Maneuver;
+            this.Ascii = ".--.".ToCharArray();
+            this.Run = 1.5;
+        }
+        else
+        {
+            this.FlightMode = eFlightMode.Attack;
+            this.Ascii = ":><:".ToCharArray();
+            this.Run = 1;
+        }
+    }
+
+    public void GoLeft() { this.Trajectory.Run = -1 * this.Run; }
+    public void GoRight() { this.Trajectory.Run = this.Run; }
 
     override public void OnHit()
     {
@@ -41,7 +71,7 @@ public class Player : Sprite
 
     public Player()
     {
-        this.Ascii = ":><:".ToCharArray();
+        SetFlightMode(eFlightMode.Maneuver);
         this.FlyZone = new FlyZoneClass(0, 0, 0, 0, FlyZoneClass.eEdgeMode.Stop);
         this.Trajectory = new Trajectory(0, 0);
         this.Trail = new Trail(new Point(Screen.Width / 2 - this.Width / 2, Screen.BottomEdge - 1));

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class WaveOfShips : AsciiEngine.Sprites.Swarm
+public class EnemyWave : AsciiEngine.Sprites.Swarm
 
 {
 
@@ -51,13 +51,13 @@ public class WaveOfShips : AsciiEngine.Sprites.Swarm
     public void ExitHyperspace() { this.Escaped = true; }
 
 
-    public WaveOfShips(bool moreguns)
+    public EnemyWave(bool moreguns)
     {
         this.AirTrafficMax = 8;
         this.WeaponsUpgrade = moreguns;
     }
 
-    public WaveOfShips(int max, string intro, string victory, bool addblaster)
+    public EnemyWave(int max, string intro, string victory, bool addblaster)
     {
         this.AirTrafficMax = max;
         this.IntroMessage = intro;

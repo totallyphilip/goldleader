@@ -15,6 +15,9 @@ namespace Easy
 
         public static int Round(double d) { return Convert.ToInt32(Math.Round(d, MidpointRounding.AwayFromZero)); }
 
+        public static int LesserOf(int a, int b) { if (a < b) { return a; } else { return b; } }
+        public static int GreaterOf(int a, int b) { if (a > b) { return a; } else { return b; } }
+
     }
 
     public class Keyboard

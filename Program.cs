@@ -11,7 +11,7 @@
                         pow.SayStuff();
                         System.Console.ReadKey(); */
 
-            TieFighterGame game = new TieFighterGame();
+            AsciiWars game = new AsciiWars();
             int score = 0;
             game.TryPlay(ref score);
             System.Environment.Exit(0);

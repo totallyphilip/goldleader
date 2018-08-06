@@ -549,6 +549,9 @@ namespace AsciiEngine
 
             try
             {
+                // make sure the buffer is never smaller than the window, otherwise the window resize operation will fail
+                Console.SetBufferSize(Easy.Abacus.GreaterOf(targetwidth, Console.WindowWidth), Easy.Abacus.GreaterOf(targetheight, Console.WindowHeight));
+                // now it's safe to resize everything
                 Console.SetWindowSize(targetwidth, targetheight);
                 Console.SetBufferSize(targetwidth, targetheight);
             }
