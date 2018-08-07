@@ -160,11 +160,11 @@ public class AsciiWars
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Interdictor, 1, Enemy.eEnemyType.Fighter));
         Waves.Add(Wave);
 
-        Wave = new EnemyWave(20, "I've got a bad feeling about this.", "WTF? How did you survive that?", true); // too hard, force hyperspace
+        Wave = new EnemyWave(20, "I've got a bad feeling about this.", "The force is strong with this one.", true); // too hard, force hyperspace
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 10));
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 10));
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 20));
-        Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 1000));
+        Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 5));
         Waves.Add(Wave);
 
         Wave = new EnemyWave(100, "", "", false);
@@ -278,7 +278,7 @@ public class AsciiWars
                 player.HP += 4;
                 Scroller.NewLine("Final wave!");
                 Scroller.NewLine("Deflector shield boosted.");
-                Scroller.NewLine("May the Force be with you.");
+                Scroller.NewLine("May the force be with you.");
             }
             else
             {
