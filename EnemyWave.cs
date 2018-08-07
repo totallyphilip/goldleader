@@ -27,13 +27,12 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
         }
     }
 
-
+    string WelcomeMessage;
+    public string VictoryMessage;
     public int AirTrafficMax;
     bool AttackRunStarted = false;
     public void StartAttackRun() { this.AttackRunStarted = true; }
     public List<EnemyDefinition> Generator = new List<EnemyDefinition>();
-    public string IntroMessage;
-    public string VictoryMessage;
     public bool WeaponsUpgrade = false;
     public bool Escaped = false;
 
@@ -50,19 +49,28 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
 
     public void ExitHyperspace() { this.Escaped = true; }
 
+    public bool HasWelcomeMessage { get { return this.WelcomeMessage != ""; } }
 
-    public EnemyWave(bool moreguns)
+    public string PopWelcomeMessage()
     {
-        this.AirTrafficMax = 8;
-        this.WeaponsUpgrade = moreguns;
+        string s = this.WelcomeMessage;
+        this.WelcomeMessage = "";
+        return s;
     }
 
-    public EnemyWave(int max, string intro, string victory, bool addblaster)
+
+    public EnemyWave(bool upgradeblasters)
     {
-        this.AirTrafficMax = max;
-        this.IntroMessage = intro;
+        this.AirTrafficMax = 8;
+        this.WeaponsUpgrade = upgradeblasters;
+    }
+
+    public EnemyWave(int max, string welcome, string victory, bool upgradeblasters)
+    {
+        this.WelcomeMessage = welcome;
         this.VictoryMessage = victory;
-        this.WeaponsUpgrade = addblaster;
+        this.AirTrafficMax = max;
+        this.WeaponsUpgrade = upgradeblasters;
     }
 
     public bool Completed()

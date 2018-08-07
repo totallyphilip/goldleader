@@ -289,7 +289,7 @@ public class AsciiWars
                 if (HyperdriveMode == eHyperdriveMode.Disengaged) { Scroller.NewLine("Navicomputer coordinates recalculated."); }
 
             }
-            if (wave.IntroMessage != "") { Scroller.NewLine(wave.IntroMessage); }
+            if (wave.HasWelcomeMessage) { Scroller.NewLine(wave.PopWelcomeMessage()); }
 
             HyperdriveMode = eHyperdriveMode.Unused;
 
@@ -312,6 +312,7 @@ public class AsciiWars
 
             do
             {
+                if (Scroller.Empty) { wave.StartAttackRun(); } // wait until wave intro messages are gone
 
                 Console.CursorVisible = false; // windows turns the cursor back on when restoring from minimized window
 
@@ -465,47 +466,49 @@ public class AsciiWars
 
                 // display messages
                 Scroller.Animate();
-                if (Scroller.Empty) { wave.StartAttackRun(); }
-
-                if (!player.Alive && !ClosingWordsStated)
+                if (player.Alive)
                 {
-                    ClosingWordsStated = true;
-                    Scroller.NewLine("G A M E   O V E R");
-                    Scroller.NewLine(3);
-                    Scroller.NewLine("They came from behind!");
-                }
-
-                if (player.Alive && wave.Completed() && !ClosingWordsStated)
-                {
-                    ClosingWordsStated = true;
-
-                    if (HyperdriveMode == eHyperdriveMode.Disengaged)
+                    if (wave.Completed() && !ClosingWordsStated)
                     {
-                        Scroller.NewLine("Traveling through hyperspace");
-                        Scroller.NewLine("ain't like dusting crops, boy.");
-                        hyperbonus.Reset();
+                        ClosingWordsStated = true;
+                        if (HyperdriveMode == eHyperdriveMode.Disengaged)
+                        {
+                            Scroller.NewLine("Traveling through hyperspace");
+                            Scroller.NewLine("ain't like dusting crops, boy.");
+                            hyperbonus.Reset();
+                        }
+                        else
+                        {
+                            if (wave.VictoryMessage == "") { Scroller.NewLine("Wave cleared."); }
+                            else { Scroller.NewLine(wave.VictoryMessage); }
+                            Scroller.NewLine("+" + (hyperbonus.Value * 10) + " navicomputer Fibonacci bonus.");
+                            Score += hyperbonus.Value * 10;
+                            hyperbonus.Increment();
+                        };
                     }
-                    else
-                    {
-                        if (wave.VictoryMessage == "") { wave.VictoryMessage = "Wave cleared."; }
-                        Scroller.NewLine(wave.VictoryMessage);
-                        Scroller.NewLine("+" + (hyperbonus.Value * 10) + " navicomputer Fibonacci bonus.");
-                        Score += hyperbonus.Value * 10;
-                        hyperbonus.Increment();
-                    };
                 }
-
-                if (!player.Alive && wave.Completed() && !HeroBonusGiven)
+                else
                 {
-                    int deadherobonus = 500;
-                    Scroller.NewLine(3);
-                    Scroller.NewLine("That");
-                    Scroller.NewLine("was");
-                    Scroller.NewLine("awesome.");
-                    Scroller.NewLine(3);
-                    Scroller.NewLine("+" + deadherobonus + " Dead hero bonus.");
-                    Score += deadherobonus;
-                    HeroBonusGiven = true;
+                    if (!ClosingWordsStated)
+                    {
+                        ClosingWordsStated = true;
+                        Scroller.NewLine("G A M E   O V E R");
+                        Scroller.NewLine(3);
+                        Scroller.NewLine("They came from behind!");
+                    }
+
+                    if (wave.Completed() && !HeroBonusGiven)
+                    {
+                        int deadherobonus = 500;
+                        Scroller.NewLine(3);
+                        Scroller.NewLine("That");
+                        Scroller.NewLine("was");
+                        Scroller.NewLine("awesome.");
+                        Scroller.NewLine(3);
+                        Scroller.NewLine("+" + deadherobonus + " Dead hero bonus.");
+                        Score += deadherobonus;
+                        HeroBonusGiven = true;
+                    }
                 }
 
                 Console.Title = "Score: " + Score;
