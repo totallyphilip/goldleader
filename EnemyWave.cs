@@ -77,8 +77,6 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
     {
         if (this.Escaped) { return true; }
         else { return this.Generator.Count == 0 && !this.Alive; }
-        //else { return this.UnflownCount == 0 && !this.Alive; }
-        //        else { return this.UnflownCount == 0 && IncomingShips.FindAll(x => x.Alive).Count == 0; }
     }
 
 

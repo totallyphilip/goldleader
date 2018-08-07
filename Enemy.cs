@@ -56,10 +56,8 @@ public class Enemy : Sprite
             points = 2;
         }
 
-        this.Score = points * scorefactor;
-        //TieFighterGame.Score += points * scorefactor;
+        this.Score = (points * scorefactor);
 
-        // this.Messages.Items.Add(new Sprite(("+" + points * scorefactor).ToCharArray(), this.XY, new Trajectory(-.5, 0, 4)));
         this.Messages.Items.Add(new Sprite(("+" + this.Score).ToCharArray(), this.XY, new Trajectory(-.5, 0, 4)));
     }
 

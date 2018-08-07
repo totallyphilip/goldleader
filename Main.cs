@@ -9,7 +9,7 @@ public class AsciiWars
 {
 
     public static bool GetTheFkOut = false;
-    public static bool ShowDebugInfo = false;
+    //    public static bool ShowDebugInfo = false;
     int FramesPerSecond = 9;
     bool ContinuousPlay = true;
 
@@ -313,6 +313,7 @@ public class AsciiWars
 
             do
             {
+
                 if (Scroller.Empty) { wave.StartAttackRun(); } // wait until wave intro messages are gone
 
                 Console.CursorVisible = false; // windows turns the cursor back on when restoring from minimized window
@@ -381,7 +382,7 @@ public class AsciiWars
 
                         // hud
                         string ShieldMarkers = "";
-                        if (player.HP > 0) { ShieldMarkers = new String('X', player.HP - 1); }
+                        if (player.HP > 0) { ShieldMarkers = new String('$', player.HP - 1); }
                         Screen.TryWrite(new Point(1, player.XY.iY + 1), ShieldMarkers + ' ');
                         string ShotMarkers = new string(' ', player.Missiles.Count) + new String('|', player.MissileCapacity - player.Missiles.Items.Count);
                         Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, player.XY.iY + 1), ShotMarkers);
@@ -392,13 +393,6 @@ public class AsciiWars
                     if (player.Active) { player.Activate(); }
                     Score += wave.CollectScore();
 
-                }
-
-
-                // debugging
-                if (ShowDebugInfo)
-                {
-                    AsciiEngine.Screen.TryWrite(new Point(0, 0), "FPS:" + FramesPerSecond + " HP:" + player.HP);
                 }
 
 
@@ -480,9 +474,6 @@ public class AsciiWars
                             break;
                         case ConsoleKey.Escape:
                             GetTheFkOut = true;
-                            break;
-                        case ConsoleKey.D:
-                            ShowDebugInfo = !ShowDebugInfo;
                             break;
                         case ConsoleKey.Enter:
                             Paused = !Paused;

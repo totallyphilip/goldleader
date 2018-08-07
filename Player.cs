@@ -67,7 +67,7 @@ public class Player : Sprite
         this.HP--;
         if (this.HP > 0)
         {
-            Debris = new AsciiEngine.Fx.Explosion(new string('\x00d7', Abacus.Random.Next(2, 5)).ToCharArray(), this.XY, 0, 2, 1, true, false, true, true);
+            Debris = new AsciiEngine.Fx.Explosion(new string('!', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 2, 1, true, false, true, true);
         }
         else
         {
