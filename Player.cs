@@ -26,8 +26,14 @@ public class Player : Sprite
     public Swarm Missiles = new Swarm();
     //    public Swarm Messages = new Swarm();
 
-    public int MaxMissiles = 1;
+    int MyMissileCapacity = 1;
+    public int MissileCapacity { get { return this.MyMissileCapacity; } }
     public AsciiEngine.Fx.Explosion Debris;
+
+    public void UpgradeBlasters()
+    {
+        if (this.MyMissileCapacity < 4) { this.MyMissileCapacity++; }
+    }
 
     public void ToggleFlightMode()
     {
@@ -83,7 +89,7 @@ public class Player : Sprite
     {
         if (this.FlightMode == eFlightMode.Maneuver)
         {
-            if (this.Missiles.Items.Count < this.MaxMissiles)
+            if (this.Missiles.Items.Count < this.MyMissileCapacity)
             {
                 PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-.66, 0, this.XY.dY));
                 missile.HP = 1;
@@ -94,8 +100,8 @@ public class Player : Sprite
         {
             if (this.Missiles.Items.Count == 0)
             {
-                double x = (this.XY.dX + this.Width / 2) - this.MaxMissiles / 2;
-                for (int i = 0; i < this.MaxMissiles; i++)
+                double x = (this.XY.dX + this.Width / 2) - this.MyMissileCapacity / 2;
+                for (int i = 0; i < this.MyMissileCapacity; i++)
                 {
                     PlayerMissile missile = new PlayerMissile(new Point(x + i, this.XY.iY), new Trajectory(-1, 0, this.XY.dY));
                     missile.HP = 1;

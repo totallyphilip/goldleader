@@ -300,10 +300,10 @@ public class AsciiWars
 
 
             // upgrade weapons
-            if (wave.WeaponsUpgrade && player.MaxMissiles < 4)
+            if (wave.WeaponsUpgrade)
             {
+                player.UpgradeBlasters();
                 Scroller.NewLine();
-                player.MaxMissiles++;
                 Scroller.NewLine("Blasters upgraded!");
             }
 
@@ -354,7 +354,7 @@ public class AsciiWars
                         string ShieldMarkers = "";
                         if (player.HP > 0) { ShieldMarkers = new String('X', player.HP - 1); }
                         Screen.TryWrite(new Point(1, player.XY.iY + 1), ShieldMarkers + ' ');
-                        string ShotMarkers = new string(' ', player.Missiles.Count) + new String('|', player.MaxMissiles - player.Missiles.Items.Count);
+                        string ShotMarkers = new string(' ', player.Missiles.Count) + new String('|', player.MissileCapacity - player.Missiles.Items.Count);
                         Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, player.XY.iY + 1), ShotMarkers);
 
                     }
@@ -373,24 +373,28 @@ public class AsciiWars
                 }
 
 
-                // wipe the keyboard buffer if a priority key is pressed
+                // check input keys and prioritize some keys
                 while (Console.KeyAvailable)
                 {
                     ConsoleKeyInfo k = Console.ReadKey(true);
-                    if (k.Key == ConsoleKey.Tab) // prioritize emergency hyperspace
+                    if (k.Key == ConsoleKey.UpArrow)
                     {
                         keybuffer.Clear();
                         keybuffer.Add(k);
                     }
-                    else if (
-                        k.Key == ConsoleKey.LeftArrow
-                            || k.Key == ConsoleKey.RightArrow
-                            || k.Key == ConsoleKey.Escape
-                            || k.Key == ConsoleKey.UpArrow
-                            || k.Key == ConsoleKey.DownArrow
-                     )
+                    else if (k.Key == ConsoleKey.Escape)
                     {
-                        keybuffer = new List<ConsoleKeyInfo>(keybuffer.RemoveAll(x => x.Key == ConsoleKey.RightArrow || x.Key == ConsoleKey.LeftArrow));
+                        keybuffer.Clear();
+                        keybuffer.Add(k);
+                    }
+                    else if (k.Key == ConsoleKey.LeftArrow || k.Key == ConsoleKey.RightArrow)
+                    {
+                        keybuffer = new List<ConsoleKeyInfo>(keybuffer.RemoveAll(x => x.Key == ConsoleKey.LeftArrow || x.Key == ConsoleKey.RightArrow));
+                        keybuffer.Insert(0, k);
+                    }
+                    else if (k.Key == ConsoleKey.PageUp || k.Key == ConsoleKey.PageDown)
+                    {
+                        keybuffer = new List<ConsoleKeyInfo>(keybuffer.RemoveAll(x => x.Key == ConsoleKey.PageUp || x.Key == ConsoleKey.PageDown));
                         keybuffer.Insert(0, k);
                     }
                     else
@@ -454,13 +458,6 @@ public class AsciiWars
                             break;
                         case ConsoleKey.Enter:
                             Paused = !Paused;
-                            break;
-                        case ConsoleKey.T:
-                            player.OnHit();
-                            //Score = 0;
-                            //player.HP++;
-                            //Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (InitialShields - 1)) * 100 + "% charged.");
-                            //Scroller.NewLine("Score reset to zero.");
                             break;
                     }
 
