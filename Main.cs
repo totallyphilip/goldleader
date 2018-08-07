@@ -266,7 +266,7 @@ public class AsciiWars
         Scroller Instructions = new Scroller(2, Screen.Height / 3, .25, 1.5);
         Scroller.NewLine("Enter = Instructions");
         Scroller.NewLine("Esc = Quit");
-        Scroller.NewLine(4);
+        Scroller.NewLine(2);
 
         foreach (EnemyWave wave in Waves)
         {
@@ -329,12 +329,18 @@ public class AsciiWars
                     if (Instructions.Empty)
                     {
                         Scroller.HideAll();
-                        Instructions.NewLine("Instructions:");
-                        //Instructions.NewLine("\x00b7==\x00b7");
+                        Instructions.NewLine("Press Enter to resume game.");
+                        Instructions.NewLine();
+                        Instructions.NewLine("Ship controls:");
                         Instructions.NewLine("Space = Fire");
                         Instructions.NewLine("Left/Right = Move");
-                        Instructions.NewLine("Down = Toggle S-foils");
                         Instructions.NewLine("Up = Hyperdrive");
+                        Instructions.NewLine("Down = Toggle S-foils");
+                        Instructions.NewLine();
+                        Instructions.NewLine("System controls:");
+                        Instructions.NewLine("PageUp = Faster");
+                        Instructions.NewLine("PageDown = Slower");
+                        Instructions.NewLine("Enter = Instructions");
                         Instructions.NewLine("Esc = Quit");
                         Instructions.NewLine();
                         Instructions.NewLine("Lock S-foils in attack position for");
@@ -345,9 +351,6 @@ public class AsciiWars
                         Instructions.NewLine("Hit = 1 point");
                         Instructions.NewLine("Kill = 2 points");
                         Instructions.NewLine("Score multiplier for higher altitude hits.");
-                        Instructions.NewLine();
-                        Instructions.NewLine();
-                        Instructions.NewLine();
                         Instructions.NewLine();
                         Instructions.NewLine("Press Enter to resume game.");
                     }
