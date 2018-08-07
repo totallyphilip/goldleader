@@ -60,8 +60,6 @@ public class AsciiWars
 
         Messages.Add("A S C I I   W A R S");
         Messages.Add("");
-        Messages.Add("- Enemies -");
-
         foreach (Enemy.eEnemyType shiptype in (Enemy.eEnemyType[])System.Enum.GetValues(typeof(Enemy.eEnemyType)))
         {
             Enemy bg = new Enemy(shiptype);
@@ -69,15 +67,8 @@ public class AsciiWars
             Messages.Add(new string(bg.Ascii) + " " + Enum.GetName(typeof(Enemy.eEnemyType), shiptype) + " (" + bg.HP + " HP)");
         }
         Messages.Add("");
-
-        Messages.Add("- Scoring -");
-        Messages.Add("Hit = 1 X Altitude Bonus");
-        Messages.Add("Kill = 2 X Altitude Bonus");
-        Messages.Add("");
         Messages.Add("Press Esc to Quit");
         Messages.Add("Press Space to Begin");
-        Messages.Add("");
-        Messages.Add("");
         Messages.Add("");
         Messages.Add("");
         Messages.Add("");
@@ -87,6 +78,14 @@ public class AsciiWars
         do
         {
             Console.CursorVisible = false;
+
+            if (badguys.Empty)
+            {
+                foreach (Enemy.eEnemyType shiptype in (Enemy.eEnemyType[])System.Enum.GetValues(typeof(Enemy.eEnemyType)))
+                {
+                    badguys.Items.Add(new Enemy(shiptype));
+                }
+            }
 
             if (Scroller.Empty)
             {
@@ -99,6 +98,12 @@ public class AsciiWars
             stars.Animate();
             Scroller.Animate();
             Easy.Clock.FpsThrottle(8);
+
+            if (Easy.Abacus.RandomTrue && Easy.Abacus.RandomTrue && Easy.Abacus.RandomTrue && Easy.Abacus.RandomTrue)
+            {
+                int r = Easy.Abacus.Random.Next(0, badguys.Count);
+                if (badguys.Items[r].Alive) { badguys.Items[r].OnHit(); }
+            }
 
         } while (!Console.KeyAvailable);
 
@@ -258,12 +263,8 @@ public class AsciiWars
 
         // display instructions
         Scroller Scroller = new Scroller(2, Screen.Height / 3, .25, 1.5);
-        Scroller.NewLine("Space = Fire");
-        Scroller.NewLine("Left/Right = Move");
-        Scroller.NewLine("Down = Toggle S-foils");
-        //Scroller.NewLine("PgUp/PgDn = Faster/Slower");
-        Scroller.NewLine("Up = Hyperdrive");
-        //Scroller.NewLine("Enter = Pause");
+        Scroller Instructions = new Scroller(2, Screen.Height / 3, .25, 1.5);
+        Scroller.NewLine("Enter = Instructions");
         Scroller.NewLine("Esc = Quit");
         Scroller.NewLine(4);
 
@@ -325,7 +326,31 @@ public class AsciiWars
                     if (player.Debris != null) { player.Debris.Refresh(); }
                     player.Missiles.Refresh();
                     wave.Refresh();
-                    if (Scroller.Empty) { Scroller.NewLine("Press Enter to resume."); }
+                    if (Instructions.Empty)
+                    {
+                        Scroller.HideAll();
+                        Instructions.NewLine("Instructions:");
+                        //Instructions.NewLine("\x00b7==\x00b7");
+                        Instructions.NewLine("Space = Fire");
+                        Instructions.NewLine("Left/Right = Move");
+                        Instructions.NewLine("Down = Toggle S-foils");
+                        Instructions.NewLine("Up = Hyperdrive");
+                        Instructions.NewLine("Esc = Quit");
+                        Instructions.NewLine();
+                        Instructions.NewLine("Lock S-foils in attack position for");
+                        Instructions.NewLine("faster blasting & slower flying.");
+                        Instructions.NewLine();
+                        Instructions.NewLine("Defeat all enemies for navicomputer bonus.");
+                        Instructions.NewLine();
+                        Instructions.NewLine("Hit = 1 point");
+                        Instructions.NewLine("Kill = 2 points");
+                        Instructions.NewLine("Score multiplier for higher altitude hits.");
+                        Instructions.NewLine();
+                        Instructions.NewLine();
+                        Instructions.NewLine();
+                        Instructions.NewLine();
+                        Instructions.NewLine("Press Enter to resume game.");
+                    }
                 }
                 else
                 {
@@ -448,7 +473,6 @@ public class AsciiWars
                             player.ToggleFlightMode();
                             break;
                         case ConsoleKey.Spacebar:
-                            if (player.Alive) { Scroller.Zoom(); }
                             if (HyperdriveMode != eHyperdriveMode.Engaged) { player.Fire(); }
                             break;
                         case ConsoleKey.Escape:
@@ -459,13 +483,14 @@ public class AsciiWars
                             break;
                         case ConsoleKey.Enter:
                             Paused = !Paused;
+                            if (!Paused) { Instructions.TerminateAll(); }
                             break;
                     }
 
                 }
 
                 // display messages
-                Scroller.Animate();
+                if (!Instructions.Empty) { Instructions.Animate(); } else { Scroller.Animate(); }
                 if (player.Alive)
                 {
                     if (wave.Completed() && !ClosingWordsStated)

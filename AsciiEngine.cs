@@ -384,6 +384,7 @@ namespace AsciiEngine
             }
 
             public void TerminateAll() { foreach (Sprite s in this.Items) { s.Terminate(); } }
+            public void HideAll() { foreach (Sprite s in this.Items) { s.Hide(); } }
 
             public void Refresh()
             {
