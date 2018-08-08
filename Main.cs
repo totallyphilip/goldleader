@@ -16,10 +16,11 @@ public class AsciiWars
     public AsciiWars() { ContinuousPlay = true; }
     public AsciiWars(bool cp) { ContinuousPlay = cp; }
 
-    public void TryPlay(ref int Score)
+    public int TryPlay(int HighScore)
     {
 
         GetTheFkOut = false;
+        int Score = 0;
 
         bool LinuxDevMode = false;
 
@@ -29,7 +30,7 @@ public class AsciiWars
         if (LinuxDevMode || Screen.TrySetSize(50, 40))
         {
             Easy.Keyboard.EatKeys();
-            this.MainLoop(ref Score);
+            Score = this.MainLoop(HighScore);
             Console.CursorVisible = true;
         }
         else
@@ -39,15 +40,19 @@ public class AsciiWars
         }
 
         Screen.TrySetSize(oldwidth, oldheight, false);
+
+        return Score;
     }
 
-    void MainLoop(ref int Score)
+    int MainLoop(int HighScore)
     {
+        int Score = 0;
         do
         {
             if (!GetTheFkOut) { Attract(); }
-            if (!GetTheFkOut) { PlayTheGame(ref Score); }
+            if (!GetTheFkOut) { Score = PlayTheGame(HighScore); }
         } while (!GetTheFkOut && ContinuousPlay);
+        return Score;
     }
 
     public void Attract()
@@ -113,7 +118,7 @@ public class AsciiWars
 
     enum eHyperdriveMode { Unused, Engaged, Disengaged };
 
-    void PlayTheGame(ref int Score)
+    int PlayTheGame(int HighScore)
     {
 
         Console.Clear();
@@ -125,7 +130,7 @@ public class AsciiWars
         Player player = new Player();
         int ShieldMax = 5;
         player.HP = 0;
-        Score = 0;
+        int Score = 0;
 
         // hyperdrive
         eHyperdriveMode HyperdriveMode = eHyperdriveMode.Unused;
@@ -266,7 +271,12 @@ public class AsciiWars
         Scroller Instructions = new Scroller(2, Screen.Height / 3, .25, 1.5);
         Scroller.NewLine("Enter = Instructions");
         Scroller.NewLine("Esc = Quit");
-        Scroller.NewLine(2);
+        Scroller.NewLine();
+        if (HighScore > 0)
+        {
+            Scroller.NewLine("Beat your high score: " + HighScore);
+            Scroller.NewLine();
+        }
 
         foreach (EnemyWave wave in Waves)
         {
@@ -544,5 +554,7 @@ public class AsciiWars
             if (!player.Alive || GetTheFkOut) { break; }
 
         }
+
+        return Score;
     }
 }

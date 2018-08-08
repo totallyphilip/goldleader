@@ -6,7 +6,7 @@
         {
             AsciiWars game = new AsciiWars();
             int score = 0;
-            game.TryPlay(ref score);
+            game.TryPlay(score);
             System.Environment.Exit(0);
         }
     }
