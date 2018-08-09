@@ -335,7 +335,7 @@ public class AsciiWars
                 if (wave.FrameCounter > FramesUntilPowerup && IncomingPup == null && !wave.Completed())
                 {
                     PowerUp pup;
-                    switch (Easy.Abacus.Random.Next(2))
+                    switch (Easy.Abacus.Random.Next(3))
                     {
                         case 0:
                             pup = new PowerUp(PowerUp.ePowerUpType.Missiles);
@@ -380,8 +380,8 @@ public class AsciiWars
                         Instructions.NewLine("Enter = Instructions");
                         Instructions.NewLine("Esc = Quit");
                         Instructions.NewLine();
-                        Instructions.NewLine("Lock S-foils in attack position for");
-                        Instructions.NewLine("faster blasting & slower flying.");
+                        Instructions.NewLine("Lock S-foils in attack position to");
+                        Instructions.NewLine("divert power from thrusters to blasters.");
                         Instructions.NewLine();
                         Instructions.NewLine("Defeat all enemies for navicomputer bonus.");
                         Instructions.NewLine();
