@@ -29,6 +29,7 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
 
     string WelcomeMessage;
     public string VictoryMessage;
+    public int FrameCounter = 0;
     public int AirTrafficMax;
     bool AttackRunStarted = false;
     public void StartAttackRun() { this.AttackRunStarted = true; }
@@ -58,11 +59,12 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
         return s;
     }
 
-
-    public EnemyWave(bool upgradeblasters)
+    protected override void OnAnimated()
     {
-        this.AirTrafficMax = 8;
-        this.WeaponsUpgrade = upgradeblasters;
+        if (this.AttackRunStarted)
+        {
+            this.FrameCounter++; // this will eventually overflow if the wave never ends but i don't care
+        }
     }
 
     public EnemyWave(int max, string welcome, string victory, bool upgradeblasters)
@@ -84,8 +86,6 @@ public class EnemyWave : AsciiEngine.Sprites.Swarm
     {
         if (this.AttackRunStarted)
         {
-
-
             if (this.Items.Count < this.AirTrafficMax && this.Generator.Count > 0)
             {
                 // get the next ship

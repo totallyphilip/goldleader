@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 public class PlayerMissile : Sprite
 {
-    override public void OnHit() { this.HP--; }
+    override public void OnHit(int damage) { this.HitPoints += damage; }
     public PlayerMissile(AsciiEngine.Grid.Point xy, AsciiEngine.Grid.Trajectory t)
     {
         this.Ascii = new[] { '|' };
@@ -22,6 +22,7 @@ public class Player : Sprite
     public enum eFlightMode { Maneuver, Attack }
     eFlightMode FlightMode;
     double Run;
+    public int DefaultHitPoints { get { return 5; } }
 
     public Swarm Missiles = new Swarm();
     //    public Swarm Messages = new Swarm();
@@ -62,12 +63,12 @@ public class Player : Sprite
     public void GoLeft() { this.Trajectory.Run = -1 * this.Run; }
     public void GoRight() { this.Trajectory.Run = this.Run; }
 
-    override public void OnHit()
+    override public void OnHit(int hiteffect)
     {
-        this.HP--;
-        if (this.HP > 0)
+        this.HitPoints += hiteffect;
+        if (this.HitPoints > 0)
         {
-            Debris = new AsciiEngine.Fx.Explosion(new string('!', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 2, 1, true, false, true, true);
+            Debris = new AsciiEngine.Fx.Explosion(new string('\x00d7', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 2, 1, true, false, true, true);
         }
         else
         {
@@ -82,7 +83,8 @@ public class Player : Sprite
         this.FlyZone = new FlyZoneClass(0, 0, 0, 0, FlyZoneClass.eEdgeMode.Stop);
         this.Trajectory = new Trajectory(0, 0);
         this.Trail = new Trail(new Point(Screen.Width / 2 - this.Width / 2, Screen.BottomEdge - 1));
-        this.HP = 1;
+        this.HitPoints = this.DefaultHitPoints;
+        this.HitEffect = -1;
     }
 
     public void Fire()
@@ -92,7 +94,7 @@ public class Player : Sprite
             if (this.Missiles.Items.Count < this.MyMissileCapacity)
             {
                 PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-.66, 0, this.XY.dY));
-                missile.HP = 1;
+                missile.HitPoints = 1;
                 this.Missiles.Items.Add(missile);
             }
         }
@@ -104,7 +106,7 @@ public class Player : Sprite
                 for (int i = 0; i < this.MyMissileCapacity; i++)
                 {
                     PlayerMissile missile = new PlayerMissile(new Point(x + i, this.XY.iY), new Trajectory(-1, 0, this.XY.dY));
-                    missile.HP = 1;
+                    missile.HitPoints = 1;
                     this.Missiles.Items.Add(missile);
                 }
             }
@@ -112,12 +114,21 @@ public class Player : Sprite
         }
     }
 
+    public void FirePowerUp()
+    {
+        for (double run = -2; run < 2; run += .2)
+        {
+            PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-1, run, this.XY.dY));
+            missile.HitPoints = 1;
+            this.Missiles.Items.Add(missile);
+        }
+    }
+
+
     override public void Activate()
     {
         Missiles.Animate();
-        //        Messages.Animate();
         if (Debris != null) { Debris.Animate(); }
-
         if (!this.Alive && this.Debris.Empty && this.Missiles.Empty) { this.Active = false; }
     }
 

@@ -69,7 +69,7 @@ public class AsciiWars
         {
             Enemy bg = new Enemy(shiptype);
             badguys.Items.Add(bg);
-            Messages.Add(new string(bg.Ascii) + " " + Enum.GetName(typeof(Enemy.eEnemyType), shiptype) + " (" + bg.HP + " HP)");
+            Messages.Add(new string(bg.Ascii) + " " + Enum.GetName(typeof(Enemy.eEnemyType), shiptype) + " (" + bg.HitPoints + " HP)");
         }
         Messages.Add("");
         Messages.Add("Press Esc to Quit");
@@ -107,7 +107,7 @@ public class AsciiWars
             if (Easy.Abacus.RandomTrue && Easy.Abacus.RandomTrue && Easy.Abacus.RandomTrue && Easy.Abacus.RandomTrue)
             {
                 int r = Easy.Abacus.Random.Next(0, badguys.Count);
-                if (badguys.Items[r].Alive) { badguys.Items[r].OnHit(); }
+                if (badguys.Items[r].Alive) { badguys.Items[r].OnHit(-1); }
             }
 
         } while (!Console.KeyAvailable);
@@ -128,9 +128,10 @@ public class AsciiWars
 
         // the user
         Player player = new Player();
-        int ShieldMax = 5;
-        player.HP = 0;
         int Score = 0;
+
+        // power ups
+        PowerUp IncomingPup = null;
 
         // hyperdrive
         eHyperdriveMode HyperdriveMode = eHyperdriveMode.Unused;
@@ -171,7 +172,7 @@ public class AsciiWars
         Waves.Add(Wave);
 
         Wave = new EnemyWave(20, "I've got a bad feeling about this.", "The force is strong with this one.", true); // too hard, force hyperspace
-        Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 10));
+        Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 30));
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 10));
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 20));
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.HeavyBomber, 5));
@@ -282,11 +283,11 @@ public class AsciiWars
         {
 
             bool ClosingWordsStated = false;
-            player.HP++;
+            //player.HP++;
 
             if (Waves.IndexOf(wave) == Waves.Count - 1)
             {
-                player.HP += 4;
+                player.HitPoints += 4;
                 Scroller.NewLine("Final wave!");
                 Scroller.NewLine("Deflector shield boosted.");
                 Scroller.NewLine("May the force be with you.");
@@ -295,7 +296,7 @@ public class AsciiWars
             {
                 Scroller.NewLine("Wave " + (Waves.IndexOf(wave) + 1));
                 // display shields message
-                Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HP - 1) / (ShieldMax - 1)) * 100 + "% charged.");
+                Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HitPoints - 1) / (player.DefaultHitPoints - 1)) * 100 + "% charged.");
                 // reset hyperdrive
                 if (HyperdriveMode == eHyperdriveMode.Disengaged) { Scroller.NewLine("Navicomputer coordinates recalculated."); }
 
@@ -321,6 +322,8 @@ public class AsciiWars
             // keyboard buffer
             List<ConsoleKeyInfo> keybuffer = new List<ConsoleKeyInfo>();
 
+            int FramesUntilPowerup = Easy.Abacus.Random.Next(100, 150);
+
             do
             {
 
@@ -328,8 +331,31 @@ public class AsciiWars
 
                 Console.CursorVisible = false; // windows turns the cursor back on when restoring from minimized window
 
+                // power ups
+                if (wave.FrameCounter > FramesUntilPowerup && IncomingPup == null && !wave.Completed())
+                {
+                    PowerUp pup;
+                    switch (Easy.Abacus.Random.Next(2))
+                    {
+                        case 0:
+                            pup = new PowerUp(PowerUp.ePowerUpType.Missiles);
+                            break;
+                        case 1:
+                            pup = new PowerUp(PowerUp.ePowerUpType.Shields);
+                            break;
+                        default:
+                            pup = new PowerUp(PowerUp.ePowerUpType.Points);
+                            break;
+                    }
+                    IncomingPup = pup;
+                    FramesUntilPowerup *= 2;
+                    wave.FrameCounter = 0;
+                }
+
                 // animate
                 stars.Animate();
+
+
 
                 if (Paused)
                 {
@@ -381,6 +407,34 @@ public class AsciiWars
                     }
                     else if (HyperdriveMode == eHyperdriveMode.Unused)
                     {
+
+                        // power ups
+                        if (IncomingPup != null)
+                        {
+
+                            bool hit = Sprite.Collided(player, IncomingPup);
+                            IncomingPup.Animate();
+                            if (hit || Sprite.Collided(player, IncomingPup))
+                            {
+                                switch (IncomingPup.PowerUpType)
+                                {
+                                    case PowerUp.ePowerUpType.Points:
+                                        int p = (Waves.IndexOf(wave) + 1) * 10;
+                                        Score += p;
+                                        Scroller.NewLine("+" + p.ToString());
+                                        break;
+                                    case PowerUp.ePowerUpType.Shields:
+                                        break;
+                                    case PowerUp.ePowerUpType.Missiles:
+                                        player.FirePowerUp();
+                                        break;
+                                }
+                            }
+
+                            if (!IncomingPup.Alive) { IncomingPup = null; }
+
+                        }
+
                         wave.CheckCollisions(player.Missiles);
                         wave.Animate();
                         wave.CheckCollisions(player.Missiles);
@@ -392,10 +446,19 @@ public class AsciiWars
 
                         // hud
                         string ShieldMarkers = "";
-                        if (player.HP > 0) { ShieldMarkers = new String('$', player.HP - 1); }
+                        if (player.HitPoints > 0) { ShieldMarkers = new String('$', player.HitPoints - 1); }
                         Screen.TryWrite(new Point(1, player.XY.iY + 1), ShieldMarkers + ' ');
-                        string ShotMarkers = new string(' ', player.Missiles.Count) + new String('|', player.MissileCapacity - player.Missiles.Items.Count);
-                        Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, player.XY.iY + 1), ShotMarkers);
+
+                        try // this dies if the missile powerup is used
+                        {
+                            string ShotMarkers = new string(' ', player.Missiles.Count) + new String('|', player.MissileCapacity - player.Missiles.Items.Count);
+                            Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, player.XY.iY + 1), ShotMarkers);
+                        }
+                        catch
+                        {
+                            string ShotMarkers = new string(' ', player.MissileCapacity);
+                            Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, player.XY.iY + 1), ShotMarkers);
+                        }
 
                     }
 

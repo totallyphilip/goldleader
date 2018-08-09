@@ -157,7 +157,8 @@ namespace AsciiEngine
 
             #region " Status "
 
-            public int HP = int.MaxValue;
+            public int HitPoints = int.MaxValue;
+            public int HitEffect = -1;
             protected int Score = 0;
             public bool Active = true;
             bool Terminated = false;
@@ -174,7 +175,7 @@ namespace AsciiEngine
             {
                 get
                 {
-                    bool alive = !this.Terminated && this.HP > 0;
+                    bool alive = !this.Terminated && this.HitPoints > 0;
                     if (alive && Trajectory != null)
                     {
                         alive = Easy.Abacus.Distance(this.Trail.XY, this.Trail.InitialXY) < Trajectory.Range;
@@ -184,6 +185,14 @@ namespace AsciiEngine
             }
 
             protected virtual bool AliveOverride { get { return true; } } // optional additional code in overriding property
+
+            public static bool Collided(Sprite s1, Sprite s2)
+            {
+                bool hit = false;
+                if (s1.Hit(s2)) { hit = true; s2.OnHit(s1.HitEffect); }
+                else { if (s2.Hit(s1)) { hit = true; s1.OnHit(s2.HitEffect); } }
+                return hit;
+            }
 
             public bool Hit(Sprite thatone)
             {
@@ -202,12 +211,13 @@ namespace AsciiEngine
                         || (thatone.XY.iX <= this.XY.iX && thatone.XY.iX + thatone.Width > this.XY.iX + this.Width) // ([])
                     );
 
-                if (HitDetected) { OnHit(); }
+                if (HitDetected) { OnHit(thatone.HitEffect); }
 
                 return HitDetected;
             }
 
-            public virtual void OnHit() { }
+            public virtual void OnHit(int hiteffect)
+            { this.HitPoints += hiteffect; }
 
             public void Terminate()
             {
@@ -402,7 +412,7 @@ namespace AsciiEngine
             {
                 foreach (Sprite thisone in this.Items.FindAll(x => x.Alive))
                 {
-                    if (thisone.Hit(thatone)) { thatone.OnHit(); }
+                    if (thisone.Hit(thatone)) { thatone.OnHit(thisone.HitEffect); }
                 }
 
             }

@@ -41,9 +41,9 @@ public class Enemy : Sprite
     public Explosion Debris = new Explosion();
     double DebrisRange;
 
-    override public void OnHit()
+    override public void OnHit(int damage)
     {
-        this.HP--;
+        this.HitPoints += damage;
 
         int scorefactor = (Screen.Height - this.XY.iY) / 4;
         int points = 1;
@@ -70,7 +70,7 @@ public class Enemy : Sprite
             if (Abacus.Random.NextDouble() < this.ReverseFactor) { this.Trajectory.Run *= -1; }
 
             // fire
-            if (this.Missiles.Items.Count < this.MissileConfig.MaxCount && this.XY.dY > Screen.BottomEdge - MissileConfig.Range && this.HP > 0 && Abacus.RandomTrue)
+            if (this.Missiles.Items.Count < this.MissileConfig.MaxCount && this.XY.dY > Screen.BottomEdge - MissileConfig.Range && this.HitPoints > 0 && Abacus.RandomTrue)
             {
                 this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Ascii }, this.XY.Clone(this.Width / 2, 0), new Trajectory(1, 0, MissileConfig.Range)));
             }
@@ -96,7 +96,7 @@ public class Enemy : Sprite
             case eEnemyType.Fighter:
                 this.Ascii = "|—o—|".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, 7, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
-                this.HP = 1;
+                this.HitPoints = 1;
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .33, 1);
                 this.DebrisRange = 4;
                 DropsPerRow = 8;
@@ -106,7 +106,7 @@ public class Enemy : Sprite
             case eEnemyType.Bomber:
                 this.Ascii = "{—o-o—}".ToCharArray();
                 this.FlyZone = new FlyZoneClass(Abacus.Round(Screen.Height * .5), Abacus.Round(Screen.Height * .25), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
-                this.HP = 2;
+                this.HitPoints = 2;
                 this.MissileConfig = new MissileStructure('@', Screen.Height * .85, 2);
                 this.DebrisRange = 8;
                 DropsPerRow = 1;
@@ -116,7 +116,7 @@ public class Enemy : Sprite
             case eEnemyType.Interceptor:
                 this.Ascii = "<—o—>".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, Abacus.Round(Screen.Height * -.15), 0, 0, FlyZoneClass.eEdgeMode.Bounce);
-                this.HP = 2;
+                this.HitPoints = 2;
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .40, 1);
                 this.DebrisRange = 4;
                 DropsPerRow = 16;
@@ -125,7 +125,7 @@ public class Enemy : Sprite
             case eEnemyType.Leader:
                 this.Ascii = "[—o—]".ToCharArray();
                 this.FlyZone = new FlyZoneClass(Screen.Height / 4, 5, -2, -2, FlyZoneClass.eEdgeMode.Bounce);
-                this.HP = 2;
+                this.HitPoints = 2;
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .33, 2);
                 this.DebrisRange = 4;
                 DropsPerRow = 20;
@@ -134,7 +134,7 @@ public class Enemy : Sprite
             case eEnemyType.HeavyBomber:
                 this.Ascii = "{-o-8-}".ToCharArray();
                 this.FlyZone = new FlyZoneClass(Abacus.Round(Screen.Height * .5), Abacus.Round(Screen.Height * .25), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
-                this.HP = 3;
+                this.HitPoints = 3;
                 this.MissileConfig = new MissileStructure('@', Screen.Height * .9, 4);
                 this.DebrisRange = 10;
                 DropsPerRow = 2;
@@ -143,7 +143,7 @@ public class Enemy : Sprite
             case eEnemyType.HeavyFighter:
                 this.Ascii = "|=o=|".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, 2, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
-                this.HP = 2;
+                this.HitPoints = 2;
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .25, 1);
                 this.DebrisRange = 4;
                 DropsPerRow = 15;
@@ -153,7 +153,7 @@ public class Enemy : Sprite
             case eEnemyType.Vanguard:
                 this.Ascii = "\\-o-/".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, 5, -5, -5, FlyZoneClass.eEdgeMode.Bounce);
-                this.HP = 3;
+                this.HitPoints = 3;
                 this.MissileConfig = new MissileStructure('|', 6, 1);
                 this.DebrisRange = 4;
                 DropsPerRow = 15;
@@ -163,7 +163,7 @@ public class Enemy : Sprite
             case eEnemyType.Interdictor:
                 this.Ascii = "{-8o8-}".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, Abacus.Round(Screen.Height * .75), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
-                this.HP = 4;
+                this.HitPoints = 4;
                 this.MissileConfig = new MissileStructure('@', Screen.Height * .9, 6);
                 this.DebrisRange = 10;
                 DropsPerRow = 2;
