@@ -66,13 +66,20 @@ public class Player : Sprite
     override public void OnHit(int hiteffect)
     {
         this.HitPoints += hiteffect;
-        if (this.HitPoints > 0)
+
+        if (hiteffect > 0)
         {
-            Debris = new AsciiEngine.Fx.Explosion(new string('\x00d7', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 2, 1, true, false, true, true);
+            Debris = new AsciiEngine.Fx.Explosion(new string('$', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 2, 1, true, false, true, true);
+        }
+        else if (hiteffect < 0)
+        {
+            if (this.HitPoints > 0) { Debris = new AsciiEngine.Fx.Explosion(new string('\x00d7', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 2, 1, true, false, true, true); }
+            else { Debris = new AsciiEngine.Fx.Explosion(Textify.Repeat("\x00d7*#-", 10).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true); }
+
         }
         else
         {
-            Debris = new AsciiEngine.Fx.Explosion(Textify.Repeat("\x00d7*#-", 10).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true);
+            Debris = new AsciiEngine.Fx.Explosion(new string('+', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 2, 1, true, false, true, true);
         }
 
     }
@@ -114,11 +121,21 @@ public class Player : Sprite
         }
     }
 
-    public void FirePowerUp()
+    public void FireSpread()
     {
         for (double run = -2; run < 2; run += .2)
         {
-            PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-1, run, this.XY.dY));
+            PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-1, run, Screen.Height / 2));
+            missile.HitPoints = 1;
+            this.Missiles.Items.Add(missile);
+        }
+    }
+
+    public void FireAirStrike()
+    {
+        for (double x = Screen.LeftEdge; x < Screen.RightEdge; x += 4)
+        {
+            PlayerMissile missile = new PlayerMissile(new Point(x, 0), new Trajectory(1, 0, Screen.Height * .75));
             missile.HitPoints = 1;
             this.Missiles.Items.Add(missile);
         }

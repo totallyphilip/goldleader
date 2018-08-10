@@ -131,7 +131,8 @@ public class AsciiWars
         int Score = 0;
 
         // power ups
-        PowerUp IncomingPup = null;
+        PowerUp powerup = null;
+        int BonusPoints = 0;
 
         // hyperdrive
         eHyperdriveMode HyperdriveMode = eHyperdriveMode.Unused;
@@ -283,7 +284,6 @@ public class AsciiWars
         {
 
             bool ClosingWordsStated = false;
-            //player.HP++;
 
             if (Waves.IndexOf(wave) == Waves.Count - 1)
             {
@@ -332,23 +332,11 @@ public class AsciiWars
                 Console.CursorVisible = false; // windows turns the cursor back on when restoring from minimized window
 
                 // power ups
-                if (wave.FrameCounter > FramesUntilPowerup && IncomingPup == null && !wave.Completed())
+                if (wave.FrameCounter > FramesUntilPowerup && powerup == null && !wave.Completed())
                 {
-                    PowerUp pup;
-                    switch (Easy.Abacus.Random.Next(3))
-                    {
-                        case 0:
-                            pup = new PowerUp(PowerUp.ePowerUpType.Missiles);
-                            break;
-                        case 1:
-                            pup = new PowerUp(PowerUp.ePowerUpType.Shields);
-                            break;
-                        default:
-                            pup = new PowerUp(PowerUp.ePowerUpType.Points);
-                            break;
-                    }
-                    IncomingPup = pup;
-                    FramesUntilPowerup *= 2;
+                    PowerUp.ePowerUpType pt = Easy.Abacus.RandomEnumValue<PowerUp.ePowerUpType>();
+                    powerup = new PowerUp(pt);
+                    FramesUntilPowerup = wave.FrameCounter + Easy.Abacus.Random.Next(100, 150);
                     wave.FrameCounter = 0;
                 }
 
@@ -409,29 +397,41 @@ public class AsciiWars
                     {
 
                         // power ups
-                        if (IncomingPup != null)
+                        if (powerup != null)
                         {
 
-                            bool hit = Sprite.Collided(player, IncomingPup);
-                            IncomingPup.Animate();
-                            if (hit || Sprite.Collided(player, IncomingPup))
+                            bool hit = Sprite.Collided(player, powerup);
+                            powerup.Animate();
+                            if (hit || Sprite.Collided(player, powerup))
                             {
-                                switch (IncomingPup.PowerUpType)
+                                switch (powerup.PowerUpType)
                                 {
                                     case PowerUp.ePowerUpType.Points:
-                                        int p = (Waves.IndexOf(wave) + 1) * 10;
-                                        Score += p;
-                                        Scroller.NewLine("+" + p.ToString());
+                                        BonusPoints += 10;
+                                        Score += BonusPoints;
+                                        Scroller.NewLine("+" + BonusPoints.ToString());
                                         break;
                                     case PowerUp.ePowerUpType.Shields:
                                         break;
                                     case PowerUp.ePowerUpType.Missiles:
-                                        player.FirePowerUp();
+                                        player.FireSpread();
+                                        break;
+                                    case PowerUp.ePowerUpType.Airstrike:
+                                        player.FireAirStrike();
+                                        break;
+                                    case PowerUp.ePowerUpType.Warp:
+                                        player.Hide();
+                                        player.Trajectory = new Trajectory(.5, 0);
+                                        player.Trail.Add(new Point(player.XY.dX, Screen.TopEdge));
                                         break;
                                 }
                             }
 
-                            if (!IncomingPup.Alive) { IncomingPup = null; }
+                            if (!powerup.Alive)
+                            {
+                                //powerup.Hide();
+                                powerup = null;
+                            }
 
                         }
 
@@ -447,17 +447,17 @@ public class AsciiWars
                         // hud
                         string ShieldMarkers = "";
                         if (player.HitPoints > 0) { ShieldMarkers = new String('$', player.HitPoints - 1); }
-                        Screen.TryWrite(new Point(1, player.XY.iY + 1), ShieldMarkers + ' ');
+                        Screen.TryWrite(new Point(1, Screen.BottomEdge), ShieldMarkers + ' ');
 
                         try // this dies if the missile powerup is used
                         {
                             string ShotMarkers = new string(' ', player.Missiles.Count) + new String('|', player.MissileCapacity - player.Missiles.Items.Count);
-                            Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, player.XY.iY + 1), ShotMarkers);
+                            Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, Screen.BottomEdge), ShotMarkers);
                         }
                         catch
                         {
                             string ShotMarkers = new string(' ', player.MissileCapacity);
-                            Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, player.XY.iY + 1), ShotMarkers);
+                            Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, Screen.BottomEdge), ShotMarkers);
                         }
 
                     }
