@@ -35,7 +35,7 @@ namespace AsciiEngine
                     if (left && right) { if (Easy.Abacus.RandomTrue) { run *= -1; } } // surprise me
 
                     Grid.Trajectory t = new Grid.Trajectory(rise, run, range);
-                    Grid.Point xy = new Grid.Point(coord.dX, coord.dY);
+                    Grid.Point xy = coord.Clone();
 
                     xy.dX += position;
                     position++;

@@ -48,7 +48,7 @@ internal class Enemy : Sprite
         int scorefactor = (Screen.Height - this.XY.iY) / 4;
         int points = 1;
 
-        Sparks = new Explosion(new string('\x00d7', Abacus.Random.Next(2, 5)).ToCharArray(), this.XY, 0, 2, 1, true, true, true, true);
+        Sparks = new Explosion(new string('\x00d7', Abacus.Random.Next(2, 5)).ToCharArray(), this.XY, 0, 3, 1, true, true, true, true);
         if (!this.Alive)
         {
             Debris = new Explosion(this.Ascii, this.XY, this.Width, DebrisRange, 1, true, true, true, true);

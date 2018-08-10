@@ -69,17 +69,17 @@ internal class Player : Sprite
 
         if (hiteffect > 0)
         {
-            Debris = new AsciiEngine.Fx.Explosion(new string('$', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 2, 1, true, false, true, true);
+            Debris = new AsciiEngine.Fx.Explosion(new string('$', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 3, 1, true, false, true, true);
         }
         else if (hiteffect < 0)
         {
-            if (this.HitPoints > 0) { Debris = new AsciiEngine.Fx.Explosion(new string('\x00d7', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 2, 1, true, false, true, true); }
+            if (this.HitPoints > 0) { Debris = new AsciiEngine.Fx.Explosion(new string('\x00d7', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 3, 1, true, false, true, true); }
             else { Debris = new AsciiEngine.Fx.Explosion(Textify.Repeat("\x00d7*#-", 10).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true); }
 
         }
         else
         {
-            Debris = new AsciiEngine.Fx.Explosion(new string('+', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 2, 1, true, false, true, true);
+            Debris = new AsciiEngine.Fx.Explosion(new string('+', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 3, 1, true, false, true, true);
         }
 
     }
