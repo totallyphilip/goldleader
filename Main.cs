@@ -99,8 +99,8 @@ public class AsciiWars
                     Scroller.NewLine(s);
                 }
             }
-            badguys.Animate();
             stars.Animate();
+            badguys.Animate();
             Scroller.Animate();
             Easy.Clock.FpsThrottle(8);
 
