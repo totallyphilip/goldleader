@@ -6,6 +6,14 @@ namespace Easy
 {
     public class Abacus
     {
+
+        public static T RandomEnumValue<T>()
+        {
+            //Usage: eEnumType T = RandomEnumValue<eEnumType>();
+            var v = Enum.GetValues(typeof(T));
+            return (T)v.GetValue(new Random().Next(v.Length));
+        }
+
         public static Random Random = new Random();
         public static bool RandomTrue { get { return Abacus.Random.NextDouble() < .5; } }
 
