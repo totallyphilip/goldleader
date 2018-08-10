@@ -55,7 +55,7 @@ public class AsciiWars
         return Score;
     }
 
-    public void Attract()
+    void Attract()
     {
         Console.Clear();
         Swarm badguys = new Swarm();

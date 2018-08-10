@@ -3,7 +3,7 @@ using AsciiEngine;
 using AsciiEngine.Grid;
 using AsciiEngine.Sprites;
 
-public class PowerUp : Sprite
+internal class PowerUp : Sprite
 {
 
     public enum ePowerUpType

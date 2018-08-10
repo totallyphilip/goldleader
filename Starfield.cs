@@ -4,7 +4,7 @@ using AsciiEngine.Sprites;
 using Easy;
 using System.Collections.Generic;
 
-public class Starfield : Swarm
+internal class Starfield : Swarm
 {
     bool InHyperspace = false;
     double Speed;
@@ -50,7 +50,7 @@ public class Starfield : Swarm
 
 
 
-public class Galaxy
+internal class Galaxy
 {
     List<Starfield> starfields = new List<Starfield>();
 

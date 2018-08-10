@@ -4,7 +4,7 @@ using AsciiEngine.Grid;
 using AsciiEngine.Sprites;
 using Easy;
 
-public class Enemy : Sprite
+internal class Enemy : Sprite
 {
     public enum eEnemyType
     {

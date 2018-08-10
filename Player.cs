@@ -5,7 +5,7 @@ using Easy;
 using System.Collections.Generic;
 
 
-public class PlayerMissile : Sprite
+internal class PlayerMissile : Sprite
 {
     override public void OnHit(int damage) { this.HitPoints += damage; }
     public PlayerMissile(AsciiEngine.Grid.Point xy, AsciiEngine.Grid.Trajectory t)
@@ -16,7 +16,7 @@ public class PlayerMissile : Sprite
     }
 }
 
-public class Player : Sprite
+internal class Player : Sprite
 {
 
     public enum eFlightMode { Maneuver, Attack }
