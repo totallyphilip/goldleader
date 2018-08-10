@@ -161,6 +161,7 @@ namespace AsciiEngine
             public int HitEffect = -1;
             protected int Score = 0;
             public bool Active = true;
+            public bool Shown = true;
             bool Terminated = false;
             public int Width { get { return this.Ascii.Length; } }
 
@@ -180,6 +181,7 @@ namespace AsciiEngine
                     {
                         alive = Easy.Abacus.Distance(this.Trail.XY, this.Trail.InitialXY) < Trajectory.Range;
                     }
+                    if (!alive && AliveOverride) { this.Hide(); }
                     return alive && AliveOverride;
                 }
             }
@@ -196,7 +198,7 @@ namespace AsciiEngine
 
             public bool Hit(Sprite thatone)
             {
-                // Hits are only detected if:
+                // Hits are only detected if all conditions met:
                 // * the sprite is still alive
                 // * the sprite is active (i.e. still doing something else even if dead)
                 // * the given coordinate is within the sprite body
@@ -216,8 +218,7 @@ namespace AsciiEngine
                 return HitDetected;
             }
 
-            public virtual void OnHit(int hiteffect)
-            { this.HitPoints += hiteffect; }
+            public virtual void OnHit(int hiteffect) { this.HitPoints += hiteffect; }
 
             public void Terminate()
             {
@@ -244,8 +245,19 @@ namespace AsciiEngine
 
             public char[] Ascii;
 
-            public void Hide() { Screen.TryWrite(this.XY, new String(' ', this.Width)); }
-            public void Refresh() { Screen.TryWrite(this.XY, new String(this.Ascii)); }
+            public void Hide()
+            {
+                if (this.Shown)
+                {
+                    Screen.TryWrite(this.XY, new String(' ', this.Width));
+                    this.Shown = false;
+                }
+            }
+            public void Refresh()
+            {
+                Screen.TryWrite(this.XY, new String(this.Ascii));
+                this.Shown = true;
+            }
 
             public void Animate() { this.Animate(true); }
 
@@ -358,10 +370,8 @@ namespace AsciiEngine
                 // remove dead sprites
                 this.Items.FindAll(x => !x.Alive && !x.Active).ForEach(delegate (Sprite s)
                {
-                   s.Hide();
                    this.Items.Remove(s);
                });
-
 
                 // animate squads together
                 this.Leaders().ForEach(delegate (Sprite leader)
