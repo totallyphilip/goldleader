@@ -420,9 +420,7 @@ public class AsciiWars
                                         player.FireAirStrike();
                                         break;
                                     case PowerUp.ePowerUpType.Warp:
-                                        player.Hide();
-                                        player.Trajectory = new Trajectory(.5, 0);
-                                        player.Trail.Add(new Point(player.XY.dX, Screen.TopEdge));
+                                        player.DropIn();
                                         break;
                                 }
                             }

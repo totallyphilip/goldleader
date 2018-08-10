@@ -87,11 +87,11 @@ public class Player : Sprite
     public Player()
     {
         SetFlightMode(eFlightMode.Maneuver);
-        this.FlyZone = new FlyZoneClass(0, 0, 0, 0, FlyZoneClass.eEdgeMode.Stop);
-        this.Trajectory = new Trajectory(0, 0);
-        this.Trail = new Trail(new Point(Screen.Width / 2 - this.Width / 2, Screen.BottomEdge - 1));
+        this.FlyZone = new FlyZoneClass(0, 1, 0, 0, FlyZoneClass.eEdgeMode.Stop);
+        this.Trail = new Trail(new Point(Screen.Width / 2 - this.Width / 2, 0));
         this.HitPoints = this.DefaultHitPoints;
         this.HitEffect = -1;
+        this.DropIn();
     }
 
     public void Fire()
@@ -119,6 +119,13 @@ public class Player : Sprite
             }
 
         }
+    }
+
+    public void DropIn()
+    {
+        this.Hide();
+        this.Trajectory = new Trajectory(.5, 0);
+        this.Trail.Add(new Point(this.XY.dX, Screen.TopEdge));
     }
 
     public void FireSpread()
