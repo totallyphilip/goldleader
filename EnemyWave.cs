@@ -29,7 +29,6 @@ internal class EnemyWave : AsciiEngine.Sprites.Swarm
 
     string WelcomeMessage;
     public string VictoryMessage;
-    public int FrameCounter = 0;
     public int AirTrafficMax;
     bool AttackRunStarted = false;
     public void StartAttackRun() { this.AttackRunStarted = true; }
@@ -58,15 +57,6 @@ internal class EnemyWave : AsciiEngine.Sprites.Swarm
         this.WelcomeMessage = "";
         return s;
     }
-
-    protected override void OnAnimated()
-    {
-        if (this.AttackRunStarted)
-        {
-            this.FrameCounter++; // this will eventually overflow if the wave never ends but i don't care
-        }
-    }
-
     public EnemyWave(int max, string welcome, string victory, bool upgradeblasters)
     {
         this.WelcomeMessage = welcome;

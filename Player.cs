@@ -102,7 +102,7 @@ internal class Player : Sprite
         {
             if (this.Missiles.Items.Count < this.MyMissileCapacity)
             {
-                PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-.66, 0, this.XY.dY));
+                PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-.66, 0, this.XY.dY + 1));
                 missile.HitPoints = 1;
                 this.Missiles.Items.Add(missile);
             }
@@ -114,7 +114,7 @@ internal class Player : Sprite
                 double x = (this.XY.dX + this.Width / 2) - this.MyMissileCapacity / 2;
                 for (int i = 0; i < this.MyMissileCapacity; i++)
                 {
-                    PlayerMissile missile = new PlayerMissile(new Point(x + i, this.XY.iY), new Trajectory(-1, 0, this.XY.dY));
+                    PlayerMissile missile = new PlayerMissile(new Point(x + i, this.XY.iY), new Trajectory(-1, 0, this.XY.dY + 1));
                     missile.HitPoints = 1;
                     this.Missiles.Items.Add(missile);
                 }

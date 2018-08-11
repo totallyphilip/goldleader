@@ -22,7 +22,7 @@ public class AsciiWars
         GetTheFkOut = false;
         int Score = 0;
 
-        bool LinuxDevMode = false;
+        bool LinuxDevMode = true;
 
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
@@ -134,6 +134,7 @@ public class AsciiWars
         // power ups
         PowerUp powerup = null;
         int BonusPoints = 0;
+        int FrameCounter = 0;
 
         // hyperdrive
         eHyperdriveMode HyperdriveMode = eHyperdriveMode.Unused;
@@ -333,16 +334,17 @@ public class AsciiWars
                 Console.CursorVisible = false; // windows turns the cursor back on when restoring from minimized window
 
                 // power ups
-                if (wave.FrameCounter > FramesUntilPowerup && powerup == null && !wave.Completed())
+                if (FrameCounter > FramesUntilPowerup && powerup == null && !wave.Completed())
                 {
                     PowerUp.ePowerUpType pt = Easy.Abacus.RandomEnumValue<PowerUp.ePowerUpType>();
                     powerup = new PowerUp(pt);
-                    FramesUntilPowerup = wave.FrameCounter + Easy.Abacus.Random.Next(100, 150);
-                    wave.FrameCounter = 0;
+                    FramesUntilPowerup = Easy.Abacus.Random.Next(200, 300);
+                    FrameCounter = 0;
                 }
 
                 // animate
                 stars.Animate();
+                FrameCounter++;
 
 
 
