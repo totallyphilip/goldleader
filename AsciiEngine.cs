@@ -54,8 +54,8 @@ namespace AsciiEngine
             public int Range = 0;
             public int LineSpacing = 1;
             public double Speed = 1;
-            double NormalSpeed = 1;
-            double ZoomSpeed;
+            ConsoleColor HighColor;
+            ConsoleColor LowColor;
 
             public void NewLine(int lines) { for (int i = 0; i < lines; i++) { this.NewLine(); } }
             public void NewLine() { NewLine(""); }
@@ -73,30 +73,33 @@ namespace AsciiEngine
                     if (message.XY.iY >= y) { y = message.XY.iY + this.LineSpacing; }
                 }
 
-                this.Items.Add(new Sprites.Sprite(s.ToCharArray(), new Grid.Point(Screen.Width / 2 - s.Length / 2, y), new Grid.Trajectory(-1 * this.Speed, 0, range + (y - Screen.Height))));
+                this.Items.Add(new Sprites.Sprite(s.ToCharArray(), new Grid.Point(Screen.Width / 2 - s.Length / 2, y), new Grid.Trajectory(-1 * this.Speed, 0, range + (y - Screen.Height)), this.HighColor));
 
             }
 
-            public void Zoom()
+            protected override void OnAnimated()
             {
-                this.Speed = -1 * ZoomSpeed;
-                this.Items.ForEach(delegate (Sprites.Sprite s) { s.Trajectory.Rise = this.Speed; });
+                foreach (Sprites.Sprite s in this.Items)
+                {
+                    if (Easy.Abacus.Distance(s.Trail.XY, s.Trail.InitialXY) > s.Trajectory.Range * .90)
+                    {
+                        s.Color = this.LowColor;
+                    }
+                }
             }
 
-            protected override void OnAnimated() { if (this.Empty) { this.Speed = this.NormalSpeed; } }
+            public Scroller(int spacing) { this.constructor(spacing, 0, 1, ConsoleColor.Gray, ConsoleColor.DarkGray); }
+            public Scroller(int spacing, int distance) { this.constructor(spacing, distance, 1, ConsoleColor.Gray, ConsoleColor.DarkGray); }
+            public Scroller(int spacing, int distance, double speed) { this.constructor(spacing, distance, speed, ConsoleColor.Gray, ConsoleColor.DarkGray); }
+            public Scroller(int spacing, int distance, double speed, ConsoleColor hicolor, ConsoleColor locolor) { this.constructor(spacing, distance, speed, hicolor, locolor); }
 
-            public Scroller(int spacing) { this.constructor(spacing, 0, 1, 2); }
-            public Scroller(int spacing, int distance) { this.constructor(spacing, distance, 1, 2); }
-            public Scroller(int spacing, int distance, double speed) { this.constructor(spacing, distance, speed, speed * 2); }
-            public Scroller(int spacing, int distance, double speed, double zoomspeed) { this.constructor(spacing, distance, speed, zoomspeed); }
-
-            public void constructor(int spacing, int distance, double speed, double zoomspeed)
+            public void constructor(int spacing, int distance, double speed, ConsoleColor hicolor, ConsoleColor locolor)
             {
                 this.LineSpacing = spacing;
                 this.Range = distance;
                 this.Speed = speed;
-                this.NormalSpeed = speed;
-                this.ZoomSpeed = zoomspeed;
+                this.HighColor = hicolor;
+                this.LowColor = locolor;
             }
 
         }
@@ -162,6 +165,7 @@ namespace AsciiEngine
             protected int Score = 0;
             public bool Active = true;
             public bool Shown = true;
+            public ConsoleColor Color = Console.ForegroundColor;
             bool Terminated = false;
             public int Width { get { return this.Ascii.Length; } }
 
@@ -255,8 +259,11 @@ namespace AsciiEngine
             }
             public void Refresh()
             {
+                ConsoleColor savecolor = Console.ForegroundColor;
+                Console.ForegroundColor = this.Color;
                 Screen.TryWrite(this.XY, new String(this.Ascii));
                 this.Shown = true;
+                Console.ForegroundColor = savecolor;
             }
 
             public void Animate() { this.Animate(true); }
@@ -328,8 +335,12 @@ namespace AsciiEngine
 
             public Sprite() { }
 
-            public Sprite(char[] c, Grid.Point xy, Grid.Trajectory t)
+            public Sprite(char[] c, Grid.Point xy, Grid.Trajectory t) { constructor(c, xy, t, ConsoleColor.Gray); }
+            public Sprite(char[] c, Grid.Point xy, Grid.Trajectory t, ConsoleColor color) { constructor(c, xy, t, color); }
+
+            void constructor(char[] c, Grid.Point xy, Grid.Trajectory t, ConsoleColor color)
             {
+                this.Color = color;
                 this.Ascii = new List<char>(c).ToArray();
                 this.Trail = new Grid.Trail(xy);
                 this.Trajectory = t.Clone();

@@ -59,7 +59,8 @@ public class AsciiWars
     {
         Console.Clear();
         Swarm badguys = new Swarm();
-        Starfield stars = new Starfield(.2, .5);
+        //Starfield stars = new Starfield(.2, .5, ConsoleColor.Gray);
+        Galaxy stars = new Galaxy();
 
         List<string> Messages = new List<string>();
 
@@ -269,8 +270,8 @@ public class AsciiWars
         #endregion
 
         // display instructions
-        Scroller Scroller = new Scroller(2, Screen.Height / 3, .25, 1.5);
-        Scroller Instructions = new Scroller(2, Screen.Height / 3, .25, 1.5);
+        Scroller Scroller = new Scroller(2, Screen.Height / 3, .25);
+        Scroller Instructions = new Scroller(2, Screen.Height / 3, .25, ConsoleColor.Green, ConsoleColor.DarkGray);
         Scroller.NewLine("Enter = Instructions");
         Scroller.NewLine("Esc = Quit");
         Scroller.NewLine();
@@ -425,11 +426,7 @@ public class AsciiWars
                                 }
                             }
 
-                            if (!powerup.Alive)
-                            {
-                                //powerup.Hide();
-                                powerup = null;
-                            }
+                            if (!powerup.Alive) { powerup = null; }
 
                         }
 
@@ -443,6 +440,7 @@ public class AsciiWars
                         }
 
                         // hud
+                        Console.ForegroundColor = ConsoleColor.White;
                         string ShieldMarkers = "";
                         if (player.HitPoints > 0) { ShieldMarkers = new String('$', player.HitPoints - 1); }
                         Screen.TryWrite(new Point(1, Screen.BottomEdge), ShieldMarkers + ' ');

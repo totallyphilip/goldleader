@@ -72,7 +72,7 @@ internal class Enemy : Sprite
             // fire
             if (this.Missiles.Items.Count < this.MissileConfig.MaxCount && this.XY.dY > Screen.BottomEdge - MissileConfig.Range && this.HitPoints > 0 && Abacus.RandomTrue)
             {
-                this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Ascii }, this.XY.Clone(this.Width / 2, 0), new Trajectory(1, 0, MissileConfig.Range)));
+                this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Ascii }, this.XY.Clone(this.Width / 2, 0), new Trajectory(1, 0, MissileConfig.Range), System.ConsoleColor.Green));
             }
         }
 
@@ -171,6 +171,7 @@ internal class Enemy : Sprite
                 break;
         }
 
+        this.Color = System.ConsoleColor.White;
         this.Trail = new Trail(new Point(Abacus.Random.Next(Screen.LeftEdge - this.Width, Screen.RightEdge + this.Width), Screen.TopEdge));
 
         if (Abacus.RandomTrue) { Run *= -1; }

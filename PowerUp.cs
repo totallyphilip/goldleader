@@ -47,6 +47,7 @@ internal class PowerUp : Sprite
         }
 
         this.Ascii = ('(' + Symbol + ')').ToCharArray();
+        this.Color = System.ConsoleColor.Cyan;
         this.FlyZone.EdgeMode = FlyZoneClass.eEdgeMode.Ignore;
         this.Trail = new Trail(new Point(Abacus.Random.Next(Screen.LeftEdge + this.Width, Screen.RightEdge - this.Width), Screen.TopEdge));
         this.Trajectory = new Trajectory(1, 0, Screen.Height);

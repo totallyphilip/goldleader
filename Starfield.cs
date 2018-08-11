@@ -8,6 +8,7 @@ internal class Starfield : Swarm
 {
     bool InHyperspace = false;
     double Speed;
+    System.ConsoleColor Color;
     double RowCoverageFactor;
     char Starlight
     {
@@ -19,10 +20,11 @@ internal class Starfield : Swarm
     }
     int MaxStars { get { return Abacus.Round(Screen.Height * this.RowCoverageFactor); } }
 
-    public Starfield(double speed, double coverage)
+    public Starfield(double speed, double coverage, System.ConsoleColor color)
     {
         this.Speed = speed;
         this.RowCoverageFactor = coverage;
+        this.Color = color;
         this.Spawn(true);
     }
 
@@ -36,7 +38,7 @@ internal class Starfield : Swarm
             int y = Screen.TopEdge - 1;
             if (randomly) { y = Abacus.Random.Next(Screen.TopEdge - 1, Screen.Height); }
             Point xy = new Point(x, y);
-            this.Add(new Sprite(new[] { this.Starlight }, xy, new Trajectory(this.Speed, 0, Screen.Height - y)));
+            this.Add(new Sprite(new[] { this.Starlight }, xy, new Trajectory(this.Speed, 0, Screen.Height - y), this.Color));
         }
 
     }
@@ -67,7 +69,7 @@ internal class Galaxy
 
     public Galaxy()
     {
-        starfields.Add(new Starfield(.1, .75)); // slow
-        starfields.Add(new Starfield(1, .2)); // fast
+        starfields.Add(new Starfield(.1, .75, System.ConsoleColor.DarkGray)); // slow
+        starfields.Add(new Starfield(1, .2, System.ConsoleColor.White)); // fast
     }
 }

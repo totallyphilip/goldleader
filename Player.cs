@@ -13,6 +13,7 @@ internal class PlayerMissile : Sprite
         this.Ascii = new[] { '|' };
         this.Trail = new AsciiEngine.Grid.Trail(xy);
         this.Trajectory = t;
+        this.Color = System.ConsoleColor.Red;
     }
 }
 
@@ -92,6 +93,7 @@ internal class Player : Sprite
         this.HitPoints = this.DefaultHitPoints;
         this.HitEffect = -1;
         this.DropIn();
+        this.Color = System.ConsoleColor.DarkYellow;
     }
 
     public void Fire()
@@ -132,7 +134,7 @@ internal class Player : Sprite
     {
         for (double run = -2; run < 2; run += .2)
         {
-            PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-1, run, Screen.Height / 2));
+            PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-1, run, Screen.Height * .75));
             missile.HitPoints = 1;
             this.Missiles.Items.Add(missile);
         }
@@ -140,9 +142,9 @@ internal class Player : Sprite
 
     public void FireAirStrike()
     {
-        for (double x = Screen.LeftEdge; x < Screen.RightEdge; x += 4)
+        for (double x = Screen.LeftEdge; x < Screen.RightEdge; x += 5)
         {
-            PlayerMissile missile = new PlayerMissile(new Point(x, 0), new Trajectory(1, 0, Screen.Height * .75));
+            PlayerMissile missile = new PlayerMissile(new Point(x, 0), new Trajectory(1, 0, Screen.Height));
             missile.HitPoints = 1;
             this.Missiles.Items.Add(missile);
         }
