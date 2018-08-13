@@ -491,7 +491,7 @@ namespace AsciiEngine
 
         public class Static
         {
-            public static Complex GenericComplex = new Complex();
+            public static Complex Swarms = new Complex();
         }
 
     }

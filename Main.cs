@@ -5,34 +5,24 @@ using AsciiEngine.Sprites;
 using System;
 using System.Collections.Generic;
 
-//todo: kill powerup when hyperspace
-//todo: make powerup drop rate based on screen dimensions (distance to fall & player distance to catch)
-//todo: make player fire powerups based on screen dimensions
-//todo: put all explosions into one class
-
-
-
 public class AsciiWars
 {
-    // globals
-    public static bool GetTheFkOut = false;
+    bool QuitFast = false;
     int FramesPerSecond = 9;
-    bool ContinuousPlay = true;
-    Galaxy stars = new Galaxy();
-    //public static Complex allexplosions = new Complex();
+    bool PlayAgain;
+    Galaxy Stars = new Galaxy();
 
-    public AsciiWars() { ContinuousPlay = true; }
-    public AsciiWars(bool b) { ContinuousPlay = b; }
+
+
+    public AsciiWars() { this.PlayAgain = true; }
+    public AsciiWars(bool b) { PlayAgain = b; }
 
     public int TryPlay(int HighScore)
     {
-
-        GetTheFkOut = false;
-        int Score = 0;
-
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
         Screen.TrySetSize(50, 40, false);
+        int Score = 0;
         Score = this.MainLoop(HighScore);
         Screen.TrySetSize(oldwidth, oldheight, false);
         Console.CursorVisible = true;
@@ -45,16 +35,18 @@ public class AsciiWars
         int Score = 0;
         do
         {
-            if (!GetTheFkOut) { Attract(); }
-            if (!GetTheFkOut) { Score = PlayTheGame(HighScore); }
-        } while (!GetTheFkOut && ContinuousPlay);
+            if (!QuitFast) { Attract(); }
+            if (!QuitFast) { Score = PlayTheGame(HighScore); }
+        } while (!QuitFast && this.PlayAgain);
         return Score;
     }
 
     void Attract()
     {
         Console.Clear();
-        Swarm badguys = new Swarm();
+        Swarm DemoEnemies = new Swarm();
+
+        #region " Text "
 
         List<string> Messages = new List<string>();
 
@@ -63,7 +55,7 @@ public class AsciiWars
         foreach (Enemy.eEnemyType shiptype in (Enemy.eEnemyType[])System.Enum.GetValues(typeof(Enemy.eEnemyType)))
         {
             Enemy bg = new Enemy(shiptype);
-            badguys.Items.Add(bg);
+            DemoEnemies.Items.Add(bg);
             Messages.Add(new string(bg.Ascii) + " " + Enum.GetName(typeof(Enemy.eEnemyType), shiptype) + " (" + bg.HitPoints + " HP)");
         }
         Messages.Add("");
@@ -73,17 +65,19 @@ public class AsciiWars
         Messages.Add("");
         Messages.Add("");
 
+        #endregion
+
 
         Scroller Scroller = new Scroller(2, Screen.Height / 2, .25);
         do
         {
             Console.CursorVisible = false;
 
-            if (badguys.Empty)
+            if (DemoEnemies.Empty)
             {
                 foreach (Enemy.eEnemyType shiptype in (Enemy.eEnemyType[])System.Enum.GetValues(typeof(Enemy.eEnemyType)))
                 {
-                    badguys.Items.Add(new Enemy(shiptype));
+                    DemoEnemies.Items.Add(new Enemy(shiptype));
                 }
             }
 
@@ -94,21 +88,21 @@ public class AsciiWars
                     Scroller.NewLine(s);
                 }
             }
-            stars.Animate();
-            badguys.Animate();
-            AsciiEngine.Sprites.Static.GenericComplex.Animate();
+            Stars.Animate();
+            DemoEnemies.Animate();
+            AsciiEngine.Sprites.Static.Swarms.Animate();
             Scroller.Animate();
             Easy.Clock.FpsThrottle(8);
 
-            if (Easy.Abacus.RandomTrue && Easy.Abacus.RandomTrue && Easy.Abacus.RandomTrue && Easy.Abacus.RandomTrue)
+            if (Easy.Abacus.Random.NextDouble() < .05)
             {
-                int r = Easy.Abacus.Random.Next(0, badguys.Count);
-                if (badguys.Items[r].Alive) { badguys.Items[r].OnHit(-1); }
+                int victim = Easy.Abacus.Random.Next(0, DemoEnemies.Count);
+                if (DemoEnemies.Items[victim].Alive) { DemoEnemies.Items[victim].OnHit(-1); }
             }
 
         } while (!Console.KeyAvailable);
 
-        GetTheFkOut = Console.ReadKey(true).Key == ConsoleKey.Escape;
+        QuitFast = Console.ReadKey(true).Key == ConsoleKey.Escape;
 
     }
 
@@ -118,9 +112,6 @@ public class AsciiWars
     {
 
         Console.Clear();
-
-        // starfield
-        //Galaxy stars = new Galaxy();
 
         // the user
         Player player = new Player();
@@ -292,11 +283,8 @@ public class AsciiWars
             else
             {
                 Scroller.NewLine("Wave " + (Waves.IndexOf(wave) + 1));
-                // display shields message
                 Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HitPoints - 1) / (player.DefaultHitPoints - 1)) * 100 + "% charged.");
-                // reset hyperdrive
                 if (HyperdriveMode == eHyperdriveMode.Disengaged) { Scroller.NewLine("Navicomputer coordinates recalculated."); }
-
             }
             if (wave.HasWelcomeMessage) { Scroller.NewLine(wave.PopWelcomeMessage()); }
 
@@ -338,7 +326,7 @@ public class AsciiWars
                 }
 
                 // animate
-                stars.Animate();
+                Stars.Animate();
                 FrameCounter++;
 
 
@@ -346,7 +334,7 @@ public class AsciiWars
                 if (Paused)
                 {
                     player.Refresh();
-                    AsciiEngine.Sprites.Static.GenericComplex.Refresh();
+                    AsciiEngine.Sprites.Static.Swarms.Refresh();
                     player.Missiles.Refresh();
                     wave.Refresh();
                     if (Instructions.Empty)
@@ -381,16 +369,16 @@ public class AsciiWars
                 else
                 {
 
-                    AsciiEngine.Sprites.Static.GenericComplex.Animate();
+                    AsciiEngine.Sprites.Static.Swarms.Animate();
 
                     if (HyperdriveMode == eHyperdriveMode.Engaged)
                     {
-                        stars.Animate();
+                        Stars.Animate();
                         if (Easy.Clock.Elapsed(3))
                         {
                             HyperdriveMode = eHyperdriveMode.Disengaged;
                             wave.ExitHyperspace();
-                            stars.SetHyperspace(false);
+                            Stars.SetHyperspace(false);
                         }
                     }
                     else if (HyperdriveMode == eHyperdriveMode.Unused)
@@ -429,14 +417,13 @@ public class AsciiWars
 
                         }
 
+                        // check if anybody shot anybody
                         wave.CheckCollisions(player.Missiles);
                         wave.Animate();
                         wave.CheckCollisions(player.Missiles);
 
-                        foreach (Enemy bg in wave.Items)
-                        {
-                            bg.Missiles.CheckCollision(player);
-                        }
+                        // give the player a break by not checking if they ran into a missile
+                        foreach (Enemy bg in wave.Items) { bg.Missiles.CheckCollision(player); }
 
                         // hud
                         Console.ForegroundColor = ConsoleColor.White;
@@ -507,7 +494,8 @@ public class AsciiWars
                             {
                                 if (Waves.IndexOf(wave) < Waves.Count - 1)
                                 {
-                                    stars.SetHyperspace(true);
+                                    Stars.SetHyperspace(true);
+                                    powerup = null;
                                     player.Trajectory.Run = 0;
                                     player.Missiles.TerminateAll();
                                     HyperdriveMode = eHyperdriveMode.Engaged;
@@ -541,7 +529,7 @@ public class AsciiWars
                             if (HyperdriveMode != eHyperdriveMode.Engaged) { player.Fire(); }
                             break;
                         case ConsoleKey.Escape:
-                            GetTheFkOut = true;
+                            QuitFast = true;
                             break;
                         case ConsoleKey.Enter:
                             Paused = !Paused;
@@ -601,15 +589,15 @@ public class AsciiWars
                 Console.Title = "Score: " + Score;
 
                 // throttle the cpu
-                if (!GetTheFkOut)
+                if (!QuitFast)
                 {
                     if (HyperdriveMode == eHyperdriveMode.Engaged) { Easy.Clock.FpsThrottle(100); }
                     else { Easy.Clock.FpsThrottle(FramesPerSecond); }
                 }
 
-            } while (!GetTheFkOut && (!Scroller.Empty || (player.Active && !wave.Completed())));
+            } while (!QuitFast && (!Scroller.Empty || (player.Active && !wave.Completed())));
 
-            if (!player.Alive || GetTheFkOut) { break; }
+            if (!player.Alive || QuitFast) { break; }
 
         }
 
