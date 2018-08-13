@@ -2,7 +2,7 @@ using AsciiEngine;
 using AsciiEngine.Grid;
 using AsciiEngine.Sprites;
 using Easy;
-using System.Collections.Generic;
+//using System.Collections.Generic;
 
 internal class Starfield : Swarm
 {
@@ -10,14 +10,7 @@ internal class Starfield : Swarm
     double Speed;
     System.ConsoleColor Color;
     double RowCoverageFactor;
-    char Starlight
-    {
-        get
-        {
-            if (this.InHyperspace) { return '|'; }
-            else { return '.'; }
-        }
-    }
+    char Starlight { get { if (this.InHyperspace) { return '|'; } else { return '.'; } } } // 00b7 is center dot
     int MaxStars { get { return Abacus.Round(Screen.Height * this.RowCoverageFactor); } }
 
     public Starfield(double speed, double coverage, System.ConsoleColor color)
@@ -52,24 +45,17 @@ internal class Starfield : Swarm
 
 
 
-internal class Galaxy
+internal class Galaxy: Complex
 {
-    List<Starfield> starfields = new List<Starfield>();
-
-    public void Animate()
-    {
-        foreach (Starfield s in starfields) { s.Animate(); }
-    }
-
     public void SetHyperspace(bool inhyperspace)
     {
         System.Console.Clear();
-        foreach (Starfield s in starfields) { s.SetHyperspace(inhyperspace); }
+        foreach (Starfield s in this.Items) { s.SetHyperspace(inhyperspace); }
     }
 
     public Galaxy()
     {
-        starfields.Add(new Starfield(.1, .75, System.ConsoleColor.DarkGray)); // slow
-        starfields.Add(new Starfield(1, .2, System.ConsoleColor.White)); // fast
+        this.Add(new Starfield(.1, .75, System.ConsoleColor.DarkGray)); // slow
+        this.Add(new Starfield(1, .2, System.ConsoleColor.White)); // fast
     }
 }

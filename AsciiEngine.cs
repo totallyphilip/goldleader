@@ -462,8 +462,18 @@ namespace AsciiEngine
 
         }
 
-        #region " Specialty Swarms "
-        #endregion
+        public class Complex {
+
+            public List<Swarm> Items = new List<Swarm>();
+
+            public void Animate() {
+                foreach (Swarm s in Items) { s.Animate(); }
+            }
+
+            public void Add(Swarm s) { this.Items.Add(s); }
+
+            public Complex() {}
+        }
     }
 
     namespace Grid

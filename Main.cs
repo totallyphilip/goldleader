@@ -5,16 +5,25 @@ using AsciiEngine.Sprites;
 using System;
 using System.Collections.Generic;
 
+//todo: kill powerup when hyperspace
+//todo: make powerup drop rate based on screen dimensions (distance to fall & player distance to catch)
+//todo: make player fire powerups based on screen dimensions
+//todo: put all explosions into one class
+
+
+
 public class AsciiWars
 {
+    //public Complex allexplosions = new Complex();
 
+    // globals
     public static bool GetTheFkOut = false;
-    //    public static bool ShowDebugInfo = false;
     int FramesPerSecond = 9;
     bool ContinuousPlay = true;
+    Galaxy stars = new Galaxy();
 
     public AsciiWars() { ContinuousPlay = true; }
-    public AsciiWars(bool cp) { ContinuousPlay = cp; }
+    public AsciiWars(bool b) { ContinuousPlay = b; }
 
     public int TryPlay(int HighScore)
     {
@@ -22,30 +31,18 @@ public class AsciiWars
         GetTheFkOut = false;
         int Score = 0;
 
-        bool LinuxDevMode = true;
-
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
-
-        if (LinuxDevMode || Screen.TrySetSize(50, 40))
-        {
-            Easy.Keyboard.EatKeys();
-            Score = this.MainLoop(HighScore);
-            Console.CursorVisible = true;
-        }
-        else
-        {
-            Console.Write("something went horribly wrong");
-            Console.ReadKey();
-        }
-
+        Screen.TrySetSize(50, 40, false);
+        Score = this.MainLoop(HighScore);
         Screen.TrySetSize(oldwidth, oldheight, false);
-
+        Console.CursorVisible = true;
         return Score;
     }
 
     int MainLoop(int HighScore)
     {
+        Easy.Keyboard.EatKeys();
         int Score = 0;
         do
         {
@@ -59,8 +56,6 @@ public class AsciiWars
     {
         Console.Clear();
         Swarm badguys = new Swarm();
-        //Starfield stars = new Starfield(.2, .5, ConsoleColor.Gray);
-        Galaxy stars = new Galaxy();
 
         List<string> Messages = new List<string>();
 
@@ -125,7 +120,7 @@ public class AsciiWars
         Console.Clear();
 
         // starfield
-        Galaxy stars = new Galaxy();
+        //Galaxy stars = new Galaxy();
 
         // the user
         Player player = new Player();
