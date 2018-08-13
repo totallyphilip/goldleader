@@ -37,8 +37,6 @@ internal class Enemy : Sprite
 
     public Swarm Missiles = new Swarm();
 
-    public Explosion Sparks = new Explosion();
-    public Explosion Debris = new Explosion();
     double DebrisRange;
 
     override public void OnHit(int damage)
@@ -48,10 +46,11 @@ internal class Enemy : Sprite
         int scorefactor = (Screen.Height - this.XY.iY) / 4;
         int points = 1;
 
-        Sparks = new Explosion(new string('\x00d7', Abacus.Random.Next(2, 5)).ToCharArray(), this.XY, 0, 3, 1, true, true, true, true);
+        AsciiEngine.Sprites.Static.GenericComplex.Add( new Explosion(new string('\x00d7', Abacus.Random.Next(2, 5)).ToCharArray(), this.XY, 0, 3, 1, true, true, true, true));
         if (!this.Alive)
         {
-            Debris = new Explosion(this.Ascii, this.XY, this.Width, DebrisRange, 1, true, true, true, true);
+
+            AsciiEngine.Sprites.Static.GenericComplex.Add(new Explosion(this.Ascii, this.XY, this.Width, DebrisRange, 1, true, true, true, true));
 
             points = 2;
         }
@@ -77,11 +76,9 @@ internal class Enemy : Sprite
         }
 
         this.Missiles.Animate();
-        this.Sparks.Animate();
-        this.Debris.Animate();
         Messages.Animate();
 
-        if (!this.Alive && this.Debris.Empty && this.Sparks.Empty && this.Messages.Empty && this.Missiles.Empty) { this.Active = false; }
+        if (!this.Alive && this.Messages.Empty && this.Missiles.Empty) { this.Active = false; }
 
     }
 

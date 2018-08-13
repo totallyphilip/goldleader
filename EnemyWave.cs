@@ -40,8 +40,6 @@ internal class EnemyWave : AsciiEngine.Sprites.Swarm
     {
         foreach (Enemy bg in this.Items)
         {
-            bg.Sparks.Refresh();
-            bg.Debris.Refresh();
             bg.Messages.Refresh();
             bg.Missiles.Refresh();
         }

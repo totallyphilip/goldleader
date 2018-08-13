@@ -14,13 +14,12 @@ using System.Collections.Generic;
 
 public class AsciiWars
 {
-    //public Complex allexplosions = new Complex();
-
     // globals
     public static bool GetTheFkOut = false;
     int FramesPerSecond = 9;
     bool ContinuousPlay = true;
     Galaxy stars = new Galaxy();
+    //public static Complex allexplosions = new Complex();
 
     public AsciiWars() { ContinuousPlay = true; }
     public AsciiWars(bool b) { ContinuousPlay = b; }
@@ -97,6 +96,7 @@ public class AsciiWars
             }
             stars.Animate();
             badguys.Animate();
+            AsciiEngine.Sprites.Static.GenericComplex.Animate();
             Scroller.Animate();
             Easy.Clock.FpsThrottle(8);
 
@@ -346,7 +346,7 @@ public class AsciiWars
                 if (Paused)
                 {
                     player.Refresh();
-                    if (player.Debris != null) { player.Debris.Refresh(); }
+                    AsciiEngine.Sprites.Static.GenericComplex.Refresh();
                     player.Missiles.Refresh();
                     wave.Refresh();
                     if (Instructions.Empty)
@@ -380,6 +380,8 @@ public class AsciiWars
                 }
                 else
                 {
+
+                    AsciiEngine.Sprites.Static.GenericComplex.Animate();
 
                     if (HyperdriveMode == eHyperdriveMode.Engaged)
                     {

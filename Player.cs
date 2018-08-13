@@ -26,11 +26,9 @@ internal class Player : Sprite
     public int DefaultHitPoints { get { return 5; } }
 
     public Swarm Missiles = new Swarm();
-    //    public Swarm Messages = new Swarm();
 
     int MyMissileCapacity = 1;
     public int MissileCapacity { get { return this.MyMissileCapacity; } }
-    public AsciiEngine.Fx.Explosion Debris;
 
     public void UpgradeBlasters()
     {
@@ -70,17 +68,17 @@ internal class Player : Sprite
 
         if (hiteffect > 0)
         {
-            Debris = new AsciiEngine.Fx.Explosion(new string('$', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 3, 1, true, false, true, true);
+            AsciiEngine.Sprites.Static.GenericComplex.Add( new AsciiEngine.Fx.Explosion(new string('$', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 3, 1, true, false, true, true));
         }
         else if (hiteffect < 0)
         {
-            if (this.HitPoints > 0) { Debris = new AsciiEngine.Fx.Explosion(new string('\x00d7', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 3, 1, true, false, true, true); }
-            else { Debris = new AsciiEngine.Fx.Explosion(Textify.Repeat("\x00d7*#-", 10).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true); }
+            if (this.HitPoints > 0) { AsciiEngine.Sprites.Static.GenericComplex.Add( new AsciiEngine.Fx.Explosion(new string('\x00d7', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 3, 1, true, false, true, true)); }
+            else { AsciiEngine.Sprites.Static.GenericComplex.Add( new AsciiEngine.Fx.Explosion(Textify.Repeat("\x00d7*#-", 10).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true)); }
 
         }
         else
         {
-            Debris = new AsciiEngine.Fx.Explosion(new string('+', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 3, 1, true, false, true, true);
+            AsciiEngine.Sprites.Static.GenericComplex.Add( new AsciiEngine.Fx.Explosion(new string('+', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 3, 1, true, false, true, true));
         }
 
     }
@@ -154,8 +152,7 @@ internal class Player : Sprite
     override public void Activate()
     {
         Missiles.Animate();
-        if (Debris != null) { Debris.Animate(); }
-        if (!this.Alive && this.Debris.Empty && this.Missiles.Empty) { this.Active = false; }
+        if (!this.Alive &&  this.Missiles.Empty) { this.Active = false; }
     }
 
 }

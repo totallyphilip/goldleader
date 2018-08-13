@@ -462,18 +462,38 @@ namespace AsciiEngine
 
         }
 
-        public class Complex {
+        public class Complex // a collection of swarms
+        {
 
             public List<Swarm> Items = new List<Swarm>();
 
-            public void Animate() {
+            public void Refresh()
+            {
+                foreach (Swarm s in this.Items.FindAll(x => x.Alive)) { s.Refresh(); }
+            }
+
+            public void Animate()
+            {
+
+                // remove dead swarms
+                this.Items.FindAll(x => !x.Alive).ForEach(delegate (Swarm s)
+              {
+                  this.Items.Remove(s);
+              });
+
                 foreach (Swarm s in Items) { s.Animate(); }
             }
 
             public void Add(Swarm s) { this.Items.Add(s); }
 
-            public Complex() {}
+            public Complex() { }
         }
+
+        public class Static
+        {
+            public static Complex GenericComplex = new Complex();
+        }
+
     }
 
     namespace Grid
