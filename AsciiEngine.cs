@@ -1,3 +1,4 @@
+using Easy;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -726,6 +727,83 @@ namespace AsciiEngine
         }
 
         #endregion
+    }
+
+    public class Input
+    {
+        public static string ArcadeInitials(Grid.Point coord, int maxlength)
+        {
+            bool iscursorvisible = System.Console.CursorVisible;
+            System.Console.OutputEncoding = System.Text.Encoding.Unicode;
+            System.Console.CursorVisible = false;
+
+            Screen.TryWrite(coord.iX - 1, coord.iY, '\u25ba');
+            Screen.TryWrite(coord.iX + maxlength, coord.iY, '\u25c4');
+
+            List<char> alphabet = new List<char>();
+            alphabet.Add(' ');
+            for (int i = 65; i <= 90; i++) { alphabet.Add(Convert.ToChar(i)); } // A..Z
+            alphabet.Add('\u0393'); // Γ
+            alphabet.Add('\u0394'); // Δ
+            alphabet.Add('\u0398'); // Θ
+            alphabet.Add('\u039B'); // Λ
+            alphabet.Add('\u039E'); // Ξ
+            alphabet.Add('\u03A0'); // Π
+            alphabet.Add('\u03A3'); // Σ
+            alphabet.Add('\u03A6'); // Φ
+            alphabet.Add('\u03A8'); // Ψ
+            alphabet.Add('\u03A9'); // Ω
+            for (int i = 48; i <= 57; i++) { alphabet.Add(Convert.ToChar(i)); } // 0..9
+            alphabet.Add('\u263a'); // ☺
+            alphabet.Add('\u263b'); // ☻
+            alphabet.Add('\u2640'); // ♀
+            alphabet.Add('\u2642'); // ♂
+            alphabet.Add('\u2660'); // ♠
+            alphabet.Add('\u2663'); // ♣
+            alphabet.Add('\u2665'); // ♥
+            alphabet.Add('\u2666'); // ♦
+            alphabet.Add('\u266b'); // ♫
+
+            string initials = "";
+            int symbol = 1;
+            Easy.Keyboard.EatKeys();
+            do
+            {
+                //if (Console.KeyAvailable)
+                //{
+                    ConsoleKeyInfo k = Console.ReadKey(true);
+                    Easy.Keyboard.EatKeys(); // don't let keys stack up
+                    if (k.Key == ConsoleKey.UpArrow || k.Key == ConsoleKey.RightArrow)
+                    {
+                        symbol++;
+                        if (symbol > alphabet.Count - 1) { symbol = 0; }
+                    }
+                    else if (k.Key == ConsoleKey.DownArrow || k.Key == ConsoleKey.LeftArrow)
+                    {
+                        symbol--;
+                        if (symbol < 0) { symbol = alphabet.Count - 1; }
+                    }
+                    else if (k.Key == ConsoleKey.Spacebar)
+                    {
+                        initials += alphabet[symbol];
+                    }
+                    else if (k.Key == ConsoleKey.Escape)
+                    {
+                        initials += new string(' ', maxlength);
+                    }
+                //}
+
+                if (initials.Length < maxlength) { Screen.TryWrite(coord.iX + initials.Length, coord.iY, alphabet[symbol]); }
+
+                //System.Threading.Thread.Sleep(100);
+
+            } while (initials.Length < maxlength);
+
+            System.Console.CursorVisible = iscursorvisible;
+
+            return initials.Substring(0, maxlength);
+
+        }
     }
 
 }
