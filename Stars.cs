@@ -1,6 +1,6 @@
-using AsciiEngine;
-using AsciiEngine.Grid;
-using AsciiEngine.Sprites;
+using UnicodeEngine;
+using UnicodeEngine.Grid;
+using UnicodeEngine.Sprites;
 using Easy;
 //using System.Collections.Generic;
 
@@ -39,7 +39,7 @@ internal class Starfield : Swarm
     public void SetHyperspace(bool inhyperspace)
     {
         this.InHyperspace = inhyperspace;
-        foreach (Sprite star in Items) { star.Ascii = new[] { this.Starlight }; }
+        foreach (Sprite star in Items) { star.Text = new[] { this.Starlight }; }
     }
 }
 

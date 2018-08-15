@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-internal class EnemyWave : AsciiEngine.Sprites.Swarm
+internal class EnemyWave : UnicodeEngine.Sprites.Swarm
 
 {
 

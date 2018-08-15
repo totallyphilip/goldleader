@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AsciiEngine
+namespace UnicodeEngine
 {
     namespace Fx
     {
@@ -12,17 +12,17 @@ namespace AsciiEngine
 
             public Explosion() { }
 
-            public Explosion(char[] ascii, Grid.Point coord, int width, double range, double force, bool up, bool down, bool left, bool right)
+            public Explosion(char[] text, Grid.Point coord, int width, double range, double force, bool up, bool down, bool left, bool right)
             {
-                constructor(ascii, coord, width, range, force, up, down, left, right);
+                constructor(text, coord, width, range, force, up, down, left, right);
             }
 
-            void constructor(char[] ascii, Grid.Point coord, int width, double range, double force, bool up, bool down, bool left, bool right)
+            void constructor(char[] text, Grid.Point coord, int width, double range, double force, bool up, bool down, bool left, bool right)
             {
 
                 int position = 0;
 
-                foreach (char c in ascii)
+                foreach (char c in text)
                 {
                     double rise = force * (Easy.Abacus.Random.NextDouble() + .1); // right (at least slightly)
                     double run = force * (Easy.Abacus.Random.NextDouble() + .1); // down (at least slightly)
@@ -168,7 +168,7 @@ namespace AsciiEngine
             public bool Shown = true;
             public ConsoleColor Color = Console.ForegroundColor;
             bool Terminated = false;
-            public int Width { get { return this.Ascii.Length; } }
+            public int Width { get { return this.Text.Length; } }
 
             public int CollectScore()
             {
@@ -248,7 +248,7 @@ namespace AsciiEngine
 
             #region " Animation "
 
-            public char[] Ascii;
+            public char[] Text;
 
             public void Hide()
             {
@@ -262,7 +262,7 @@ namespace AsciiEngine
             {
                 ConsoleColor savecolor = Console.ForegroundColor;
                 Console.ForegroundColor = this.Color;
-                Screen.TryWrite(this.XY, new String(this.Ascii));
+                Screen.TryWrite(this.XY, new String(this.Text));
                 this.Shown = true;
                 Console.ForegroundColor = savecolor;
             }
@@ -342,7 +342,7 @@ namespace AsciiEngine
             void constructor(char[] c, Grid.Point xy, Grid.Trajectory t, ConsoleColor color)
             {
                 this.Color = color;
-                this.Ascii = new List<char>(c).ToArray();
+                this.Text = new List<char>(c).ToArray();
                 this.Trail = new Grid.Trail(xy);
                 this.Trajectory = t.Clone();
                 this.OriginalTrajectory = t.Clone();
@@ -602,12 +602,12 @@ namespace AsciiEngine
             return new Grid.Point(Easy.Abacus.Round(Screen.Width / 2), Easy.Abacus.Round(Screen.Height / 2));
         }
 
-        public static bool TrySetSize(int targetwidth, int targetheight)
+        public static bool TryInitializeScreen(int targetwidth, int targetheight)
         {
-            return TrySetSize(targetwidth, targetheight, true);
+            return TryInitializeScreen(targetwidth, targetheight, true);
         }
 
-        public static bool TrySetSize(int targetwidth, int targetheight, bool adjustmanually)
+        public static bool TryInitializeScreen(int targetwidth, int targetheight, bool adjustmanually)
         {
 
             try
@@ -617,6 +617,7 @@ namespace AsciiEngine
                 // now it's safe to resize everything
                 Console.SetWindowSize(targetwidth, targetheight);
                 Console.SetBufferSize(targetwidth, targetheight);
+                System.Console.OutputEncoding = System.Text.Encoding.Unicode;
             }
             catch
             {

@@ -1,6 +1,6 @@
-using AsciiEngine;
-using AsciiEngine.Grid;
-using AsciiEngine.Sprites;
+using UnicodeEngine;
+using UnicodeEngine.Grid;
+using UnicodeEngine.Sprites;
 using Easy;
 using System.Collections.Generic;
 
@@ -8,10 +8,10 @@ using System.Collections.Generic;
 internal class PlayerMissile : Sprite
 {
     override public void OnHit(int damage) { this.HitPoints += damage; }
-    public PlayerMissile(AsciiEngine.Grid.Point xy, AsciiEngine.Grid.Trajectory t)
+    public PlayerMissile(UnicodeEngine.Grid.Point xy, UnicodeEngine.Grid.Trajectory t)
     {
-        this.Ascii = new[] { '|' };
-        this.Trail = new AsciiEngine.Grid.Trail(xy);
+        this.Text = new[] { '|' };
+        this.Trail = new UnicodeEngine.Grid.Trail(xy);
         this.Trajectory = t;
         this.Color = System.ConsoleColor.Red;
     }
@@ -48,13 +48,13 @@ internal class Player : Sprite
         if (mode == eFlightMode.Maneuver)
         {
             this.FlightMode = eFlightMode.Maneuver;
-            this.Ascii = "\x00b7==\x00b7".ToCharArray();
+            this.Text = "\x00b7==\x00b7".ToCharArray();
             this.Run = 1.5;
         }
         else
         {
             this.FlightMode = eFlightMode.Attack;
-            this.Ascii = ":><:".ToCharArray();
+            this.Text = ":><:".ToCharArray();
             this.Run = .66;
         }
     }
@@ -68,17 +68,16 @@ internal class Player : Sprite
 
         if (hiteffect > 0)
         {
-            AsciiEngine.Sprites.Static.Swarms.Add( new AsciiEngine.Fx.Explosion(new string('$', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 3, 1, true, false, true, true));
+            UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string(UnicodeWars.xShield, 3).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 3, 1, true, false, true, true));
         }
         else if (hiteffect < 0)
         {
-            if (this.HitPoints > 0) { AsciiEngine.Sprites.Static.Swarms.Add( new AsciiEngine.Fx.Explosion(new string('\x00d7', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 3, 1, true, false, true, true)); }
-            else { AsciiEngine.Sprites.Static.Swarms.Add( new AsciiEngine.Fx.Explosion(Textify.Repeat("\x00d7*#-", 10).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true)); }
-
+            if (this.HitPoints > 0) { UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string(UnicodeWars.xHit, this.Width).ToCharArray(), this.XY, this.Width, 3, 1, true, false, true, true)); }
+            else { UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion( new string(UnicodeWars.xHit, 50).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true)); }
         }
         else
         {
-            AsciiEngine.Sprites.Static.Swarms.Add( new AsciiEngine.Fx.Explosion(new string('+', Abacus.Random.Next(3, 6)).ToCharArray(), this.XY, 0, 3, 1, true, false, true, true));
+            UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string('+', 3).ToCharArray(), this.XY.Clone(this.Width/2,0), 0, 3, 1, true, false, true, true));
         }
 
     }
@@ -152,7 +151,7 @@ internal class Player : Sprite
     override public void Activate()
     {
         Missiles.Animate();
-        if (!this.Alive &&  this.Missiles.Empty) { this.Active = false; }
+        if (!this.Alive && this.Missiles.Empty) { this.Active = false; }
     }
 
 }

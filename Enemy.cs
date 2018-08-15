@@ -1,7 +1,7 @@
-using AsciiEngine;
-using AsciiEngine.Fx;
-using AsciiEngine.Grid;
-using AsciiEngine.Sprites;
+using UnicodeEngine;
+using UnicodeEngine.Fx;
+using UnicodeEngine.Grid;
+using UnicodeEngine.Sprites;
 using Easy;
 
 internal class Enemy : Sprite
@@ -20,15 +20,17 @@ internal class Enemy : Sprite
 
     double ReverseFactor;
     public eEnemyType EnemyType;
+    int InitialHitPoints;
+
     public Swarm Messages = new Swarm();
     struct MissileStructure
     {
-        public char Ascii;
+        public char Text;
         public double Range;
         public int MaxCount;
         public MissileStructure(char c, double range, int maxcount)
         {
-            this.Ascii = c;
+            this.Text = c;
             this.Range = range;
             this.MaxCount = maxcount;
         }
@@ -46,11 +48,11 @@ internal class Enemy : Sprite
         int scorefactor = (Screen.Height - this.XY.iY) / 4;
         int points = 1;
 
-        AsciiEngine.Sprites.Static.Swarms.Add( new Explosion(new string('\x00d7', Abacus.Random.Next(2, 5)).ToCharArray(), this.XY, 0, 3, 1, true, true, true, true));
+        UnicodeEngine.Sprites.Static.Swarms.Add(new Explosion(new string(UnicodeWars.xHit, this.Width).ToCharArray(), this.XY, this.Width, 3, 1, true, true, true, true));
         if (!this.Alive)
         {
 
-            AsciiEngine.Sprites.Static.Swarms.Add(new Explosion(this.Ascii, this.XY, this.Width, DebrisRange, 1, true, true, true, true));
+            UnicodeEngine.Sprites.Static.Swarms.Add(new Explosion(this.Text, this.XY, this.Width, DebrisRange, 1, true, true, true, true));
 
             points = 2;
         }
@@ -65,13 +67,20 @@ internal class Enemy : Sprite
 
         if (this.Alive)
         {
+
+            // add smoke
+            if (this.HitPoints < this.InitialHitPoints && Abacus.Random.NextDouble() > .8)
+            {
+                UnicodeEngine.Sprites.Static.Swarms.Add(new Explosion( new string ( UnicodeWars.xSmoke, this.InitialHitPoints-this.HitPoints ).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 2, .5, true, true, true, true));
+            }
+
             // reverse direction
             if (Abacus.Random.NextDouble() < this.ReverseFactor) { this.Trajectory.Run *= -1; }
 
             // fire
             if (this.Missiles.Items.Count < this.MissileConfig.MaxCount && this.XY.dY > Screen.BottomEdge - MissileConfig.Range && this.HitPoints > 0 && Abacus.RandomTrue)
             {
-                this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Ascii }, this.XY.Clone(this.Width / 2, 0), new Trajectory(1, 0, MissileConfig.Range), System.ConsoleColor.Green));
+                this.Missiles.Items.Add(new Sprite(new[] { MissileConfig.Text }, this.XY.Clone(this.Width / 2, 0), new Trajectory(1, 0, MissileConfig.Range), System.ConsoleColor.Green));
             }
         }
 
@@ -91,7 +100,7 @@ internal class Enemy : Sprite
         switch (et)
         {
             case eEnemyType.Fighter:
-                this.Ascii = "|—o—|".ToCharArray();
+                this.Text = "|—o—|".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, 7, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
                 this.HitPoints = 1;
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .33, 1);
@@ -101,7 +110,7 @@ internal class Enemy : Sprite
                 Run = Abacus.Random.NextDouble() + .5;
                 break;
             case eEnemyType.Bomber:
-                this.Ascii = "{—o-o—}".ToCharArray();
+                this.Text = "{—o-o—}".ToCharArray();
                 this.FlyZone = new FlyZoneClass(Abacus.Round(Screen.Height * .5), Abacus.Round(Screen.Height * .25), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
                 this.HitPoints = 2;
                 this.MissileConfig = new MissileStructure('@', Screen.Height * .85, 2);
@@ -111,7 +120,7 @@ internal class Enemy : Sprite
                 Run = Abacus.Random.NextDouble() + .5;
                 break;
             case eEnemyType.Interceptor:
-                this.Ascii = "<—o—>".ToCharArray();
+                this.Text = "<—o—>".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, Abacus.Round(Screen.Height * -.15), 0, 0, FlyZoneClass.eEdgeMode.Bounce);
                 this.HitPoints = 2;
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .40, 1);
@@ -120,7 +129,7 @@ internal class Enemy : Sprite
                 ReverseFactor = .05;
                 break;
             case eEnemyType.Leader:
-                this.Ascii = "[—o—]".ToCharArray();
+                this.Text = "[—o—]".ToCharArray();
                 this.FlyZone = new FlyZoneClass(Screen.Height / 4, 5, -2, -2, FlyZoneClass.eEdgeMode.Bounce);
                 this.HitPoints = 2;
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .33, 2);
@@ -129,7 +138,7 @@ internal class Enemy : Sprite
                 ReverseFactor = .01;
                 break;
             case eEnemyType.HeavyBomber:
-                this.Ascii = "{-o-8-}".ToCharArray();
+                this.Text = "{-o-8-}".ToCharArray();
                 this.FlyZone = new FlyZoneClass(Abacus.Round(Screen.Height * .5), Abacus.Round(Screen.Height * .25), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
                 this.HitPoints = 3;
                 this.MissileConfig = new MissileStructure('@', Screen.Height * .9, 4);
@@ -138,7 +147,7 @@ internal class Enemy : Sprite
                 ReverseFactor = .005;
                 break;
             case eEnemyType.HeavyFighter:
-                this.Ascii = "|=o=|".ToCharArray();
+                this.Text = "|=o=|".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, 2, 0, 0, FlyZoneClass.eEdgeMode.Bounce);
                 this.HitPoints = 2;
                 this.MissileConfig = new MissileStructure('|', Screen.Height * .25, 1);
@@ -148,7 +157,7 @@ internal class Enemy : Sprite
                 Run = Abacus.Random.NextDouble() + .5;
                 break;
             case eEnemyType.Vanguard:
-                this.Ascii = "\\-o-/".ToCharArray();
+                this.Text = "\\-o-/".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, 5, -5, -5, FlyZoneClass.eEdgeMode.Bounce);
                 this.HitPoints = 3;
                 this.MissileConfig = new MissileStructure('|', 6, 1);
@@ -158,7 +167,7 @@ internal class Enemy : Sprite
                 Run = Abacus.Random.NextDouble() + .5;
                 break;
             case eEnemyType.Interdictor:
-                this.Ascii = "{-8o8-}".ToCharArray();
+                this.Text = "{-8o8-}".ToCharArray();
                 this.FlyZone = new FlyZoneClass(0, Abacus.Round(Screen.Height * .75), Abacus.Round(Screen.Width * -.25), Abacus.Round(Screen.Width * -.25), FlyZoneClass.eEdgeMode.Bounce);
                 this.HitPoints = 4;
                 this.MissileConfig = new MissileStructure('@', Screen.Height * .9, 6);
@@ -175,6 +184,7 @@ internal class Enemy : Sprite
         this.Trajectory = new Trajectory(DropsPerRow / System.Convert.ToDouble(this.FlyZone.Width), Run);
         this.OriginalTrajectory = this.Trajectory.Clone();
         this.EnemyType = et;
+        this.InitialHitPoints = this.HitPoints;
 
     }
 

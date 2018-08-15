@@ -1,30 +1,37 @@
-using AsciiEngine;
-using AsciiEngine.Fx;
-using AsciiEngine.Grid;
-using AsciiEngine.Sprites;
+using UnicodeEngine;
+using UnicodeEngine.Fx;
+using UnicodeEngine.Grid;
+using UnicodeEngine.Sprites;
 using System;
 using System.Collections.Generic;
 
-public class AsciiWars
+public class UnicodeWars
 {
     bool QuitFast = false;
     int FramesPerSecond = 9;
     bool PlayAgain;
     Galaxy Stars = new Galaxy();
 
+    // unicode choices
+    static internal char xSmoke = '\x0489';
+    static internal char xHit = '\x00d7';
+    static internal char xShield = '\x25ca';
+    static internal char xDoubleMissile = '#';
+    static internal char xJump = '\x25ac';
 
 
-    public AsciiWars() { this.PlayAgain = true; }
-    public AsciiWars(bool b) { PlayAgain = b; }
+
+    public UnicodeWars() { this.PlayAgain = true; }
+    public UnicodeWars(bool b) { PlayAgain = b; }
 
     public int TryPlay(int HighScore)
     {
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
-        Screen.TrySetSize(50, 40, false);
+        Screen.TryInitializeScreen(50, 40, false);
         int Score = 0;
         Score = this.MainLoop(HighScore);
-        Screen.TrySetSize(oldwidth, oldheight, false);
+        Screen.TryInitializeScreen(oldwidth, oldheight, false);
         Console.CursorVisible = true;
         return Score;
     }
@@ -50,13 +57,13 @@ public class AsciiWars
 
         List<string> Messages = new List<string>();
 
-        Messages.Add("A S C I I   W A R S");
+        Messages.Add("U N I C O D E   W A R S");
         Messages.Add("");
         foreach (Enemy.eEnemyType shiptype in (Enemy.eEnemyType[])System.Enum.GetValues(typeof(Enemy.eEnemyType)))
         {
             Enemy bg = new Enemy(shiptype);
             DemoEnemies.Items.Add(bg);
-            Messages.Add(new string(bg.Ascii) + " " + Enum.GetName(typeof(Enemy.eEnemyType), shiptype) + " (" + bg.HitPoints + " HP)");
+            Messages.Add(new string(bg.Text) + " " + Enum.GetName(typeof(Enemy.eEnemyType), shiptype) + " (" + bg.HitPoints + " HP)");
         }
         Messages.Add("");
         Messages.Add("Press Esc to Quit");
@@ -90,7 +97,7 @@ public class AsciiWars
             }
             Stars.Animate();
             DemoEnemies.Animate();
-            AsciiEngine.Sprites.Static.Swarms.Animate();
+            UnicodeEngine.Sprites.Static.Swarms.Animate();
             Scroller.Animate();
             Easy.Clock.FpsThrottle(8);
 
@@ -334,7 +341,7 @@ public class AsciiWars
                 if (Paused)
                 {
                     player.Refresh();
-                    AsciiEngine.Sprites.Static.Swarms.Refresh();
+                    UnicodeEngine.Sprites.Static.Swarms.Refresh();
                     player.Missiles.Refresh();
                     wave.Refresh();
                     if (Instructions.Empty)
@@ -369,7 +376,7 @@ public class AsciiWars
                 else
                 {
 
-                    AsciiEngine.Sprites.Static.Swarms.Animate();
+                    UnicodeEngine.Sprites.Static.Swarms.Animate();
 
                     if (HyperdriveMode == eHyperdriveMode.Engaged)
                     {
@@ -407,7 +414,7 @@ public class AsciiWars
                                     case PowerUp.ePowerUpType.Airstrike:
                                         player.FireAirStrike();
                                         break;
-                                    case PowerUp.ePowerUpType.Warp:
+                                    case PowerUp.ePowerUpType.Jump:
                                         player.DropIn();
                                         break;
                                 }
@@ -428,7 +435,7 @@ public class AsciiWars
                         // hud
                         Console.ForegroundColor = ConsoleColor.White;
                         string ShieldMarkers = "";
-                        if (player.HitPoints > 0) { ShieldMarkers = new String('$', player.HitPoints - 1); }
+                        if (player.HitPoints > 0) { ShieldMarkers = new String(xShield, player.HitPoints - 1); }
                         Screen.TryWrite(new Point(1, Screen.BottomEdge), ShieldMarkers + ' ');
 
                         try // this dies if the missile powerup is used

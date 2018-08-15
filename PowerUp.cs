@@ -1,7 +1,7 @@
 using Easy;
-using AsciiEngine;
-using AsciiEngine.Grid;
-using AsciiEngine.Sprites;
+using UnicodeEngine;
+using UnicodeEngine.Grid;
+using UnicodeEngine.Sprites;
 
 internal class PowerUp : Sprite
 {
@@ -12,41 +12,41 @@ internal class PowerUp : Sprite
         , Shields
         , Missiles
         , Airstrike
-        , Warp
+        , Jump
     }
     public ePowerUpType PowerUpType;
 
 
     public PowerUp(ePowerUpType type)
     {
-        string Symbol = "?"; // init value to satisfy the editor
+        char Symbol = '?'; // init value to satisfy the editor
 
         switch (type)
         {
             case ePowerUpType.Points: // extra points
-                Symbol = "+";
+                Symbol = '+';
                 this.HitEffect = 0;
                 break;
             case ePowerUpType.Shields: // deflector shield increase
-                Symbol = "$";
+                Symbol = UnicodeWars.xShield;
                 this.HitEffect = 1;
                 break;
             case ePowerUpType.Missiles: // fire an arc of missiles
-                Symbol = "|";
+                Symbol = '|';
                 this.HitEffect = 0;
                 break;
             case ePowerUpType.Airstrike: // rain down missiles
-                Symbol = "||";
+                Symbol = UnicodeWars.xDoubleMissile;
                 this.HitEffect = -1;
                 break;
-            case ePowerUpType.Warp: // fly up
-                Symbol = "^";
+            case ePowerUpType.Jump: // fly up
+                Symbol = UnicodeWars.xJump;
                 this.HitEffect = 0;
                 break;
 
         }
 
-        this.Ascii = ('(' + Symbol + ')').ToCharArray();
+        this.Text = new[] { '(' , Symbol , ')'};
         this.Color = System.ConsoleColor.Cyan;
         this.FlyZone.EdgeMode = FlyZoneClass.eEdgeMode.Ignore;
         this.Trail = new Trail(new Point(Abacus.Random.Next(Screen.LeftEdge + this.Width, Screen.RightEdge - this.Width), Screen.TopEdge));
