@@ -22,7 +22,7 @@ internal class Enemy : Sprite
     public eEnemyType EnemyType;
     int InitialHitPoints;
 
-    public Swarm Messages = new Swarm();
+//    public Swarm Messages = new Swarm();
     struct MissileStructure
     {
         public char Text;
@@ -59,7 +59,8 @@ internal class Enemy : Sprite
 
         this.Score = (points * scorefactor);
 
-        this.Messages.Items.Add(new Sprite(("+" + this.Score).ToCharArray(), this.XY, new Trajectory(-.5, 0, 4)));
+        UnicodeWars.ScoreUp(this.Score, this.XY);
+
     }
 
     override public void Activate()
@@ -85,9 +86,9 @@ internal class Enemy : Sprite
         }
 
         this.Missiles.Animate();
-        Messages.Animate();
+        //Messages.Animate();
 
-        if (!this.Alive && this.Messages.Empty && this.Missiles.Empty) { this.Active = false; }
+        if (!this.Alive &&  this.Missiles.Empty) { this.Active = false; }
 
     }
 

@@ -30,7 +30,7 @@ public class UnicodeWars
         int oldheight = Console.WindowHeight;
         Screen.TryInitializeScreen(50, 40, false);
         int Score = 0;
-        Stars =  new Galaxy();
+        Stars = new Galaxy();
         Score = this.MainLoop(HighScore);
         Screen.TryInitializeScreen(oldwidth, oldheight, false);
         Console.CursorVisible = true;
@@ -99,6 +99,7 @@ public class UnicodeWars
             Stars.Animate();
             DemoEnemies.Animate();
             UnicodeEngine.Sprites.Static.Swarms.Animate();
+            UnicodeEngine.Sprites.Static.Sprites.Animate();
             Scroller.Animate();
             Easy.Clock.FpsThrottle(8);
 
@@ -378,6 +379,7 @@ public class UnicodeWars
                 {
 
                     UnicodeEngine.Sprites.Static.Swarms.Animate();
+                    UnicodeEngine.Sprites.Static.Sprites.Animate();
 
                     if (HyperdriveMode == eHyperdriveMode.Engaged)
                     {
@@ -405,17 +407,25 @@ public class UnicodeWars
                                     case PowerUp.ePowerUpType.Points:
                                         BonusPoints += 10;
                                         Score += BonusPoints;
-                                        Scroller.NewLine("+" + BonusPoints.ToString());
+                                        ScoreUp(BonusPoints, player.XY);
                                         break;
                                     case PowerUp.ePowerUpType.Shields:
+                                        Score += powerup.Points;
+                                        ScoreUp(5, player.XY);
                                         break;
                                     case PowerUp.ePowerUpType.Missiles:
+                                        Score += powerup.Points;
+                                        ScoreUp(5, player.XY);
                                         player.FireSpread();
                                         break;
                                     case PowerUp.ePowerUpType.Airstrike:
+                                        Score += powerup.Points;
+                                        ScoreUp(-5, player.XY);
                                         player.FireAirStrike();
                                         break;
                                     case PowerUp.ePowerUpType.Jump:
+                                        Score += powerup.Points;
+                                        ScoreUp(5, player.XY);
                                         player.DropIn();
                                         break;
                                 }
@@ -611,4 +621,11 @@ public class UnicodeWars
 
         return Score;
     }
+
+    static internal void ScoreUp(int points, Point xy)
+    {
+        if (points > 0) { Static.Sprites.Add(new Sprite(("+" + points.ToString()).ToCharArray(), xy.Clone(0, -1), new Trajectory(-.33, 0, 4), ConsoleColor.White)); }
+        else if (points < 0) { Static.Sprites.Add(new Sprite((points.ToString()).ToCharArray(), xy.Clone(0, -1), new Trajectory(-.33, 0, 4), ConsoleColor.Red)); }
+    }
+
 }

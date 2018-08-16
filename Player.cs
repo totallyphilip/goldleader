@@ -68,7 +68,7 @@ internal class Player : Sprite
 
         if (hiteffect > 0)
         {
-            UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string(UnicodeWars.xShield, 3).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 3, 1, true, false, true, true));
+            UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string(UnicodeWars.xShield, 5).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 3, 1, true, false, true, true));
         }
         else if (hiteffect < 0)
         {

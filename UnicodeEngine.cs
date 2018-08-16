@@ -493,6 +493,7 @@ namespace UnicodeEngine
         public class Static
         {
             public static Complex Swarms = new Complex();
+            public static Swarm Sprites = new Swarm();
         }
 
     }
@@ -772,26 +773,26 @@ namespace UnicodeEngine
             {
                 //if (Console.KeyAvailable)
                 //{
-                    ConsoleKeyInfo k = Console.ReadKey(true);
-                    Easy.Keyboard.EatKeys(); // don't let keys stack up
-                    if (k.Key == ConsoleKey.UpArrow || k.Key == ConsoleKey.RightArrow)
-                    {
-                        symbol++;
-                        if (symbol > alphabet.Count - 1) { symbol = 0; }
-                    }
-                    else if (k.Key == ConsoleKey.DownArrow || k.Key == ConsoleKey.LeftArrow)
-                    {
-                        symbol--;
-                        if (symbol < 0) { symbol = alphabet.Count - 1; }
-                    }
-                    else if (k.Key == ConsoleKey.Spacebar)
-                    {
-                        initials += alphabet[symbol];
-                    }
-                    else if (k.Key == ConsoleKey.Escape)
-                    {
-                        initials += new string(' ', maxlength);
-                    }
+                ConsoleKeyInfo k = Console.ReadKey(true);
+                Easy.Keyboard.EatKeys(); // don't let keys stack up
+                if (k.Key == ConsoleKey.UpArrow || k.Key == ConsoleKey.RightArrow)
+                {
+                    symbol++;
+                    if (symbol > alphabet.Count - 1) { symbol = 0; }
+                }
+                else if (k.Key == ConsoleKey.DownArrow || k.Key == ConsoleKey.LeftArrow)
+                {
+                    symbol--;
+                    if (symbol < 0) { symbol = alphabet.Count - 1; }
+                }
+                else if (k.Key == ConsoleKey.Spacebar)
+                {
+                    initials += alphabet[symbol];
+                }
+                else if (k.Key == ConsoleKey.Escape)
+                {
+                    initials += new string(' ', maxlength);
+                }
                 //}
 
                 if (initials.Length < maxlength) { Screen.TryWrite(coord.iX + initials.Length, coord.iY, alphabet[symbol]); }
