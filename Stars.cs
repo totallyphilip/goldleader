@@ -28,9 +28,9 @@ internal class Starfield : Swarm
         while (this.Count < this.MaxStars)
         {
             int x = Abacus.Random.Next(Screen.LeftEdge, Screen.RightEdge + 1);
-            int y = Screen.TopEdge - 1;
-            if (randomly) { y = Abacus.Random.Next(Screen.TopEdge - 1, Screen.Height); }
-            Point xy = new Point(x, y);
+            int y = Screen.TopEdge - (Abacus.Random.Next(5)); // randomly set stars back so the pattern doesn't repeat as stars fall off the bottom
+            if (randomly) { y = Abacus.Random.Next(Screen.TopEdge - 1 , Screen.Height); }
+            Point xy = new  Point(x, y);
             this.Add(new Sprite(new[] { this.Starlight }, xy, new Trajectory(this.Speed, 0, Screen.Height - y), this.Color));
         }
 

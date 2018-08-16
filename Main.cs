@@ -10,7 +10,7 @@ public class UnicodeWars
     bool QuitFast = false;
     int FramesPerSecond = 9;
     bool PlayAgain;
-    Galaxy Stars = new Galaxy();
+    Galaxy Stars;
 
     // unicode choices
     static internal char xSmoke = '\x0489';
@@ -30,6 +30,7 @@ public class UnicodeWars
         int oldheight = Console.WindowHeight;
         Screen.TryInitializeScreen(50, 40, false);
         int Score = 0;
+        Stars =  new Galaxy();
         Score = this.MainLoop(HighScore);
         Screen.TryInitializeScreen(oldwidth, oldheight, false);
         Console.CursorVisible = true;
