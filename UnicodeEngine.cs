@@ -745,30 +745,31 @@ namespace UnicodeEngine
             List<char> alphabet = new List<char>();
             alphabet.Add(' ');
             for (int i = 65; i <= 90; i++) { alphabet.Add(Convert.ToChar(i)); } // A..Z
-            alphabet.Add('\u0393'); // Γ
-            alphabet.Add('\u0394'); // Δ
-            alphabet.Add('\u0398'); // Θ
-            alphabet.Add('\u039B'); // Λ
-            alphabet.Add('\u039E'); // Ξ
-            alphabet.Add('\u03A0'); // Π
-            alphabet.Add('\u03A3'); // Σ
-            alphabet.Add('\u03A6'); // Φ
-            alphabet.Add('\u03A8'); // Ψ
-            alphabet.Add('\u03A9'); // Ω
+            // alphabet.Add('\u0393'); // Γ
+            // alphabet.Add('\u0394'); // Δ
+            // alphabet.Add('\u0398'); // Θ
+            // alphabet.Add('\u039B'); // Λ
+            // alphabet.Add('\u039E'); // Ξ
+            // alphabet.Add('\u03A0'); // Π
+            // alphabet.Add('\u03A3'); // Σ
+            // alphabet.Add('\u03A6'); // Φ
+            // alphabet.Add('\u03A8'); // Ψ
+            // alphabet.Add('\u03A9'); // Ω
             for (int i = 48; i <= 57; i++) { alphabet.Add(Convert.ToChar(i)); } // 0..9
-            alphabet.Add('\u263a'); // ☺
-            alphabet.Add('\u263b'); // ☻
-            alphabet.Add('\u2640'); // ♀
-            alphabet.Add('\u2642'); // ♂
-            alphabet.Add('\u2660'); // ♠
-            alphabet.Add('\u2663'); // ♣
-            alphabet.Add('\u2665'); // ♥
-            alphabet.Add('\u2666'); // ♦
-            alphabet.Add('\u266b'); // ♫
+            // alphabet.Add('\u263a'); // ☺
+            // alphabet.Add('\u263b'); // ☻
+            // alphabet.Add('\u2640'); // ♀
+            // alphabet.Add('\u2642'); // ♂
+            // alphabet.Add('\u2660'); // ♠
+            // alphabet.Add('\u2663'); // ♣
+            // alphabet.Add('\u2665'); // ♥
+            // alphabet.Add('\u2666'); // ♦
+            // alphabet.Add('\u266b'); // ♫
 
             string initials = "";
             int symbol = 1;
             Easy.Keyboard.EatKeys();
+            Screen.TryWrite(coord.iX + initials.Length, coord.iY, alphabet[symbol]);
             do
             {
                 //if (Console.KeyAvailable)

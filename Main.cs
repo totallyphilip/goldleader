@@ -4,11 +4,12 @@ using UnicodeEngine.Grid;
 using UnicodeEngine.Sprites;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 
 public class UnicodeWars
 {
     bool QuitFast = false;
-    int FramesPerSecond = 9;
+    int FramesPerSecond = 10;
     bool PlayAgain;
     Galaxy Stars;
 
@@ -91,6 +92,52 @@ public class UnicodeWars
 
             if (Scroller.Empty)
             {
+
+
+
+
+                SqlConnection myConnection = new SqlConnection("user id=dbLb;" +
+                                                       "password=9eTkXw7hP7b5vBVEGmZJ;server=sql00\\prod01;" +
+                                                       "Trusted_Connection=no;" +
+                                                       "database=Common; " +
+                                                       "connection timeout=30");
+
+
+
+                try
+                {
+                    myConnection.Open();
+                    SqlCommand myCommand = new SqlCommand("exec dbo.ReadLb", myConnection);
+
+                    SqlDataReader myReader = myCommand.ExecuteReader();
+                    if (myReader.HasRows)
+                    {
+                        Scroller.NewLine("TOP 20 SCORES");
+                        Scroller.NewLine();
+                        while (myReader.Read())
+                        {
+                            Scroller.NewLine(
+                                myReader["Sco"].ToString()
+                                + " " + myReader["Sig"].ToString()
+                            );
+                        }
+                        Scroller.NewLine();
+                    }
+
+
+                }
+                catch (Exception e) { }
+
+
+                try
+                {
+                    myConnection.Close();
+                }
+                catch (Exception e)
+                {
+
+                }
+
                 foreach (string s in Messages)
                 {
                     Scroller.NewLine(s);
@@ -610,6 +657,55 @@ public class UnicodeWars
             } while (!QuitFast && (!Scroller.Empty || (player.Active && !wave.Completed())));
 
             if (!player.Alive || QuitFast) { break; }
+
+        }
+
+        if (!QuitFast)
+        {
+            string initials = UnicodeEngine.Input.ArcadeInitials(new Point(Screen.Width/2-2.5, Screen.Height/2), 3);
+
+            SqlConnection myConnection = new SqlConnection("user id=dbLb;" +
+                                                   "password=9eTkXw7hP7b5vBVEGmZJ;server=sql00\\prod01;" +
+                                                   "Trusted_Connection=no;" +
+                                                   "database=Common; " +
+                                                   "connection timeout=30");
+
+
+
+            try
+            {
+                myConnection.Open();
+
+                SqlCommand myCommand = new SqlCommand("exec dbo.AddLb @Sig, @Sco", myConnection);
+                SqlParameter myscore = new SqlParameter("@Sco", System.Data.SqlDbType.Int);
+                myscore.Value = Score;
+                SqlParameter myname = new SqlParameter("@Sig", System.Data.SqlDbType.VarChar);
+                myname.Value = initials;
+
+                myCommand.Parameters.Add(myscore);
+                myCommand.Parameters.Add(myname);
+
+                myCommand.ExecuteNonQuery();
+
+
+
+            }
+            catch (Exception e)
+            {
+
+            }
+
+
+
+            try
+            {
+                myConnection.Close();
+            }
+            catch (Exception e)
+            {
+
+            }
+
 
         }
 

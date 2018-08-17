@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<Squealer Type="StoredProcedure" Version="3.0.2.0">
+  <!-- Describe the purpose of this procedure, the Return values, And any difficult concepts. -->
+  <Comments><![CDATA[
+
+
+
+]]></Comments>
+  <Parameters>
+    <!--<Parameter Name="MyParameter" Type="int" Required="False" Output="False" DefaultValue="" Comments="" Sequence="1"/> -->
+  </Parameters>
+  <Code><![CDATA[
+
+/***********************************************************************
+	Comments.
+***********************************************************************/
+
+select
+	top 20
+	lb.Sig
+	,lb.Sco
+	,lb.Dat
+	,row_number() over (order by lb.Sco, lb.Dat) as [Rank]
+from
+	dbo.Lb lb
+order by
+	lb.Sco desc
+	,lb.Dat asc
+;
+
+]]></Code>
+  <Users>
+    <User Name="dbLb" />
+  </Users>
+</Squealer>

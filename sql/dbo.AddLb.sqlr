@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<Squealer Type="StoredProcedure" Version="3.0.2.0">
+  <!-- Describe the purpose of this procedure, the Return values, And any difficult concepts. -->
+  <Comments><![CDATA[
+
+
+
+]]></Comments>
+  <Parameters>
+    <Parameter Name="Sig" Type="nvarchar(10)" Required="False" Output="False" DefaultValue="" Comments="" Sequence="1" />
+    <Parameter Name="Sco" Type="int" Required="False" Output="False" DefaultValue="" Comments="" Sequence="2" />
+  </Parameters>
+  <Code><![CDATA[
+
+/***********************************************************************
+	Comments.
+***********************************************************************/
+
+insert
+	dbo.Lb
+(
+	Sig
+	,Sco
+	,Dat
+)
+values
+(
+	@Sig
+	,@Sco
+	,getdate()
+);
+
+]]></Code>
+  <Users>
+    <User Name="dbLb" />
+  </Users>
+</Squealer>
