@@ -22,7 +22,7 @@ internal class Enemy : Sprite
     public eEnemyType EnemyType;
     int InitialHitPoints;
 
-//    public Swarm Messages = new Swarm();
+    //    public Swarm Messages = new Swarm();
     struct MissileStructure
     {
         public char Text;
@@ -49,7 +49,13 @@ internal class Enemy : Sprite
         int points = 1;
 
         UnicodeEngine.Sprites.Static.Swarms.Add(new Explosion(new string(UnicodeWars.xHit, this.Width).ToCharArray(), this.XY, this.Width, 3, 1, true, true, true, true));
-        if (!this.Alive)
+        if (this.Alive)
+        {
+            this.Text[Abacus.Random.Next(this.Text.Length)] = '\x2e17';
+            this.Trail.Add(this.XY.Clone(0, -1));
+            this.Trajectory.Run *= -.75;
+        }
+        else
         {
 
             UnicodeEngine.Sprites.Static.Swarms.Add(new Explosion(this.Text, this.XY, this.Width, DebrisRange, 1, true, true, true, true));
@@ -72,7 +78,7 @@ internal class Enemy : Sprite
             // add smoke
             if (this.HitPoints < this.InitialHitPoints && Abacus.Random.NextDouble() > .8)
             {
-                UnicodeEngine.Sprites.Static.Swarms.Add(new Explosion( new string ( UnicodeWars.xSmoke, this.InitialHitPoints-this.HitPoints ).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 2, .5, true, true, true, true));
+                UnicodeEngine.Sprites.Static.Swarms.Add(new Explosion(new string(UnicodeWars.xSmoke, this.InitialHitPoints - this.HitPoints).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 2, .5, true, true, true, true));
             }
 
             // reverse direction
@@ -88,7 +94,7 @@ internal class Enemy : Sprite
         this.Missiles.Animate();
         //Messages.Animate();
 
-        if (!this.Alive &&  this.Missiles.Empty) { this.Active = false; }
+        if (!this.Alive && this.Missiles.Empty) { this.Active = false; }
 
     }
 

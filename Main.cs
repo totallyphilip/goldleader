@@ -402,33 +402,27 @@ public class UnicodeWars
                             powerup.Animate();
                             if (hit || Sprite.Collided(player, powerup))
                             {
+                                int points = powerup.Points;
                                 switch (powerup.PowerUpType)
                                 {
                                     case PowerUp.ePowerUpType.Points:
                                         BonusPoints += 10;
-                                        Score += BonusPoints;
-                                        ScoreUp(BonusPoints, player.XY);
+                                        points = BonusPoints;
                                         break;
                                     case PowerUp.ePowerUpType.Shields:
-                                        Score += powerup.Points;
-                                        ScoreUp(5, player.XY);
                                         break;
                                     case PowerUp.ePowerUpType.Missiles:
-                                        Score += powerup.Points;
-                                        ScoreUp(5, player.XY);
                                         player.FireSpread();
                                         break;
                                     case PowerUp.ePowerUpType.Airstrike:
-                                        Score += powerup.Points;
-                                        ScoreUp(-5, player.XY);
                                         player.FireAirStrike();
                                         break;
                                     case PowerUp.ePowerUpType.Jump:
-                                        Score += powerup.Points;
-                                        ScoreUp(5, player.XY);
                                         player.DropIn();
                                         break;
                                 }
+                                Score += points;
+                                ScoreUp(points, player.XY);
                             }
 
                             if (!powerup.Alive) { powerup = null; }
