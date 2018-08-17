@@ -20,7 +20,7 @@ select
 	lb.Sig
 	,lb.Sco
 	,lb.Dat
-	,row_number() over (order by lb.Sco, lb.Dat) as [Rank]
+	,row_number() over (order by lb.Sco desc, lb.Dat asc) as [Rank]
 from
 	dbo.Lb lb
 order by

@@ -117,7 +117,8 @@ public class UnicodeWars
                         while (myReader.Read())
                         {
                             Scroller.NewLine(
-                                myReader["Sco"].ToString()
+                                myReader["Rank"].ToString()
+                                + ". " + myReader["Sco"].ToString()
                                 + " " + myReader["Sig"].ToString()
                             );
                         }
