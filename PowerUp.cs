@@ -23,11 +23,12 @@ internal class PowerUp : Sprite
     {
         char Symbol = '?'; // init value to satisfy the editor
 
+        this.HitEffect = 0;
+
         switch (type)
         {
             case ePowerUpType.Points: // extra points
                 Symbol = '+';
-                this.HitEffect = 0;
                 break;
             case ePowerUpType.Shields: // deflector shield increase
                 Symbol = UnicodeWars.xShield;
@@ -35,17 +36,14 @@ internal class PowerUp : Sprite
                 break;
             case ePowerUpType.Missiles: // fire an arc of missiles
                 Symbol = '|';
-                this.HitEffect = 0;
                 this.Points = 5;
                 break;
             case ePowerUpType.Airstrike: // rain down missiles
                 Symbol = UnicodeWars.xDoubleMissile;
-                this.HitEffect = 0;
-                this.Points = -10;
+                this.Points = 5;
                 break;
             case ePowerUpType.Jump: // fly up
                 Symbol = UnicodeWars.xJump;
-                this.HitEffect = 0;
                 this.Points = 5;
                 break;
 
