@@ -4,7 +4,7 @@ using UnicodeEngine.Grid;
 using UnicodeEngine.Sprites;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
 
 public class UnicodeWars
 {
@@ -93,48 +93,40 @@ public class UnicodeWars
             if (Scroller.Empty)
             {
 
-
-
-
-                SqlConnection myConnection = new SqlConnection("user id=dbLb;" +
-                                                       "password=9eTkXw7hP7b5vBVEGmZJ;server=sql00\\prod01;" +
-                                                       "Trusted_Connection=no;" +
-                                                       "database=Common; " +
-                                                       "connection timeout=30");
-
-
+                MySqlConnection qConn = new MySqlConnection("server=192.168.242.10;user=foo;database=GameData;password=12345");
 
                 try
                 {
-                    myConnection.Open();
-                    SqlCommand myCommand = new SqlCommand("exec dbo.ReadLb", myConnection);
+                    qConn.Open();
+                    MySqlCommand qCommand = new MySqlCommand("GetScores", qConn);
+                    qCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    qCommand.Parameters.AddWithValue("@GameId", 1);
+                    MySqlDataReader qReader = qCommand.ExecuteReader();
 
-                    SqlDataReader myReader = myCommand.ExecuteReader();
-                    if (myReader.HasRows)
+                    if (qReader.HasRows)
                     {
                         Scroller.NewLine("TOP 20 SCORES");
                         Scroller.NewLine();
-                        while (myReader.Read())
+                        while (qReader.Read())
                         {
                             Scroller.NewLine(
-                                myReader["Rank"].ToString()
-                                + ". " + myReader["Sco"].ToString()
-                                + " " + myReader["Sig"].ToString()
+                                 qReader["Score"].ToString()
+                                + " " + qReader["Signature"].ToString()
                             );
                         }
                         Scroller.NewLine();
                     }
 
-
                 }
-                catch (Exception e) { }
+                catch // (Exception e) 
+                { }
 
 
                 try
                 {
-                    myConnection.Close();
+                    qConn.Close();
                 }
-                catch (Exception e)
+                catch //(Exception e)
                 {
 
                 }
@@ -663,37 +655,25 @@ public class UnicodeWars
 
         if (!QuitFast)
         {
-            string initials = UnicodeEngine.Input.ArcadeInitials(new Point(Screen.Width/2-2.5, Screen.Height/2), 3);
+            string initials = UnicodeEngine.Input.ArcadeInitials(new Point(Screen.Width / 2 - 2.5, Screen.Height / 2), 3);
 
             if (string.IsNullOrWhiteSpace(initials)) { initials = "???"; }
 
-            SqlConnection myConnection = new SqlConnection("user id=dbLb;" +
-                                                   "password=9eTkXw7hP7b5vBVEGmZJ;server=sql00\\prod01;" +
-                                                   "Trusted_Connection=no;" +
-                                                   "database=Common; " +
-                                                   "connection timeout=30");
+            MySqlConnection qConn = new MySqlConnection("server=192.168.242.10;user=foo;database=GameData;password=12345");
 
 
 
             try
             {
-                myConnection.Open();
-
-                SqlCommand myCommand = new SqlCommand("exec dbo.AddLb @Sig, @Sco", myConnection);
-                SqlParameter myscore = new SqlParameter("@Sco", System.Data.SqlDbType.Int);
-                myscore.Value = Score;
-                SqlParameter myname = new SqlParameter("@Sig", System.Data.SqlDbType.VarChar);
-                myname.Value = initials;
-
-                myCommand.Parameters.Add(myscore);
-                myCommand.Parameters.Add(myname);
-
-                myCommand.ExecuteNonQuery();
-
-
-
+                qConn.Open();
+                MySqlCommand qCommand = new MySqlCommand("AddScore", qConn);
+                qCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                qCommand.Parameters.AddWithValue("@GameId", 1);
+                qCommand.Parameters.AddWithValue("@Score", Score);
+                qCommand.Parameters.AddWithValue("@Signature", initials);
+                qCommand.ExecuteNonQuery();
             }
-            catch (Exception e)
+            catch //(Exception e)
             {
 
             }
@@ -702,9 +682,9 @@ public class UnicodeWars
 
             try
             {
-                myConnection.Close();
+                qConn.Close();
             }
-            catch (Exception e)
+            catch// (Exception e)
             {
 
             }
