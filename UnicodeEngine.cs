@@ -772,10 +772,8 @@ namespace UnicodeEngine
             Screen.TryWrite(coord.iX + initials.Length, coord.iY, alphabet[symbol]);
             do
             {
-                //if (Console.KeyAvailable)
-                //{
-                ConsoleKeyInfo k = Console.ReadKey(true);
                 Easy.Keyboard.EatKeys(); // don't let keys stack up
+                ConsoleKeyInfo k = Console.ReadKey(true);
                 if (k.Key == ConsoleKey.UpArrow || k.Key == ConsoleKey.RightArrow)
                 {
                     symbol++;
@@ -794,11 +792,8 @@ namespace UnicodeEngine
                 {
                     initials += new string(' ', maxlength);
                 }
-                //}
 
                 if (initials.Length < maxlength) { Screen.TryWrite(coord.iX + initials.Length, coord.iY, alphabet[symbol]); }
-
-                //System.Threading.Thread.Sleep(100);
 
             } while (initials.Length < maxlength);
 

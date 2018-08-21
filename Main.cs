@@ -665,6 +665,8 @@ public class UnicodeWars
         {
             string initials = UnicodeEngine.Input.ArcadeInitials(new Point(Screen.Width/2-2.5, Screen.Height/2), 3);
 
+            if (string.IsNullOrWhiteSpace(initials)) { initials = "???"; }
+
             SqlConnection myConnection = new SqlConnection("user id=dbLb;" +
                                                    "password=9eTkXw7hP7b5vBVEGmZJ;server=sql00\\prod01;" +
                                                    "Trusted_Connection=no;" +
