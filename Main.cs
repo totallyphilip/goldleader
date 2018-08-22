@@ -95,31 +95,26 @@ public class UnicodeWars
 
                 MySqlConnection qConn = new MySqlConnection("server=192.168.242.10;user=foo;database=GameData;password=12345");
 
-                try
+                qConn.Open();
+                MySqlCommand qCommand = new MySqlCommand("GetScores", qConn);
+                qCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                qCommand.Parameters.AddWithValue("?gameid", 1); // using ? instead of @ for older DLL
+                MySqlDataReader qReader = qCommand.ExecuteReader();
+
+                if (qReader.HasRows)
                 {
-                    qConn.Open();
-                    MySqlCommand qCommand = new MySqlCommand("GetScores", qConn);
-                    qCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                    qCommand.Parameters.AddWithValue("@GameId", 1);
-                    MySqlDataReader qReader = qCommand.ExecuteReader();
-
-                    if (qReader.HasRows)
+                    Scroller.NewLine("TOP 20 SCORES");
+                    Scroller.NewLine();
+                    while (qReader.Read())
                     {
-                        Scroller.NewLine("TOP 20 SCORES");
-                        Scroller.NewLine();
-                        while (qReader.Read())
-                        {
-                            Scroller.NewLine(
-                                 qReader["Score"].ToString()
-                                + " " + qReader["Signature"].ToString()
-                            );
-                        }
-                        Scroller.NewLine();
+                        Scroller.NewLine(
+                             qReader["Score"].ToString()
+                            + " " + qReader["Signature"].ToString()
+                        );
                     }
-
+                    Scroller.NewLine();
                 }
-                catch // (Exception e) 
-                { }
+
 
 
                 try
@@ -668,9 +663,9 @@ public class UnicodeWars
                 qConn.Open();
                 MySqlCommand qCommand = new MySqlCommand("AddScore", qConn);
                 qCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                qCommand.Parameters.AddWithValue("@GameId", 1);
-                qCommand.Parameters.AddWithValue("@Score", Score);
-                qCommand.Parameters.AddWithValue("@Signature", initials);
+                qCommand.Parameters.AddWithValue("?gameid", 1);
+                qCommand.Parameters.AddWithValue("?score", Score);
+                qCommand.Parameters.AddWithValue("?signature", initials);
                 qCommand.ExecuteNonQuery();
             }
             catch //(Exception e)
