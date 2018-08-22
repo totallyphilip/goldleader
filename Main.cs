@@ -4,7 +4,7 @@ using UnicodeEngine.Grid;
 using UnicodeEngine.Sprites;
 using System;
 using System.Collections.Generic;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 
 public class UnicodeWars
 {
@@ -50,6 +50,14 @@ public class UnicodeWars
         return Score;
     }
 
+    SqlConnection DbConnection()
+    {
+        string constr = "user id=dbTest;password=baMw$CAQ5hnlxjCTYJ0YP;server=sql01\\dev01;Trusted_Connection=no;database=PwrightSandbox;connection timeout=5";
+        //MySqlConnection qConn = new MySqlConnection("server=192.168.242.10;user=foo;database=GameData;password=12345");
+        //MySqlConnection("server=192.168.242.10;user=foo;database=GameData;password=12345");
+        return new SqlConnection(constr);
+    }
+
     void Attract()
     {
         Console.Clear();
@@ -93,38 +101,32 @@ public class UnicodeWars
             if (Scroller.Empty)
             {
 
-                MySqlConnection qConn = new MySqlConnection("server=192.168.242.10;user=foo;database=GameData;password=12345");
-
-                qConn.Open();
-                MySqlCommand qCommand = new MySqlCommand("GetScores", qConn);
-                qCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                qCommand.Parameters.AddWithValue("?gameid", 1); // using ? instead of @ for older DLL
-                MySqlDataReader qReader = qCommand.ExecuteReader();
-
-                if (qReader.HasRows)
-                {
-                    Scroller.NewLine("TOP 20 SCORES");
-                    Scroller.NewLine();
-                    while (qReader.Read())
-                    {
-                        Scroller.NewLine(
-                             qReader["Score"].ToString()
-                            + " " + qReader["Signature"].ToString()
-                        );
-                    }
-                    Scroller.NewLine();
-                }
-
-
-
+                SqlConnection dbConn = DbConnection();
                 try
                 {
-                    qConn.Close();
-                }
-                catch //(Exception e)
-                {
+                    dbConn.Open();
+                    SqlCommand oCommand = new SqlCommand("dbo.GetScores", dbConn);
+                    oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    oCommand.Parameters.AddWithValue("@gameid", 1);
+                    SqlDataReader dbReader = oCommand.ExecuteReader();
 
+                    if (dbReader.HasRows)
+                    {
+                        Scroller.NewLine("TOP 20 SCORES");
+                        Scroller.NewLine();
+                        while (dbReader.Read())
+                        {
+                            Scroller.NewLine(
+                                 dbReader["Score"].ToString()
+                                + " " + dbReader["Signature"].ToString()
+                            );
+                        }
+                        Scroller.NewLine();
+                    }
                 }
+                catch { }
+
+                try { dbConn.Close(); } catch { }
 
                 foreach (string s in Messages)
                 {
@@ -650,41 +652,26 @@ public class UnicodeWars
 
         if (!QuitFast)
         {
-            string initials = UnicodeEngine.Input.ArcadeInitials(new Point(Screen.Width / 2 - 2.5, Screen.Height / 2), 3);
-
-            if (string.IsNullOrWhiteSpace(initials)) { initials = "???"; }
-
-            MySqlConnection qConn = new MySqlConnection("server=192.168.242.10;user=foo;database=GameData;password=12345");
-
-
-
+            SqlConnection dbConn = DbConnection();
             try
             {
-                qConn.Open();
-                MySqlCommand qCommand = new MySqlCommand("AddScore", qConn);
-                qCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                qCommand.Parameters.AddWithValue("?gameid", 1);
-                qCommand.Parameters.AddWithValue("?score", Score);
-                qCommand.Parameters.AddWithValue("?signature", initials);
-                qCommand.ExecuteNonQuery();
+                dbConn.Open();
+
+                // don't prompt for input until after we tried to open the database
+                string initials = UnicodeEngine.Input.ArcadeInitials(new Point(Screen.Width / 2 - 2.5, Screen.Height / 2), 3);
+                if (string.IsNullOrWhiteSpace(initials)) { initials = "???"; }
+
+                SqlCommand oCommand = new SqlCommand("dbo.AddScore", dbConn);
+                oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                oCommand.Parameters.AddWithValue("@gameid", 1);
+                oCommand.Parameters.AddWithValue("@score", Score);
+                oCommand.Parameters.AddWithValue("@signature", initials);
+
+                oCommand.ExecuteNonQuery();
             }
-            catch //(Exception e)
-            {
+            catch { }
 
-            }
-
-
-
-            try
-            {
-                qConn.Close();
-            }
-            catch// (Exception e)
-            {
-
-            }
-
-
+            try { dbConn.Close(); } catch { }
         }
 
         return Score;
