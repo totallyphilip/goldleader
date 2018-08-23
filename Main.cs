@@ -18,7 +18,8 @@ public class UnicodeWars
     static internal char xHit = '\x00d7';
     static internal char xShield = '\x25ca';
     static internal char xDoubleMissile = '#';
-    static internal char xJump = '\x25ac';
+    static internal char xJump = ' '; //'\x25ac';
+    static internal char xTorpedo = '\x25b2';
 
 
 
@@ -367,6 +368,7 @@ public class UnicodeWars
                 {
                     PowerUp.ePowerUpType pt = Easy.Abacus.RandomEnumValue<PowerUp.ePowerUpType>();
                     powerup = new PowerUp(pt);
+                    //powerup = new PowerUp(PowerUp.ePowerUpType.Torpedo); // to force a powerup choice
                     FramesUntilPowerup = Easy.Abacus.Random.Next(200, 300);
                     FrameCounter = 0;
                 }
@@ -390,6 +392,7 @@ public class UnicodeWars
                         Instructions.NewLine();
                         Instructions.NewLine("Ship controls:");
                         Instructions.NewLine("Space = Fire");
+                        Instructions.NewLine("Tab = Use Torpedo");
                         Instructions.NewLine("Left/Right = Move");
                         Instructions.NewLine("Up = Hyperdrive");
                         Instructions.NewLine("Down = Toggle S-foils");
@@ -455,7 +458,10 @@ public class UnicodeWars
                                         player.FireAirStrike();
                                         break;
                                     case PowerUp.ePowerUpType.Jump:
-                                        player.DropIn();
+                                        player.DropIn(.3);
+                                        break;
+                                    case PowerUp.ePowerUpType.Torpedo:
+                                        player.TorpedosLocked += 1;
                                         break;
                                 }
                                 Score += points;
@@ -482,12 +488,12 @@ public class UnicodeWars
 
                         try // this dies if the missile powerup is used
                         {
-                            string ShotMarkers = new string(' ', player.Missiles.Count) + new String('|', player.MissileCapacity - player.Missiles.Items.Count);
+                            string ShotMarkers = new string(' ', player.Missiles.Count + player.Torpedos.Count) + new string(xTorpedo, player.TorpedosLocked) + new String('|', player.MissileCapacity - player.Missiles.Items.Count);
                             Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, Screen.BottomEdge), ShotMarkers);
                         }
                         catch
                         {
-                            string ShotMarkers = new string(' ', player.MissileCapacity);
+                            string ShotMarkers = new string(' ', player.MissileCapacity + player.Torpedos.Count) + new string(xTorpedo, player.TorpedosLocked);
                             Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, Screen.BottomEdge), ShotMarkers);
                         }
 
@@ -576,6 +582,9 @@ public class UnicodeWars
                             break;
                         case ConsoleKey.Spacebar:
                             if (HyperdriveMode != eHyperdriveMode.Engaged) { player.Fire(); }
+                            break;
+                        case ConsoleKey.Tab:
+                            if (HyperdriveMode != eHyperdriveMode.Engaged) { player.FireTorpedo(); }
                             break;
                         case ConsoleKey.Escape:
                             QuitFast = true;

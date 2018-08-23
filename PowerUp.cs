@@ -13,6 +13,7 @@ internal class PowerUp : Sprite
         , Missiles
         , Airstrike
         , Jump
+        , Torpedo
     }
     public ePowerUpType PowerUpType;
 
@@ -46,10 +47,14 @@ internal class PowerUp : Sprite
                 Symbol = UnicodeWars.xJump;
                 this.Points = 5;
                 break;
+            case ePowerUpType.Torpedo: // launch explosive
+                Symbol = UnicodeWars.xTorpedo;
+                this.Points = 5;
+                break;
 
         }
 
-        this.Text = new[] { '(' , Symbol , ')'};
+        this.Text = new[] { '(', Symbol, ')' };
         this.Color = System.ConsoleColor.Cyan;
         this.FlyZone.EdgeMode = FlyZoneClass.eEdgeMode.Ignore;
         this.Trail = new Trail(new Point(Abacus.Random.Next(Screen.LeftEdge + this.Width, Screen.RightEdge - this.Width), Screen.TopEdge));
