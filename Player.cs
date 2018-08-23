@@ -113,7 +113,7 @@ internal class Player : Sprite
 
     public void FireTorpedo()
     {
-        if (this.TorpedosLocked > 0)
+        if (this.TorpedosLocked > 0 && this.Alive)
         {
             this.TorpedosLocked -= 1;
             this.Torpedos.Add(new PlayerTorpedo(this.XY.Clone(this.Width / 2, 0)));
@@ -121,28 +121,30 @@ internal class Player : Sprite
     }
     public void Fire()
     {
-        if (this.FlightMode == eFlightMode.Maneuver)
+        if (this.Alive)
         {
-            if (this.Missiles.Items.Count < this.MyMissileCapacity)
+            if (this.FlightMode == eFlightMode.Maneuver)
             {
-                PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-.66, 0, this.XY.dY + 1));
-                missile.HitPoints = 1;
-                this.Missiles.Items.Add(missile);
-            }
-        }
-        else
-        {
-            if (this.Missiles.Items.Count == 0)
-            {
-                double x = (this.XY.dX + this.Width / 2) - this.MyMissileCapacity / 2;
-                for (int i = 0; i < this.MyMissileCapacity; i++)
+                if (this.Missiles.Items.Count < this.MyMissileCapacity)
                 {
-                    PlayerMissile missile = new PlayerMissile(new Point(x + i, this.XY.iY), new Trajectory(-1, 0, this.XY.dY + 1));
+                    PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-.66, 0, this.XY.dY + 1));
                     missile.HitPoints = 1;
                     this.Missiles.Items.Add(missile);
                 }
             }
-
+            else
+            {
+                if (this.Missiles.Items.Count == 0)
+                {
+                    double x = (this.XY.dX + this.Width / 2) - this.MyMissileCapacity / 2;
+                    for (int i = 0; i < this.MyMissileCapacity; i++)
+                    {
+                        PlayerMissile missile = new PlayerMissile(new Point(x + i, this.XY.iY), new Trajectory(-1, 0, this.XY.dY + 1));
+                        missile.HitPoints = 1;
+                        this.Missiles.Items.Add(missile);
+                    }
+                }
+            }
         }
     }
 
@@ -172,7 +174,7 @@ internal class Player : Sprite
             {
                 if (rise * run != 0)
                 {
-                    PlayerMissile missile = new PlayerMissile(xy, new Trajectory(rise, run, System.Math.Abs(rise * run*20)),UnicodeWars.xHit );
+                    PlayerMissile missile = new PlayerMissile(xy, new Trajectory(rise, run, System.Math.Abs(rise * run * 20)), UnicodeWars.xHit);
                     missile.HitPoints = 1;
                     this.Missiles.Items.Add(missile);
                 }
@@ -197,7 +199,8 @@ internal class Player : Sprite
     {
         Torpedos.Animate();
         Missiles.Animate();
-        foreach (PlayerTorpedo t in Torpedos.Items) {
+        foreach (PlayerTorpedo t in Torpedos.Items)
+        {
             if (!t.Alive) { this.TorpedoExplode(t.XY); }
         }
         if (!this.Alive && this.Missiles.Empty && this.Torpedos.Empty) { this.Active = false; }
