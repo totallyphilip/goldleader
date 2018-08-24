@@ -5,6 +5,13 @@ using System.Linq;
 
 namespace UnicodeEngine
 {
+    class Character
+    {
+        public static char ShadeLight { get { return '\x2591'; } }
+        public static char TriangleUpSolid { get { return '\x25b2'; } }
+        public static char DiamondLight { get { return '\x25ca'; } }
+        public static char HyphenDoubleOblique { get { return '\x2e17'; } }
+    }
     namespace Fx
     {
         public class Explosion : Sprites.Swarm

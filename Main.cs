@@ -6,21 +6,25 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 
+internal class CharSet {
+    public static char Missile { get { return '|'; } }
+    public static char Shield { get { return Character.DiamondLight; } }
+    public static char Torpedo { get { return Character.TriangleUpSolid; } }
+    public static char Smoke { get { return Character.ShadeLight; } }
+    public static char Damage { get { return Character.HyphenDoubleOblique; } }
+    public static char Debris { get { return 'x'; } }
+    // power ups
+    public static char AirStrike { get { return '#'; } }
+    public static char Jump { get { return '^'; } }
+    public static char Shrapnel { get { return '*'; } }
+}
+
 public class UnicodeWars
 {
     bool QuitFast = false;
     int FramesPerSecond = 10;
     bool PlayAgain;
     Galaxy Stars;
-
-    // unicode choices
-    static internal char xSmoke = '\x0489';
-    static internal char xHit = '\x00d7';
-    static internal char xShield = '\x25ca';
-    static internal char xDoubleMissile = '#';
-    static internal char xJump = ' '; //'\x25ac';
-    static internal char xTorpedo = '\x25b2';
-
 
 
     public UnicodeWars() { this.PlayAgain = true; }
@@ -368,7 +372,7 @@ public class UnicodeWars
                 {
                     PowerUp.ePowerUpType pt = Easy.Abacus.RandomEnumValue<PowerUp.ePowerUpType>();
                     powerup = new PowerUp(pt);
-                    powerup = new PowerUp(PowerUp.ePowerUpType.Torpedo); // to force a powerup choice
+                    //powerup = new PowerUp(PowerUp.ePowerUpType.Torpedo); // to force a powerup choice
                     FramesUntilPowerup = Easy.Abacus.Random.Next(200, 300);
                     FrameCounter = 0;
                 }
@@ -483,17 +487,17 @@ public class UnicodeWars
                         // hud
                         Console.ForegroundColor = ConsoleColor.White;
                         string ShieldMarkers = "";
-                        if (player.HitPoints > 0) { ShieldMarkers = new String(xShield, player.HitPoints - 1); }
+                        if (player.HitPoints > 0) { ShieldMarkers = new String(CharSet.Shield, player.HitPoints - 1); }
                         Screen.TryWrite(new Point(1, Screen.BottomEdge), ShieldMarkers + ' ');
 
                         try // this dies if the missile powerup is used
                         {
-                            string ShotMarkers = new string(' ', player.Missiles.Count + player.Torpedos.Count) + new string(xTorpedo, player.TorpedosLocked) + new String('|', player.MissileCapacity - player.Missiles.Items.Count);
+                            string ShotMarkers = new string(' ', player.Missiles.Count + player.Torpedos.Count) + new string(CharSet.Torpedo, player.TorpedosLocked) + new String('|', player.MissileCapacity - player.Missiles.Items.Count);
                             Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, Screen.BottomEdge), ShotMarkers);
                         }
                         catch
                         {
-                            string ShotMarkers = new string(' ', player.MissileCapacity + player.Torpedos.Count) + new string(xTorpedo, player.TorpedosLocked);
+                            string ShotMarkers = new string(' ', player.MissileCapacity + player.Torpedos.Count) + new string(CharSet.Torpedo, player.TorpedosLocked);
                             Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, Screen.BottomEdge), ShotMarkers);
                         }
 

@@ -9,7 +9,7 @@ internal class PlayerMissile : Sprite
 {
     //override public void OnHit(int damage) { this.HitPoints += damage; } // i don't think this is needed, does the same as the base class
     public PlayerMissile(UnicodeEngine.Grid.Point xy, UnicodeEngine.Grid.Trajectory t, char ascii) { constructor(xy, t, ascii); }
-    public PlayerMissile(UnicodeEngine.Grid.Point xy, UnicodeEngine.Grid.Trajectory t) { constructor(xy, t, '|'); }
+    public PlayerMissile(UnicodeEngine.Grid.Point xy, UnicodeEngine.Grid.Trajectory t) { constructor(xy, t, CharSet.Missile); }
 
     public void constructor(UnicodeEngine.Grid.Point xy, UnicodeEngine.Grid.Trajectory t, char ascii)
     {
@@ -86,12 +86,12 @@ internal class Player : Sprite
 
         if (hiteffect > 0)
         {
-            UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string(UnicodeWars.xShield, 5).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 3, 1, true, false, true, true));
+            UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string(CharSet.Shield, 5).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 3, 1, true, false, true, true));
         }
         else if (hiteffect < 0)
         {
-            if (this.HitPoints > 0) { UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string(UnicodeWars.xHit, this.Width).ToCharArray(), this.XY, this.Width, 3, 1, true, false, true, true)); }
-            else { UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string(UnicodeWars.xHit, 50).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true)); }
+            if (this.HitPoints > 0) { UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string(CharSet.Debris, this.Width).ToCharArray(), this.XY, this.Width, 3, 1, true, false, true, true)); }
+            else { UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string(CharSet.Debris, 50).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true)); }
         }
         else
         {
@@ -167,18 +167,22 @@ internal class Player : Sprite
 
     void TorpedoExplode(UnicodeEngine.Grid.Point xy)
     {
-        for (double rise = -1; rise < 1; rise += .5)
-        {
 
-            for (double run = -2; run < 2; run += .5)
-            {
-                if (rise !=0 || run != 0)
-                {
-                    PlayerMissile missile = new PlayerMissile(xy, new Trajectory(rise, run, 12), UnicodeWars.xHit);
-                    missile.HitPoints = 1;
-                    this.Missiles.Items.Add(missile);
-                }
-            }
+
+
+        for (int i = 0; i < 40; i++)
+        {
+            int degrees = Easy.Abacus.Random.Next(360);
+
+            double force = 1;
+            double rise = force * (Easy.Abacus.Random.NextDouble() + .5); // right (at least slightly)
+            double run = force * (Easy.Abacus.Random.NextDouble() + 1); // down (at least slightly)
+            if (Easy.Abacus.RandomTrue) { rise *= -1; }
+            if (Easy.Abacus.RandomTrue) { run *= -1; }
+
+            PlayerMissile missile = new PlayerMissile(xy, new Trajectory(rise, run, 12), CharSet.Shrapnel);
+            missile.HitPoints = 1;
+            this.Missiles.Items.Add(missile);
         }
     }
 

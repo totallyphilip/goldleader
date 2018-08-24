@@ -22,7 +22,7 @@ internal class PowerUp : Sprite
 
     public PowerUp(ePowerUpType type)
     {
-        char Symbol = '?'; // init value to satisfy the editor
+        char Symbol = '?'; // init value to eliminate warnings
 
         this.HitEffect = 0;
 
@@ -32,29 +32,28 @@ internal class PowerUp : Sprite
                 Symbol = '+';
                 break;
             case ePowerUpType.Shields: // deflector shield increase
-                Symbol = UnicodeWars.xShield;
+                Symbol = CharSet.Shield;
                 this.HitEffect = 1;
                 break;
             case ePowerUpType.Missiles: // fire an arc of missiles
-                Symbol = '|';
+                Symbol = CharSet.Missile;
                 this.Points = 5;
                 break;
             case ePowerUpType.Airstrike: // rain down missiles
-                Symbol = UnicodeWars.xDoubleMissile;
+                Symbol = CharSet.AirStrike;
                 this.Points = 5;
                 break;
             case ePowerUpType.Jump: // fly up
-                Symbol = UnicodeWars.xJump;
+                Symbol = CharSet.Jump;
                 this.Points = 5;
                 break;
             case ePowerUpType.Torpedo: // launch explosive
-                Symbol = UnicodeWars.xTorpedo;
+                Symbol = CharSet.Torpedo;
                 this.Points = 5;
                 break;
-
         }
 
-        this.Text = new[] { '(', Symbol, ')' };
+        this.Text = new[] { '\x258c', Symbol, '\x2590' };
         this.Color = System.ConsoleColor.Cyan;
         this.FlyZone.EdgeMode = FlyZoneClass.eEdgeMode.Ignore;
         this.Trail = new Trail(new Point(Abacus.Random.Next(Screen.LeftEdge + this.Width, Screen.RightEdge - this.Width), Screen.TopEdge));
