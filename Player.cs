@@ -4,7 +4,6 @@ using UnicodeEngine.Sprites;
 using Easy;
 using System.Collections.Generic;
 
-
 internal class PlayerMissile : Sprite
 {
     //override public void OnHit(int damage) { this.HitPoints += damage; } // i don't think this is needed, does the same as the base class
@@ -25,7 +24,7 @@ internal class PlayerTorpedo : Sprite
 {
     public PlayerTorpedo(UnicodeEngine.Grid.Point xy)
     {
-        this.Text = new[] { '\x25b2' };
+        this.Text = new[] { CharSet.Torpedo };
         this.Trail = new UnicodeEngine.Grid.Trail(xy);
         this.Trajectory = new Trajectory(-1, 0, Screen.Height / 2);
         this.Color = System.ConsoleColor.Red;
@@ -43,7 +42,7 @@ internal class Player : Sprite
 
     public Swarm Missiles = new Swarm();
     public Swarm Torpedos = new Swarm();
-    public int TorpedosLocked = 20;
+    public int TorpedosLocked = 0;
 
     int MyMissileCapacity = 1;
     public int MissileCapacity { get { return this.MyMissileCapacity; } }
@@ -53,6 +52,7 @@ internal class Player : Sprite
         if (this.MyMissileCapacity < 4) { this.MyMissileCapacity++; }
     }
 
+    #region  " Flight/Navigation "
     public void ToggleFlightMode()
     {
         if (this.FlightMode == eFlightMode.Attack) { SetFlightMode(eFlightMode.Maneuver); }
@@ -80,6 +80,15 @@ internal class Player : Sprite
     public void GoLeft() { this.Trajectory.Run = -1 * this.Run; }
     public void GoRight() { this.Trajectory.Run = this.Run; }
 
+    public void DropIn(double FallRate)
+    {
+        this.Hide();
+        this.Trajectory = new Trajectory(FallRate, 0);
+        this.Trail.Add(new Point(this.XY.dX, Screen.TopEdge));
+    }
+
+    #endregion
+
     override public void OnHit(int hiteffect)
     {
         this.HitPoints += hiteffect;
@@ -99,7 +108,6 @@ internal class Player : Sprite
         }
 
     }
-
     public Player()
     {
         SetFlightMode(eFlightMode.Maneuver);
@@ -111,6 +119,19 @@ internal class Player : Sprite
         this.Color = System.ConsoleColor.DarkYellow;
     }
 
+    override public void Activate()
+    {
+        Torpedos.Animate();
+        Missiles.Animate();
+        foreach (PlayerTorpedo t in Torpedos.Items)
+        {
+            if (!t.Alive) { this.MakeTorpedoShrapnel(t.XY); }
+        }
+        if (!this.Alive && this.Missiles.Empty && this.Torpedos.Empty) { this.Active = false; }
+    }
+
+    #region  " Torpedo "
+
     public void FireTorpedo()
     {
         if (this.TorpedosLocked > 0 && this.Alive)
@@ -119,6 +140,24 @@ internal class Player : Sprite
             this.Torpedos.Add(new PlayerTorpedo(this.XY.Clone(this.Width / 2, 0)));
         }
     }
+
+    void MakeTorpedoShrapnel(UnicodeEngine.Grid.Point xy)
+    {
+        for (int i = 0; i < 20; i++)
+        {
+            double velocity = 2;
+            Easy.Abacus.Slope slope = Abacus.SlopeFrom(Abacus.RandomDegrees);
+            PlayerMissile missile = new PlayerMissile(xy, new Trajectory(slope.Rise * velocity, slope.Run * velocity, 12), CharSet.Shrapnel);
+            missile.HitPoints = 1;
+            this.Missiles.Items.Add(missile);
+        }
+    }
+
+    #endregion
+
+
+    #region " Blasters "
+
     public void Fire()
     {
         if (this.Alive)
@@ -148,39 +187,16 @@ internal class Player : Sprite
         }
     }
 
-    public void DropIn(double FallRate)
+    public void FireBloom()
     {
-        this.Hide();
-        this.Trajectory = new Trajectory(FallRate, 0);
-        this.Trail.Add(new Point(this.XY.dX, Screen.TopEdge));
-    }
-
-    public void FireSpread()
-    {
-        for (double run = -2; run < 2; run += .2)
+        for (double degrees = 200; degrees <= 340; degrees += 10)
         {
-            PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(-1, run, Screen.Height * .75));
+            Abacus.Slope slope = Abacus.SlopeFrom(degrees);
+            PlayerMissile missile = new PlayerMissile(this.XY.Clone(this.Width / 2, 0), new Trajectory(slope.Rise, slope.Run, Screen.Height * .75));
             missile.HitPoints = 1;
             this.Missiles.Items.Add(missile);
         }
     }
-
-    void TorpedoExplode(UnicodeEngine.Grid.Point xy)
-    {
-
-
-
-        for (int i = 0; i < 20; i++)
-        {
-double velocity = 2;
-            Easy.Abacus.Slope slope = Abacus.SlopeFrom(Abacus.RandomDegrees);
-            PlayerMissile missile = new PlayerMissile(xy, new Trajectory(slope.Rise*velocity, slope.Run*velocity, 12), CharSet.Shrapnel);
-            missile.HitPoints = 1;
-            this.Missiles.Items.Add(missile);
-        }
-    }
-
-
 
     public void FireAirStrike()
     {
@@ -192,16 +208,5 @@ double velocity = 2;
         }
     }
 
-
-    override public void Activate()
-    {
-        Torpedos.Animate();
-        Missiles.Animate();
-        foreach (PlayerTorpedo t in Torpedos.Items)
-        {
-            if (!t.Alive) { this.TorpedoExplode(t.XY); }
-        }
-        if (!this.Alive && this.Missiles.Empty && this.Torpedos.Empty) { this.Active = false; }
-    }
-
+    #endregion
 }

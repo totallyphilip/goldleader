@@ -373,7 +373,7 @@ public class UnicodeWars
                 {
                     PowerUp.ePowerUpType pt = Easy.Abacus.RandomEnumValue<PowerUp.ePowerUpType>();
                     powerup = new PowerUp(pt);
-                    //powerup = new PowerUp(PowerUp.ePowerUpType.Torpedo); // to force a powerup choice
+                    //powerup = new PowerUp(PowerUp.ePowerUpType.Missiles); // to force a powerup choice
                     FramesUntilPowerup = Easy.Abacus.Random.Next(200, 300);
                     FrameCounter = 0;
                 }
@@ -457,7 +457,7 @@ public class UnicodeWars
                                     case PowerUp.ePowerUpType.Shields:
                                         break;
                                     case PowerUp.ePowerUpType.Missiles:
-                                        player.FireSpread();
+                                        player.FireBloom();
                                         break;
                                     case PowerUp.ePowerUpType.Airstrike:
                                         player.FireAirStrike();
@@ -493,7 +493,7 @@ public class UnicodeWars
 
                         try // this dies if the missile powerup is used
                         {
-                            string ShotMarkers = new string(' ', player.Missiles.Count + player.Torpedos.Count) + new string(CharSet.Torpedo, player.TorpedosLocked) + new String('|', player.MissileCapacity - player.Missiles.Items.Count);
+                            string ShotMarkers = new string(' ', player.Missiles.Count + player.Torpedos.Count)  + new String('|', player.MissileCapacity - player.Missiles.Items.Count)+ new string(CharSet.Torpedo, player.TorpedosLocked);
                             Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, Screen.BottomEdge), ShotMarkers);
                         }
                         catch

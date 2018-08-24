@@ -56,6 +56,6 @@ internal class Galaxy: Complex
     public Galaxy()
     {
         this.Add(new Starfield(.1, .75, System.ConsoleColor.DarkGray)); // slow
-        this.Add(new Starfield(1, .2, System.ConsoleColor.White)); // fast
+        this.Add(new Starfield(.9, .2, System.ConsoleColor.White)); // fast
     }
 }
