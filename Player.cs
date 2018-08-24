@@ -145,7 +145,7 @@ internal class Player : Sprite
     {
         for (int i = 0; i < 20; i++)
         {
-            double velocity = 2;
+            double velocity = 1; // velocity too high was skipping shrapnel right over targets
             Easy.Abacus.Slope slope = Abacus.SlopeFrom(Abacus.RandomDegrees);
             PlayerMissile missile = new PlayerMissile(xy, new Trajectory(slope.Rise * velocity, slope.Run * velocity, 12), CharSet.Shrapnel);
             missile.HitPoints = 1;

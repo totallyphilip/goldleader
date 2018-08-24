@@ -26,6 +26,7 @@ public class UnicodeWars
     int FramesPerSecond = 10;
     bool PlayAgain;
     Galaxy Stars;
+    int TimeLimit = 90;
 
 
     public UnicodeWars() { this.PlayAgain = true; }
@@ -181,6 +182,7 @@ public class UnicodeWars
         // misc
         bool Paused = false;
         bool HeroBonusGiven = false;
+        Easy.Clock.Timer timer = new Easy.Clock.Timer();
 
         #region  " Waves "
 
@@ -361,10 +363,23 @@ public class UnicodeWars
 
             int FramesUntilPowerup = Easy.Abacus.Random.Next(100, 150);
 
+            bool AttackRunStarted = false;
+            //timer.Pause();
+
             do
             {
 
-                if (Scroller.Empty) { wave.StartAttackRun(); } // wait until wave intro messages are gone
+                if (!AttackRunStarted)
+                {
+                    if (Scroller.Empty) // wait until wave intro messages are gone
+                    { 
+                        wave.StartAttackRun();
+                        timer.Start();
+                        AttackRunStarted = true;
+                    }
+
+                }
+
 
                 Console.CursorVisible = false; // windows turns the cursor back on when restoring from minimized window
 
@@ -493,13 +508,23 @@ public class UnicodeWars
 
                         try // this dies if the missile powerup is used
                         {
-                            string ShotMarkers = new string(' ', player.Missiles.Count + player.Torpedos.Count)  + new String('|', player.MissileCapacity - player.Missiles.Items.Count)+ new string(CharSet.Torpedo, player.TorpedosLocked);
+                            string ShotMarkers = new string(' ', player.Missiles.Count + player.Torpedos.Count) + new String('|', player.MissileCapacity - player.Missiles.Items.Count) + new string(CharSet.Torpedo, player.TorpedosLocked);
                             Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, Screen.BottomEdge), ShotMarkers);
                         }
                         catch
                         {
                             string ShotMarkers = new string(' ', player.MissileCapacity + player.Torpedos.Count) + new string(CharSet.Torpedo, player.TorpedosLocked);
                             Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, Screen.BottomEdge), ShotMarkers);
+                        }
+
+                        if (AttackRunStarted)
+                        {
+
+                            string secondsremaining = " " + (TimeLimit - timer.ElapsedSeconds).ToString("0") + " ";
+                            if (TimeLimit - timer.ElapsedSeconds > 0) { Console.ForegroundColor = ConsoleColor.White; }
+                            else { Console.ForegroundColor = ConsoleColor.Red; }
+
+                            Screen.TryWrite(new Point((Screen.Width-secondsremaining.Length) / 2, Screen.BottomEdge), secondsremaining);
                         }
 
                     }
@@ -598,7 +623,8 @@ public class UnicodeWars
                             break;
                         case ConsoleKey.Enter:
                             Paused = !Paused;
-                            if (!Paused) { Instructions.TerminateAll(); }
+                            if (Paused) { timer.Pause(); }
+                            else { timer.Resume(); Instructions.TerminateAll(); }
                             break;
                     }
 
@@ -610,6 +636,7 @@ public class UnicodeWars
                 {
                     if (wave.Completed() && !ClosingWordsStated)
                     {
+                        timer.Pause();
                         ClosingWordsStated = true;
                         if (HyperdriveMode == eHyperdriveMode.Disengaged)
                         {
@@ -624,6 +651,12 @@ public class UnicodeWars
                             Scroller.NewLine("+" + (hyperbonus.Value * 10) + " navicomputer Fibonacci bonus.");
                             Score += hyperbonus.Value * 10;
                             hyperbonus.Increment();
+                                int timebonus = TimeLimit - Easy.Abacus.Round( timer.ElapsedSeconds);
+                            if (timebonus > 0)
+                            {
+                                Scroller.NewLine("+" + timebonus + " time bonus.");
+                                Score += timebonus;
+                            }
                         };
                     }
                 }

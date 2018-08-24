@@ -6,10 +6,12 @@ namespace Easy
 {
     public class Abacus
     {
-        public class Slope{
+        public class Slope
+        {
             public double Rise;
             public double Run;
-            public Slope(double rise, double run) {
+            public Slope(double rise, double run)
+            {
                 this.Rise = rise;
                 this.Run = run;
             }
@@ -26,12 +28,13 @@ namespace Easy
         public static bool RandomTrue { get { return Abacus.Random.NextDouble() < .5; } }
         public static double RandomDegrees { get { return Abacus.Random.Next(360); } }
 
-        public static Slope SlopeFrom(double degrees) {
+        public static Slope SlopeFrom(double degrees)
+        {
             // 0 degrees is east
             double radians = degrees * Math.PI / 180;
             double run = Math.Cos(radians);
             double rise = Math.Sin(radians);
-            return new Slope(rise,run);
+            return new Slope(rise, run);
         }
 
         public static double Distance(UnicodeEngine.Grid.Point c1, UnicodeEngine.Grid.Point c2)
@@ -122,6 +125,44 @@ namespace Easy
         public static void StartTimer() { StopWatchTick = DateTime.Now.Ticks; }
 
         public static bool Elapsed(int seconds) { return DateTime.Now.Ticks > StopWatchTick + seconds * 10000000; }
+
+
+        // rename the timer class, and the starttimer function above, etc. it's confusing.
+
+
+
+        public class Timer
+        {
+            Int64 StartedTick;
+            Int64 PausedTick;
+            bool Paused { get { return this.PausedTick > 0; } } // infer if timer is paused
+
+            public Timer() { this.Start(); }
+
+            public void Start()
+            {
+                this.StartedTick = DateTime.Now.Ticks;
+                this.PausedTick = 0;
+            }
+            public void Pause() { if (!this.Paused) { this.PausedTick = DateTime.Now.Ticks; } }
+            public void Resume()
+            {
+                if (this.Paused)
+                {
+                    this.StartedTick += DateTime.Now.Ticks - this.PausedTick;
+                    this.PausedTick = 0;
+                }
+            }
+            public double ElapsedSeconds
+            {
+                get
+                {
+                    if (this.Paused) { return (this.PausedTick - this.StartedTick) / 10000000; }
+                    else { return (DateTime.Now.Ticks - this.StartedTick) / 10000000; }
+                }
+            }
+
+        }
     }
 }
 
