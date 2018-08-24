@@ -6,6 +6,14 @@ namespace Easy
 {
     public class Abacus
     {
+        public class Slope{
+            public double Rise;
+            public double Run;
+            public Slope(double rise, double run) {
+                this.Rise = rise;
+                this.Run = run;
+            }
+        }
 
         public static T RandomEnumValue<T>()
         {
@@ -16,6 +24,15 @@ namespace Easy
 
         public static Random Random = new Random();
         public static bool RandomTrue { get { return Abacus.Random.NextDouble() < .5; } }
+        public static double RandomDegrees { get { return Abacus.Random.Next(360); } }
+
+        public static Slope SlopeFrom(double degrees) {
+            // 0 degrees is east
+            double radians = degrees * Math.PI / 180;
+            double run = Math.Cos(radians);
+            double rise = Math.Sin(radians);
+            return new Slope(rise,run);
+        }
 
         public static double Distance(UnicodeEngine.Grid.Point c1, UnicodeEngine.Grid.Point c2)
         {

@@ -43,7 +43,7 @@ internal class Player : Sprite
 
     public Swarm Missiles = new Swarm();
     public Swarm Torpedos = new Swarm();
-    public int TorpedosLocked = 0;
+    public int TorpedosLocked = 20;
 
     int MyMissileCapacity = 1;
     public int MissileCapacity { get { return this.MyMissileCapacity; } }
@@ -170,17 +170,11 @@ internal class Player : Sprite
 
 
 
-        for (int i = 0; i < 40; i++)
+        for (int i = 0; i < 20; i++)
         {
-            int degrees = Easy.Abacus.Random.Next(360);
-
-            double force = 1;
-            double rise = force * (Easy.Abacus.Random.NextDouble() + .5); // right (at least slightly)
-            double run = force * (Easy.Abacus.Random.NextDouble() + 1); // down (at least slightly)
-            if (Easy.Abacus.RandomTrue) { rise *= -1; }
-            if (Easy.Abacus.RandomTrue) { run *= -1; }
-
-            PlayerMissile missile = new PlayerMissile(xy, new Trajectory(rise, run, 12), CharSet.Shrapnel);
+double velocity = 2;
+            Easy.Abacus.Slope slope = Abacus.SlopeFrom(Abacus.RandomDegrees);
+            PlayerMissile missile = new PlayerMissile(xy, new Trajectory(slope.Rise*velocity, slope.Run*velocity, 12), CharSet.Shrapnel);
             missile.HitPoints = 1;
             this.Missiles.Items.Add(missile);
         }

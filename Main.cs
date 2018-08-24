@@ -6,7 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 
-internal class CharSet {
+internal class CharSet
+{
     public static char Missile { get { return '|'; } }
     public static char Shield { get { return Character.DiamondLight; } }
     public static char Torpedo { get { return Character.TriangleUpSolid; } }
@@ -395,8 +396,8 @@ public class UnicodeWars
                         Instructions.NewLine("Press Enter to resume game.");
                         Instructions.NewLine();
                         Instructions.NewLine("Ship controls:");
-                        Instructions.NewLine("Space = Fire");
-                        Instructions.NewLine("Tab = Use Torpedo");
+                        Instructions.NewLine("Space = Fire Blasters");
+                        Instructions.NewLine("Control-Space = Fire Torpedo");
                         Instructions.NewLine("Left/Right = Move");
                         Instructions.NewLine("Up = Hyperdrive");
                         Instructions.NewLine("Down = Toggle S-foils");
@@ -585,10 +586,12 @@ public class UnicodeWars
                             player.ToggleFlightMode();
                             break;
                         case ConsoleKey.Spacebar:
-                            if (HyperdriveMode != eHyperdriveMode.Engaged) { player.Fire(); }
-                            break;
-                        case ConsoleKey.Tab:
-                            if (HyperdriveMode != eHyperdriveMode.Engaged) { player.FireTorpedo(); }
+                            if (HyperdriveMode != eHyperdriveMode.Engaged)
+                            {
+                                if ((k.Modifiers & ConsoleModifiers.Control) != 0) { player.FireTorpedo(); }
+                                else { player.Fire(); }
+
+                            }
                             break;
                         case ConsoleKey.Escape:
                             QuitFast = true;

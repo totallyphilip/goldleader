@@ -19,30 +19,31 @@ namespace UnicodeEngine
 
             public Explosion() { }
 
-            public Explosion(char[] text, Grid.Point coord, int width, double range, double force, bool up, bool down, bool left, bool right)
+            public Explosion(char[] text, Grid.Point coord, int width, double range, double velocity, bool up, bool down, bool left, bool right)
             {
-                constructor(text, coord, width, range, force, up, down, left, right);
+                constructor(text, coord, width, range, velocity, up, down, left, right);
             }
 
-            void constructor(char[] text, Grid.Point coord, int width, double range, double force, bool up, bool down, bool left, bool right)
+            void constructor(char[] text, Grid.Point coord, int width, double range, double velocity, bool up, bool down, bool left, bool right)
             {
 
                 int position = 0;
 
                 foreach (char c in text)
                 {
-                    double rise = force * (Easy.Abacus.Random.NextDouble() + .1); // right (at least slightly)
-                    double run = force * (Easy.Abacus.Random.NextDouble() + .1); // down (at least slightly)
+                    Abacus.Slope slope = Abacus.SlopeFrom(Abacus.RandomDegrees);
 
-                    if (!up && !down) { rise = 0; } // no rise
-                    if (up && !down) { rise *= -1; } // go up
-                    if (up && down) { if (Easy.Abacus.RandomTrue) { rise *= -1; } } // surprise me
+                    double throttle = Abacus.Random.NextDouble()+.1; // add a fraction to make sure it's never zero
 
-                    if (!left && !right) { run = 0; } // no run
-                    if (left && !right) { run *= -1; } // go left
-                    if (left && right) { if (Easy.Abacus.RandomTrue) { run *= -1; } } // surprise me
+                    slope.Rise *= velocity * throttle;
+                    slope.Run *= velocity * throttle;
 
-                    Grid.Trajectory t = new Grid.Trajectory(rise, run, range);
+                    if (!up && !down) { slope.Rise = 0; } // no rise
+                    if (up && !down) { slope.Rise *= -1; } // go up
+                    if (!left && !right) { slope.Run = 0; } // no run
+                    if (left && !right) { slope.Run *= -1; } // go left
+
+                    Grid.Trajectory t = new Grid.Trajectory(slope.Rise,slope.Run, range);
                     Grid.Point xy = coord.Clone();
 
                     xy.dX += position;
