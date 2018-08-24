@@ -172,9 +172,9 @@ internal class Player : Sprite
 
             for (double run = -2; run < 2; run += .5)
             {
-                if (rise * run != 0)
+                if (rise !=0 || run != 0)
                 {
-                    PlayerMissile missile = new PlayerMissile(xy, new Trajectory(rise, run, System.Math.Abs(rise * run * 20)), UnicodeWars.xHit);
+                    PlayerMissile missile = new PlayerMissile(xy, new Trajectory(rise, run, 12), UnicodeWars.xHit);
                     missile.HitPoints = 1;
                     this.Missiles.Items.Add(missile);
                 }

@@ -368,7 +368,7 @@ public class UnicodeWars
                 {
                     PowerUp.ePowerUpType pt = Easy.Abacus.RandomEnumValue<PowerUp.ePowerUpType>();
                     powerup = new PowerUp(pt);
-                    //powerup = new PowerUp(PowerUp.ePowerUpType.Torpedo); // to force a powerup choice
+                    powerup = new PowerUp(PowerUp.ePowerUpType.Torpedo); // to force a powerup choice
                     FramesUntilPowerup = Easy.Abacus.Random.Next(200, 300);
                     FrameCounter = 0;
                 }
