@@ -33,7 +33,7 @@ namespace UnicodeEngine
                 {
                     Abacus.Slope slope = Abacus.SlopeFrom(Abacus.RandomDegrees);
 
-                    double throttle = Abacus.Random.NextDouble()+.1; // add a fraction to make sure it's never zero
+                    double throttle = Abacus.Random.NextDouble() + .1; // add a fraction to make sure it's never zero
 
                     slope.Rise *= velocity * throttle;
                     slope.Run *= velocity * throttle;
@@ -43,7 +43,7 @@ namespace UnicodeEngine
                     if (!left && !right) { slope.Run = 0; } // no run
                     if (left && !right) { slope.Run *= -1; } // go left
 
-                    Grid.Trajectory t = new Grid.Trajectory(slope.Rise,slope.Run, range);
+                    Grid.Trajectory t = new Grid.Trajectory(slope.Rise, slope.Run, range);
                     Grid.Point xy = coord.Clone();
 
                     xy.dX += position;
@@ -747,8 +747,10 @@ namespace UnicodeEngine
             System.Console.OutputEncoding = System.Text.Encoding.Unicode;
             System.Console.CursorVisible = false;
 
-            Screen.TryWrite(coord.iX - 1, coord.iY, '\u25ba');
-            Screen.TryWrite(coord.iX + maxlength, coord.iY, '\u25c4');
+            Screen.TryWrite(coord.iX - 2, coord.iY - 1, "\x2554" + new string('\x2550', maxlength + 2) + "\x2557");
+            Screen.TryWrite(coord.iX - 2, coord.iY + 1, "\x255a" + new string('\x2550', maxlength + 2) + "\x255d");
+            Screen.TryWrite(coord.iX - 2, coord.iY, "\x2551\x25ba");
+            Screen.TryWrite(coord.iX + maxlength, coord.iY, "\x25c4\x2551");
 
             List<char> alphabet = new List<char>();
             alphabet.Add(' ');
