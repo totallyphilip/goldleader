@@ -1,7 +1,7 @@
 using Easy;
-using UnicodeEngine;
-using UnicodeEngine.Grid;
-using UnicodeEngine.Sprites;
+using AsciiEngine;
+using AsciiEngine.Grid;
+using AsciiEngine.Sprites;
 
 internal class PowerUp : Sprite
 {

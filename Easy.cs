@@ -1,4 +1,4 @@
-using UnicodeEngine;
+using AsciiEngine;
 using System;
 using System.Collections.Generic;
 
@@ -37,7 +37,7 @@ namespace Easy
             return new Slope(rise, run);
         }
 
-        public static double Distance(UnicodeEngine.Grid.Point c1, UnicodeEngine.Grid.Point c2)
+        public static double Distance(AsciiEngine.Grid.Point c1, AsciiEngine.Grid.Point c2)
         {
             return Math.Sqrt(Math.Pow(c1.dX - c2.dX, 2) + Math.Pow(c1.dY - c2.dY, 2));
         }
@@ -79,9 +79,17 @@ namespace Easy
     {
         public static string Repeat(string s, int n)
         {
-            string result = "";
-            for (int i = 0; i < n; i++) { result += s; }
+            string result = s;
+            for (int i = 1; i < n; i++) { result += s; }
             return result;
+        }
+
+        public static string Fluffer(string s, string fluff)
+        {
+            string fluffed = "";
+            for (int i = 0; i < s.Length - 1; i++) { fluffed += s.ToCharArray()[i] + fluff; }
+            fluffed += s.ToCharArray()[s.Length - 1];
+            return fluffed;
         }
 
         public static string Pluralize(string s, int i)

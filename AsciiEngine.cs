@@ -3,14 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace UnicodeEngine
+namespace AsciiEngine
 {
-    class Character
+
+    internal class Application
+    {
+        public static string Title = "Untitled";
+    }
+    class Symbol
     {
         public static char ShadeLight { get { return '\x2591'; } }
         public static char TriangleUpSolid { get { return '\x25b2'; } }
         public static char DiamondLight { get { return '\x25ca'; } }
         public static char HyphenDoubleOblique { get { return '\x2e17'; } }
+        public static char DotCenter { get { return '\x00b7'; } }
     }
     namespace Fx
     {

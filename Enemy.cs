@@ -1,7 +1,7 @@
-using UnicodeEngine;
-using UnicodeEngine.Fx;
-using UnicodeEngine.Grid;
-using UnicodeEngine.Sprites;
+using AsciiEngine;
+using AsciiEngine.Fx;
+using AsciiEngine.Grid;
+using AsciiEngine.Sprites;
 using Easy;
 
 internal class Enemy : Sprite
@@ -49,17 +49,17 @@ internal class Enemy : Sprite
         int scorefactor = (Screen.Height - this.XY.iY) / 4;
         int points = 1;
 
-        UnicodeEngine.Sprites.Static.Swarms.Add(new Explosion(new string(CharSet.Debris, this.Width).ToCharArray(), this.XY, this.Width, 3, 1, true, true, true, true));
+        AsciiEngine.Sprites.Static.Swarms.Add(new Explosion(new string(CharSet.Debris, this.Width).ToCharArray(), this.XY, this.Width, 3, 1, true, true, true, true));
         if (this.Alive)
         {
-            this.Text[Abacus.Random.Next(this.Text.Length)] =  CharSet.Damage;
+            this.Text[Abacus.Random.Next(this.Text.Length)] = CharSet.Damage;
             this.Trail.Add(this.XY.Clone(0, -1));
             this.Trajectory.Run *= -.75;
         }
         else
         {
 
-            UnicodeEngine.Sprites.Static.Swarms.Add(new Explosion(this.Text, this.XY, this.Width, DebrisRange, 1, true, true, true, true));
+            AsciiEngine.Sprites.Static.Swarms.Add(new Explosion(this.Text, this.XY, this.Width, DebrisRange, 1, true, true, true, true));
 
             points = 2;
         }
@@ -79,7 +79,7 @@ internal class Enemy : Sprite
             // add smoke
             if (this.HitPoints < this.InitialHitPoints && Abacus.Random.NextDouble() > .8)
             {
-                UnicodeEngine.Sprites.Static.Swarms.Add(new Explosion(new string(CharSet.Smoke, this.InitialHitPoints - this.HitPoints).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 2, .5, true, true, true, true));
+                AsciiEngine.Sprites.Static.Swarms.Add(new Explosion(new string(CharSet.Smoke, this.InitialHitPoints - this.HitPoints).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 2, .5, true, true, true, true));
             }
 
             // reverse direction

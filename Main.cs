@@ -1,7 +1,7 @@
-using UnicodeEngine;
-using UnicodeEngine.Fx;
-using UnicodeEngine.Grid;
-using UnicodeEngine.Sprites;
+using AsciiEngine;
+using AsciiEngine.Fx;
+using AsciiEngine.Grid;
+using AsciiEngine.Sprites;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -9,10 +9,10 @@ using System.Data.SqlClient;
 internal class CharSet
 {
     public static char Missile { get { return '|'; } }
-    public static char Shield { get { return Character.DiamondLight; } }
-    public static char Torpedo { get { return Character.TriangleUpSolid; } }
-    public static char Smoke { get { return Character.ShadeLight; } }
-    public static char Damage { get { return Character.HyphenDoubleOblique; } }
+    public static char Shield { get { return Symbol.DiamondLight; } }
+    public static char Torpedo { get { return Symbol.TriangleUpSolid; } }
+    public static char Smoke { get { return Symbol.ShadeLight; } }
+    public static char Damage { get { return Symbol.HyphenDoubleOblique; } }
     public static char Debris { get { return 'x'; } }
     // power ups
     public static char AirStrike { get { return '#'; } }
@@ -22,6 +22,7 @@ internal class CharSet
 
 public class UnicodeWars
 {
+
     bool QuitFast = false;
     int FramesPerSecond = 10;
     bool PlayAgain;
@@ -34,6 +35,9 @@ public class UnicodeWars
 
     public int TryPlay(int HighScore)
     {
+
+        AsciiEngine.Application.Title = "GOLD LEADER";
+
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
         Screen.TryInitializeScreen(50, 40, false);
@@ -74,11 +78,11 @@ public class UnicodeWars
 
         List<string> Messages = new List<string>();
 
-        Messages.Add("U N I C O D E   W A R S");
+        Messages.Add(Easy.Textify.Fluffer(AsciiEngine.Application.Title, " "));
         Messages.Add("");
         foreach (Enemy.eEnemyType shiptype in (Enemy.eEnemyType[])System.Enum.GetValues(typeof(Enemy.eEnemyType)))
         {
-            Enemy bg = new Enemy(shiptype,true);
+            Enemy bg = new Enemy(shiptype, true);
             DemoEnemies.Items.Add(bg);
             Messages.Add(new string(bg.Text) + " " + Enum.GetName(typeof(Enemy.eEnemyType), shiptype) + " (" + bg.HitPoints + " HP)");
         }
@@ -101,7 +105,7 @@ public class UnicodeWars
             {
                 foreach (Enemy.eEnemyType shiptype in (Enemy.eEnemyType[])System.Enum.GetValues(typeof(Enemy.eEnemyType)))
                 {
-                    DemoEnemies.Items.Add(new Enemy(shiptype,true));
+                    DemoEnemies.Items.Add(new Enemy(shiptype, true));
                 }
             }
 
@@ -142,8 +146,8 @@ public class UnicodeWars
             }
             Stars.Animate();
             DemoEnemies.Animate();
-            UnicodeEngine.Sprites.Static.Swarms.Animate();
-            UnicodeEngine.Sprites.Static.Sprites.Animate();
+            AsciiEngine.Sprites.Static.Swarms.Animate();
+            AsciiEngine.Sprites.Static.Sprites.Animate();
             Scroller.Animate();
             Easy.Clock.FpsThrottle(8);
 
@@ -372,7 +376,7 @@ public class UnicodeWars
                 if (!AttackRunStarted)
                 {
                     if (Scroller.Empty) // wait until wave intro messages are gone
-                    { 
+                    {
                         wave.StartAttackRun();
                         timer.Start();
                         AttackRunStarted = true;
@@ -402,7 +406,7 @@ public class UnicodeWars
                 if (Paused)
                 {
                     player.Refresh();
-                    UnicodeEngine.Sprites.Static.Swarms.Refresh();
+                    AsciiEngine.Sprites.Static.Swarms.Refresh();
                     player.Missiles.Refresh();
                     wave.Refresh();
                     if (Instructions.Empty)
@@ -412,7 +416,7 @@ public class UnicodeWars
                         Instructions.NewLine();
                         Instructions.NewLine("Ship controls:");
                         Instructions.NewLine("Space = Fire Blasters");
-                        Instructions.NewLine("Control-Space = Fire Torpedo");
+                        Instructions.NewLine("Tab = Fire Torpedo");
                         Instructions.NewLine("Left/Right = Move");
                         Instructions.NewLine("Up = Hyperdrive");
                         Instructions.NewLine("Down = Toggle S-foils");
@@ -437,8 +441,8 @@ public class UnicodeWars
                 else
                 {
 
-                    UnicodeEngine.Sprites.Static.Swarms.Animate();
-                    UnicodeEngine.Sprites.Static.Sprites.Animate();
+                    AsciiEngine.Sprites.Static.Swarms.Animate();
+                    AsciiEngine.Sprites.Static.Sprites.Animate();
 
                     if (HyperdriveMode == eHyperdriveMode.Engaged)
                     {
@@ -523,7 +527,7 @@ public class UnicodeWars
                             if (TimeLimit - timer.ElapsedSeconds > 0) { Console.ForegroundColor = ConsoleColor.White; }
                             else { Console.ForegroundColor = ConsoleColor.Red; }
 
-                            Screen.TryWrite(new Point((Screen.Width-secondsremaining.Length) / 2, Screen.BottomEdge), secondsremaining);
+                            Screen.TryWrite(new Point((Screen.Width - secondsremaining.Length) / 2, Screen.BottomEdge), secondsremaining);
                         }
 
                     }
@@ -609,13 +613,11 @@ public class UnicodeWars
                         case ConsoleKey.DownArrow:
                             player.ToggleFlightMode();
                             break;
+                        case ConsoleKey.Tab:
+                            if (HyperdriveMode != eHyperdriveMode.Engaged) { player.FireTorpedo(); }
+                            break;
                         case ConsoleKey.Spacebar:
-                            if (HyperdriveMode != eHyperdriveMode.Engaged)
-                            {
-                                if ((k.Modifiers & ConsoleModifiers.Control) != 0) { player.FireTorpedo(); }
-                                else { player.Fire(); }
-
-                            }
+                            if (HyperdriveMode != eHyperdriveMode.Engaged) { player.Fire(); }
                             break;
                         case ConsoleKey.Escape:
                             QuitFast = true;
@@ -650,7 +652,7 @@ public class UnicodeWars
                             Scroller.NewLine("+" + (hyperbonus.Value * 10) + " navicomputer Fibonacci bonus.");
                             Score += hyperbonus.Value * 10;
                             hyperbonus.Increment();
-                                int timebonus = TimeLimit - Easy.Abacus.Round( timer.ElapsedSeconds);
+                            int timebonus = TimeLimit - Easy.Abacus.Round(timer.ElapsedSeconds);
                             if (timebonus > 0)
                             {
                                 Scroller.NewLine("+" + timebonus + " time bonus.");
@@ -706,7 +708,7 @@ public class UnicodeWars
                 dbConn.Open();
 
                 // don't prompt for input until after we tried to open the database
-                string initials = UnicodeEngine.Input.ArcadeInitials(new Point(Screen.Width / 2 - 2.5, Screen.Height / 2), 3);
+                string initials = AsciiEngine.Input.ArcadeInitials(new Point(Screen.Width / 2 - 2.5, Screen.Height / 2), 3);
                 if (string.IsNullOrWhiteSpace(initials)) { initials = "???"; }
 
                 SqlCommand oCommand = new SqlCommand("dbo.AddScore", dbConn);

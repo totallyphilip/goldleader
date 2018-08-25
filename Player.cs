@@ -1,19 +1,19 @@
-using UnicodeEngine;
-using UnicodeEngine.Grid;
-using UnicodeEngine.Sprites;
+using AsciiEngine;
+using AsciiEngine.Grid;
+using AsciiEngine.Sprites;
 using Easy;
 using System.Collections.Generic;
 
 internal class PlayerMissile : Sprite
 {
     //override public void OnHit(int damage) { this.HitPoints += damage; } // i don't think this is needed, does the same as the base class
-    public PlayerMissile(UnicodeEngine.Grid.Point xy, UnicodeEngine.Grid.Trajectory t, char ascii) { constructor(xy, t, ascii); }
-    public PlayerMissile(UnicodeEngine.Grid.Point xy, UnicodeEngine.Grid.Trajectory t) { constructor(xy, t, CharSet.Missile); }
+    public PlayerMissile(AsciiEngine.Grid.Point xy, AsciiEngine.Grid.Trajectory t, char ascii) { constructor(xy, t, ascii); }
+    public PlayerMissile(AsciiEngine.Grid.Point xy, AsciiEngine.Grid.Trajectory t) { constructor(xy, t, CharSet.Missile); }
 
-    public void constructor(UnicodeEngine.Grid.Point xy, UnicodeEngine.Grid.Trajectory t, char ascii)
+    public void constructor(AsciiEngine.Grid.Point xy, AsciiEngine.Grid.Trajectory t, char ascii)
     {
         this.Text = new[] { ascii };
-        this.Trail = new UnicodeEngine.Grid.Trail(xy);
+        this.Trail = new AsciiEngine.Grid.Trail(xy);
         this.Trajectory = t;
         this.Color = System.ConsoleColor.Red;
     }
@@ -22,10 +22,10 @@ internal class PlayerMissile : Sprite
 
 internal class PlayerTorpedo : Sprite
 {
-    public PlayerTorpedo(UnicodeEngine.Grid.Point xy)
+    public PlayerTorpedo(AsciiEngine.Grid.Point xy)
     {
         this.Text = new[] { CharSet.Torpedo };
-        this.Trail = new UnicodeEngine.Grid.Trail(xy);
+        this.Trail = new AsciiEngine.Grid.Trail(xy);
         this.Trajectory = new Trajectory(-1, 0, Screen.Height / 2);
         this.Color = System.ConsoleColor.Red;
 
@@ -42,7 +42,7 @@ internal class Player : Sprite
 
     public Swarm Missiles = new Swarm();
     public Swarm Torpedos = new Swarm();
-    public int TorpedosLocked = 0;
+    public int TorpedosLocked = 20;
 
     int MyMissileCapacity = 1;
     public int MissileCapacity { get { return this.MyMissileCapacity; } }
@@ -66,7 +66,7 @@ internal class Player : Sprite
         if (mode == eFlightMode.Maneuver)
         {
             this.FlightMode = eFlightMode.Maneuver;
-            this.Text = "\x00b7==\x00b7".ToCharArray();
+            this.Text = (Symbol.DotCenter + "==" + Symbol.DotCenter).ToCharArray();
             this.Run = 1.5;
         }
         else
@@ -95,16 +95,16 @@ internal class Player : Sprite
 
         if (hiteffect > 0)
         {
-            UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string(CharSet.Shield, 5).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 3, 1, true, false, true, true));
+            AsciiEngine.Sprites.Static.Swarms.Add(new AsciiEngine.Fx.Explosion(new string(CharSet.Shield, 5).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 3, 1, true, false, true, true));
         }
         else if (hiteffect < 0)
         {
-            if (this.HitPoints > 0) { UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string(CharSet.Debris, this.Width).ToCharArray(), this.XY, this.Width, 3, 1, true, false, true, true)); }
-            else { UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string(CharSet.Debris, 50).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true)); }
+            if (this.HitPoints > 0) { AsciiEngine.Sprites.Static.Swarms.Add(new AsciiEngine.Fx.Explosion(new string(CharSet.Debris, this.Width).ToCharArray(), this.XY, this.Width, 3, 1, true, false, true, true)); }
+            else { AsciiEngine.Sprites.Static.Swarms.Add(new AsciiEngine.Fx.Explosion(new string(CharSet.Debris, 50).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true)); }
         }
         else
         {
-            UnicodeEngine.Sprites.Static.Swarms.Add(new UnicodeEngine.Fx.Explosion(new string('+', 3).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 3, 1, true, false, true, true));
+            AsciiEngine.Sprites.Static.Swarms.Add(new AsciiEngine.Fx.Explosion(new string('+', 3).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 3, 1, true, false, true, true));
         }
 
     }
@@ -141,7 +141,7 @@ internal class Player : Sprite
         }
     }
 
-    void MakeTorpedoShrapnel(UnicodeEngine.Grid.Point xy)
+    void MakeTorpedoShrapnel(AsciiEngine.Grid.Point xy)
     {
         for (int i = 0; i < 20; i++)
         {
