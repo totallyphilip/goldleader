@@ -371,6 +371,8 @@ public class UnicodeWars
 
             Easy.Clock.Timer wavetimer = new Easy.Clock.Timer(90);
 
+            Easy.Clock.Timer hyperdrivetimer = new Easy.Clock.Timer(3);
+
             do
             {
 
@@ -448,7 +450,7 @@ public class UnicodeWars
                     if (HyperdriveMode == eHyperdriveMode.Engaged)
                     {
                         Stars.Animate();
-                        if (Easy.Clock.Elapsed(3))
+                        if (hyperdrivetimer.Expired)
                         {
                             HyperdriveMode = eHyperdriveMode.Disengaged;
                             wave.ExitHyperspace();
@@ -588,7 +590,7 @@ public class UnicodeWars
                                     player.Trajectory.Run = 0;
                                     player.Missiles.TerminateAll();
                                     HyperdriveMode = eHyperdriveMode.Engaged;
-                                    Easy.Clock.StartTimer();
+                                    hyperdrivetimer.Start();
                                 }
                                 else
                                 {
