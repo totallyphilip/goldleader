@@ -78,7 +78,7 @@ public class UnicodeWars
         Messages.Add("");
         foreach (Enemy.eEnemyType shiptype in (Enemy.eEnemyType[])System.Enum.GetValues(typeof(Enemy.eEnemyType)))
         {
-            Enemy bg = new Enemy(shiptype);
+            Enemy bg = new Enemy(shiptype,true);
             DemoEnemies.Items.Add(bg);
             Messages.Add(new string(bg.Text) + " " + Enum.GetName(typeof(Enemy.eEnemyType), shiptype) + " (" + bg.HitPoints + " HP)");
         }
@@ -101,7 +101,7 @@ public class UnicodeWars
             {
                 foreach (Enemy.eEnemyType shiptype in (Enemy.eEnemyType[])System.Enum.GetValues(typeof(Enemy.eEnemyType)))
                 {
-                    DemoEnemies.Items.Add(new Enemy(shiptype));
+                    DemoEnemies.Items.Add(new Enemy(shiptype,true));
                 }
             }
 
@@ -192,7 +192,7 @@ public class UnicodeWars
 
         EnemyWave Wave;
 
-        Wave = new EnemyWave(100, "", "Great, Kid! Don't get cocky.", false);
+        Wave = new EnemyWave(100, "", "Great, kid! Don't get cocky.", false);
         Wave.Generator.Add(new EnemyWave.EnemyDefinition(Enemy.eEnemyType.Fighter, 1));
         Waves.Add(Wave);
 
@@ -428,9 +428,8 @@ public class UnicodeWars
                         Instructions.NewLine();
                         Instructions.NewLine("Defeat all enemies for navicomputer bonus.");
                         Instructions.NewLine();
-                        Instructions.NewLine("Hit = 1 point");
-                        Instructions.NewLine("Kill = 2 points");
-                        Instructions.NewLine("Score multiplier for higher altitude hits.");
+                        Instructions.NewLine("Hit = 1 point X altitude factor");
+                        Instructions.NewLine("Kill = 2 points X altitude factor");
                         Instructions.NewLine();
                         Instructions.NewLine("Press Enter to resume game.");
                     }

@@ -76,16 +76,16 @@ internal class EnemyWave : UnicodeEngine.Sprites.Swarm
             if (this.Items.Count < this.AirTrafficMax && this.Generator.Count > 0)
             {
                 // get the next ship
-                Enemy bg = new Enemy(this.Generator[0].EnemyType);
+                Enemy bg = new Enemy(this.Generator[0].EnemyType,false);
                 this.Add(bg);
                 if (this.Generator[0].HasWingman)
                 {
                     Enemy wingman;
-                    wingman = new Enemy(this.Generator[0].WingmanType);
+                    wingman = new Enemy(this.Generator[0].WingmanType,false);
                     wingman.Leader = bg;
                     wingman.Trail.Add(bg.XY.Clone(-1 * wingman.Width, 0));
                     this.Add(wingman);
-                    wingman = new Enemy(this.Generator[0].WingmanType);
+                    wingman = new Enemy(this.Generator[0].WingmanType,false);
                     wingman.Leader = bg;
                     wingman.Trail.Add(bg.XY.Clone(bg.Width, 0));
                     this.Add(wingman);

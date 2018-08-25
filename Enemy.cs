@@ -21,6 +21,7 @@ internal class Enemy : Sprite
     double ReverseFactor;
     public eEnemyType EnemyType;
     int InitialHitPoints;
+    bool DemoMode;
 
     //    public Swarm Messages = new Swarm();
     struct MissileStructure
@@ -65,7 +66,7 @@ internal class Enemy : Sprite
 
         this.Score = (points * scorefactor);
 
-        UnicodeWars.ScoreUp(this.Score, this.XY);
+        if (DemoMode) { UnicodeWars.ScoreUp(this.Score, this.XY); }
 
     }
 
@@ -98,9 +99,11 @@ internal class Enemy : Sprite
 
     }
 
-    public Enemy(eEnemyType et) : base()
+    public Enemy(eEnemyType et, bool demo) : base()
     {
         this.FlyZone.EdgeMode = FlyZoneClass.eEdgeMode.Bounce;
+
+        this.DemoMode = demo;
 
         double Run = 1;
         double DropsPerRow = 0; // initialized to avoid unassigned variable warning
