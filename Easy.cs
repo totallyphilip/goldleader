@@ -141,17 +141,17 @@ namespace Easy
 
         public class Timer
         {
+            // time reported in seconds
+
             Int64 StartedTick;
-            Int64 PausedTick;
+            Int64 PausedTick = 0;
+            int TimeLimit;
             bool Paused { get { return this.PausedTick > 0; } } // infer if timer is paused
 
-            public Timer() { this.Start(); }
+            public Timer(int seconds) { this.TimeLimit = seconds; }
 
-            public void Start()
-            {
-                this.StartedTick = DateTime.Now.Ticks;
-                this.PausedTick = 0;
-            }
+            public void Start() { this.StartedTick = DateTime.Now.Ticks; }
+
             public void Pause() { if (!this.Paused) { this.PausedTick = DateTime.Now.Ticks; } }
             public void Resume()
             {
@@ -161,7 +161,7 @@ namespace Easy
                     this.PausedTick = 0;
                 }
             }
-            public double ElapsedSeconds
+            public double TimeElapsed
             {
                 get
                 {
@@ -169,6 +169,11 @@ namespace Easy
                     else { return (DateTime.Now.Ticks - this.StartedTick) / 10000000; }
                 }
             }
+
+            public int TimeLeft { get { return Abacus.Round(this.TimeLeftPrecise); } }
+            public double TimeLeftPrecise { get { return this.TimeLimit - this.TimeElapsed; } }
+
+            public bool Expired { get { return this.TimeLimit - this.TimeElapsed <= 0; } }
 
         }
     }

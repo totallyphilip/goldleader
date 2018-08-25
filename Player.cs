@@ -42,7 +42,7 @@ internal class Player : Sprite
 
     public Swarm Missiles = new Swarm();
     public Swarm Torpedos = new Swarm();
-    public int TorpedosLocked = 20;
+    public int TorpedosLocked = 0;
 
     int MyMissileCapacity = 1;
     public int MissileCapacity { get { return this.MyMissileCapacity; } }
@@ -143,7 +143,7 @@ internal class Player : Sprite
 
     void MakeTorpedoShrapnel(AsciiEngine.Grid.Point xy)
     {
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 40; i++)
         {
             double velocity = 1; // velocity too high was skipping shrapnel right over targets
             Easy.Abacus.Slope slope = Abacus.SlopeFrom(Abacus.RandomDegrees);

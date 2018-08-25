@@ -27,7 +27,7 @@ public class UnicodeWars
     int FramesPerSecond = 10;
     bool PlayAgain;
     Galaxy Stars;
-    int TimeLimit = 90;
+    //int TimeLimit = 90;
 
 
     public UnicodeWars() { this.PlayAgain = true; }
@@ -186,7 +186,6 @@ public class UnicodeWars
         // misc
         bool Paused = false;
         bool HeroBonusGiven = false;
-        Easy.Clock.Timer timer = new Easy.Clock.Timer();
 
         #region  " Waves "
 
@@ -368,7 +367,9 @@ public class UnicodeWars
             int FramesUntilPowerup = Easy.Abacus.Random.Next(100, 150);
 
             bool AttackRunStarted = false;
-            //timer.Pause();
+
+
+            Easy.Clock.Timer wavetimer = new Easy.Clock.Timer(90);
 
             do
             {
@@ -378,7 +379,7 @@ public class UnicodeWars
                     if (Scroller.Empty) // wait until wave intro messages are gone
                     {
                         wave.StartAttackRun();
-                        timer.Start();
+                        wavetimer.Start();
                         AttackRunStarted = true;
                     }
 
@@ -523,9 +524,9 @@ public class UnicodeWars
                         if (AttackRunStarted)
                         {
 
-                            string secondsremaining = " " + (TimeLimit - timer.ElapsedSeconds).ToString("0") + " ";
-                            if (TimeLimit - timer.ElapsedSeconds > 0) { Console.ForegroundColor = ConsoleColor.White; }
-                            else { Console.ForegroundColor = ConsoleColor.Red; }
+                            string secondsremaining = " " + (wavetimer.TimeLeft).ToString("0") + " ";
+                            if (wavetimer.Expired) { Console.ForegroundColor = ConsoleColor.Red; }
+                            else { Console.ForegroundColor = ConsoleColor.White; }
 
                             Screen.TryWrite(new Point((Screen.Width - secondsremaining.Length) / 2, Screen.BottomEdge), secondsremaining);
                         }
@@ -624,8 +625,8 @@ public class UnicodeWars
                             break;
                         case ConsoleKey.Enter:
                             Paused = !Paused;
-                            if (Paused) { timer.Pause(); }
-                            else { timer.Resume(); Instructions.TerminateAll(); }
+                            if (Paused) { wavetimer.Pause(); }
+                            else { wavetimer.Resume(); Instructions.TerminateAll(); }
                             break;
                     }
 
@@ -637,7 +638,7 @@ public class UnicodeWars
                 {
                     if (wave.Completed() && !ClosingWordsStated)
                     {
-                        timer.Pause();
+                        wavetimer.Pause();
                         ClosingWordsStated = true;
                         if (HyperdriveMode == eHyperdriveMode.Disengaged)
                         {
@@ -652,11 +653,10 @@ public class UnicodeWars
                             Scroller.NewLine("+" + (hyperbonus.Value * 10) + " navicomputer Fibonacci bonus.");
                             Score += hyperbonus.Value * 10;
                             hyperbonus.Increment();
-                            int timebonus = TimeLimit - Easy.Abacus.Round(timer.ElapsedSeconds);
-                            if (timebonus > 0)
+                            if (!wavetimer.Expired)
                             {
-                                Scroller.NewLine("+" + timebonus + " time bonus.");
-                                Score += timebonus;
+                                Scroller.NewLine("+" + wavetimer.TimeLeft + " time bonus.");
+                                Score += wavetimer.TimeLeft;
                             }
                         };
                     }
