@@ -135,7 +135,11 @@ public class UnicodeWars
                         Scroller.NewLine();
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Scroller.NewLine("(can't connect to high score server)");
+                    Scroller.NewLine();
+                }
 
                 try { dbConn.Close(); } catch { }
 
@@ -143,6 +147,7 @@ public class UnicodeWars
                 {
                     Scroller.NewLine(s);
                 }
+
             }
             Stars.Animate();
             DemoEnemies.Animate();
@@ -151,7 +156,7 @@ public class UnicodeWars
             Scroller.Animate();
             Easy.Clock.FpsThrottle(8);
 
-            if (Easy.Abacus.Random.NextDouble() < .05)
+            if (Easy.Abacus.Random.NextDouble() < .05 && DemoEnemies.Alive)
             {
                 int victim = Easy.Abacus.Random.Next(0, DemoEnemies.Count);
                 if (DemoEnemies.Items[victim].Alive) { DemoEnemies.Items[victim].OnHit(-1); }
