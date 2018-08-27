@@ -9,6 +9,7 @@ namespace AsciiEngine
     internal class Application
     {
         public static string Title = "Untitled";
+        public static bool IsWindowsOS { get { return Environment.OSVersion.VersionString.Contains("Windows"); } }
     }
     class Symbol
     {
@@ -17,6 +18,8 @@ namespace AsciiEngine
         public static char DiamondLight { get { return '\x25ca'; } }
         public static char HyphenDoubleOblique { get { return '\x2e17'; } }
         public static char DotCenter { get { return '\x00b7'; } }
+        public static char BarVerticalLeft { get { return '\x258c'; } }
+        public static char BarVerticalRight { get { return '\x2590'; } }
     }
     namespace Fx
     {

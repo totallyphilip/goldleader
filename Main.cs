@@ -27,7 +27,6 @@ public class UnicodeWars
     int FramesPerSecond = 10;
     bool PlayAgain;
     Galaxy Stars;
-    //int TimeLimit = 90;
 
 
     public UnicodeWars() { this.PlayAgain = true; }
@@ -40,7 +39,7 @@ public class UnicodeWars
 
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
-        Screen.TryInitializeScreen(50, 40, false);
+        Screen.TryInitializeScreen(80, 30, false);
         int Score = 0;
         Stars = new Galaxy();
         Score = this.MainLoop(HighScore);
@@ -425,20 +424,22 @@ public class UnicodeWars
                     if (Instructions.Empty)
                     {
                         Scroller.HideAll();
-                        Instructions.NewLine("Press Enter to resume game.");
+                        Instructions.NewLine("GAME PAUSED");
+                        Instructions.NewLine("Press Enter to resume.");
                         Instructions.NewLine();
-                        Instructions.NewLine("Ship controls:");
-                        Instructions.NewLine("Space = Fire Blasters");
-                        Instructions.NewLine("Tab = Fire Torpedo");
-                        Instructions.NewLine("Left/Right = Move");
-                        Instructions.NewLine("Up = Hyperdrive");
-                        Instructions.NewLine("Down = Toggle S-foils");
+                        Instructions.NewLine("<< Ship controls >>");
+                        Instructions.NewLine("Fire Blasters  - Space           ");
+                        if (AsciiEngine.Application.IsWindowsOS) { Instructions.NewLine("Fire Torpedo   - Ctrl-Space      "); }
+                        else { Instructions.NewLine("Fire Torpedo   - Tab             "); }
+                        Instructions.NewLine("Move           - Left/Right Arrow");
+                        Instructions.NewLine("Hyperdrive     - Up Arrow        ");
+                        Instructions.NewLine("Toggle S-foils - Down Arrow      ");
                         Instructions.NewLine();
-                        Instructions.NewLine("System controls:");
-                        Instructions.NewLine("PageUp = Faster");
-                        Instructions.NewLine("PageDown = Slower");
-                        Instructions.NewLine("Enter = Instructions");
-                        Instructions.NewLine("Esc = Quit");
+                        Instructions.NewLine("<< System controls >>");
+                        Instructions.NewLine("Pause  - Enter    ");
+                        Instructions.NewLine("Quit   - Escape   ");
+                        Instructions.NewLine("Faster - Page Up  ");
+                        Instructions.NewLine("Slower - Page Down");
                         Instructions.NewLine();
                         Instructions.NewLine("Lock S-foils in attack position to");
                         Instructions.NewLine("divert power from thrusters to blasters.");
@@ -447,8 +448,6 @@ public class UnicodeWars
                         Instructions.NewLine();
                         Instructions.NewLine("Hit = 1 point X altitude factor");
                         Instructions.NewLine("Kill = 2 points X altitude factor");
-                        Instructions.NewLine();
-                        Instructions.NewLine("Press Enter to resume game.");
                     }
                 }
                 else
@@ -630,7 +629,12 @@ public class UnicodeWars
                             if (HyperdriveMode != eHyperdriveMode.Engaged) { player.FireTorpedo(); }
                             break;
                         case ConsoleKey.Spacebar:
-                            if (HyperdriveMode != eHyperdriveMode.Engaged) { player.Fire(); }
+                            if (HyperdriveMode != eHyperdriveMode.Engaged)
+                            {
+                                if (k.Modifiers.HasFlag(ConsoleModifiers.Control)) { player.FireTorpedo(); }
+                                else { player.Fire(); }
+                            }
+
                             break;
                         case ConsoleKey.Escape:
                             QuitFast = true;

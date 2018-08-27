@@ -53,11 +53,11 @@ internal class PowerUp : Sprite
                 break;
         }
 
-        this.Text = new[] { '\x258c', Symbol, '\x2590' };
+        this.Text = new[] { AsciiEngine.Symbol.BarVerticalLeft, Symbol, AsciiEngine.Symbol.BarVerticalRight };
         this.Color = System.ConsoleColor.Cyan;
         this.FlyZone.EdgeMode = FlyZoneClass.eEdgeMode.Ignore;
         this.Trail = new Trail(new Point(Abacus.Random.Next(Screen.LeftEdge + this.Width, Screen.RightEdge - this.Width), Screen.TopEdge));
-        this.Trajectory = new Trajectory(1, 0, Screen.Height);
+        this.Trajectory = new Trajectory(.75, 0, Screen.Height);
         this.OriginalTrajectory = this.Trajectory.Clone();
         this.PowerUpType = type;
         this.HitPoints = 1;
