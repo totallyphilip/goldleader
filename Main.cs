@@ -95,7 +95,7 @@ public class UnicodeWars
 
         #endregion
 
-
+        bool leaderboardfound;
         Scroller Scroller = new Scroller(2, Screen.Height / 2, .25);
         do
         {
@@ -134,11 +134,11 @@ public class UnicodeWars
                         }
                         Scroller.NewLine();
                     }
+                    leaderboardfound = true;
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Scroller.NewLine("(can't connect to high score server)");
-                    Scroller.NewLine();
+                    leaderboardfound = false;
                 }
 
                 try { dbConn.Close(); } catch { }
@@ -146,6 +146,11 @@ public class UnicodeWars
                 foreach (string s in Messages)
                 {
                     Scroller.NewLine(s);
+                }
+
+                if (!leaderboardfound)
+                {
+                    Scroller.NewLine("CANNOT CONNECT TO HIGH SCORE SERVER");
                 }
 
             }
