@@ -95,6 +95,9 @@ namespace AsciiEngine
 
             }
 
+            public void Fill(string[] s) { for (int i = 0; i < s.Length; i++) { this.NewLine(s[i]); } }
+            public void Fill(List<string> s) { foreach (string l in s) { this.NewLine(l); } }
+
             protected override void OnAnimated()
             {
                 foreach (Sprites.Sprite s in this.Items)

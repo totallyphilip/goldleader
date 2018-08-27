@@ -20,7 +20,7 @@ internal class CharSet
     public static char Shrapnel { get { return '*'; } }
 }
 
-public class UnicodeWars
+public class TheGame
 {
 
     bool QuitFast = false;
@@ -29,8 +29,8 @@ public class UnicodeWars
     Galaxy Stars;
 
 
-    public UnicodeWars() { this.PlayAgain = true; }
-    public UnicodeWars(bool b) { PlayAgain = b; }
+    public TheGame() { this.PlayAgain = true; }
+    public TheGame(bool b) { PlayAgain = b; }
 
     public int TryPlay(int HighScore)
     {
@@ -72,27 +72,6 @@ public class UnicodeWars
     {
         Console.Clear();
         Swarm DemoEnemies = new Swarm();
-
-        #region " Text "
-
-        List<string> Messages = new List<string>();
-
-        Messages.Add(Easy.Textify.Fluffer(AsciiEngine.Application.Title, " "));
-        Messages.Add("");
-        foreach (Enemy.eEnemyType shiptype in (Enemy.eEnemyType[])System.Enum.GetValues(typeof(Enemy.eEnemyType)))
-        {
-            Enemy bg = new Enemy(shiptype, true);
-            DemoEnemies.Items.Add(bg);
-            Messages.Add(new string(bg.Text) + " " + Enum.GetName(typeof(Enemy.eEnemyType), shiptype) + " (" + bg.HitPoints + " HP)");
-        }
-        Messages.Add("");
-        Messages.Add("Press Esc to Quit");
-        Messages.Add("Press Space to Begin");
-        Messages.Add("");
-        Messages.Add("");
-        Messages.Add("");
-
-        #endregion
 
         bool leaderboardfound;
         Scroller Scroller = new Scroller(2, Screen.Height / 2, .25);
@@ -142,10 +121,7 @@ public class UnicodeWars
 
                 try { dbConn.Close(); } catch { }
 
-                foreach (string s in Messages)
-                {
-                    Scroller.NewLine(s);
-                }
+                 Scroller.Fill(Messages.DemoText());
 
                 if (!leaderboardfound)
                 {
@@ -325,9 +301,7 @@ public class UnicodeWars
         // display instructions
         Scroller Scroller = new Scroller(2, Screen.Height / 3, .25);
         Scroller Instructions = new Scroller(2, Screen.Height / 3, .25, ConsoleColor.Green, ConsoleColor.DarkGray);
-        Scroller.NewLine("Enter = Instructions");
-        Scroller.NewLine("Esc = Quit");
-        Scroller.NewLine();
+        Scroller.Fill(Messages.BeginText());
         if (HighScore > 0)
         {
             Scroller.NewLine("Beat your high score: " + HighScore);
@@ -355,9 +329,6 @@ public class UnicodeWars
             if (wave.HasWelcomeMessage) { Scroller.NewLine(wave.PopWelcomeMessage()); }
 
             HyperdriveMode = eHyperdriveMode.Unused;
-
-
-
 
 
 
@@ -424,30 +395,7 @@ public class UnicodeWars
                     if (Instructions.Empty)
                     {
                         Scroller.HideAll();
-                        Instructions.NewLine("GAME PAUSED");
-                        Instructions.NewLine("Press Enter to resume.");
-                        Instructions.NewLine();
-                        Instructions.NewLine("<< Ship controls >>");
-                        Instructions.NewLine("Fire Blasters  - Space           ");
-                        if (AsciiEngine.Application.IsWindowsOS) { Instructions.NewLine("Fire Torpedo   - Ctrl-Space      "); }
-                        else { Instructions.NewLine("Fire Torpedo   - Tab             "); }
-                        Instructions.NewLine("Move           - Left/Right Arrow");
-                        Instructions.NewLine("Hyperdrive     - Up Arrow        ");
-                        Instructions.NewLine("Toggle S-foils - Down Arrow      ");
-                        Instructions.NewLine();
-                        Instructions.NewLine("<< System controls >>");
-                        Instructions.NewLine("Pause  - Enter    ");
-                        Instructions.NewLine("Quit   - Escape   ");
-                        Instructions.NewLine("Faster - Page Up  ");
-                        Instructions.NewLine("Slower - Page Down");
-                        Instructions.NewLine();
-                        Instructions.NewLine("Lock S-foils in attack position to");
-                        Instructions.NewLine("divert power from thrusters to blasters.");
-                        Instructions.NewLine();
-                        Instructions.NewLine("Defeat all enemies for navicomputer bonus.");
-                        Instructions.NewLine();
-                        Instructions.NewLine("Hit = 1 point X altitude factor");
-                        Instructions.NewLine("Kill = 2 points X altitude factor");
+                        Instructions.Fill(Messages.HelpText());
                     }
                 }
                 else
@@ -521,7 +469,7 @@ public class UnicodeWars
                         if (player.HitPoints > 0) { ShieldMarkers = new String(CharSet.Shield, player.HitPoints - 1); }
                         Screen.TryWrite(new Point(1, Screen.BottomEdge), ShieldMarkers + ' ');
 
-                        try // this dies if the missile powerup is used
+                        try // this fails if the missile powerup is used
                         {
                             string ShotMarkers = new string(' ', player.Missiles.Count + player.Torpedos.Count) + new String('|', player.MissileCapacity - player.Missiles.Items.Count) + new string(CharSet.Torpedo, player.TorpedosLocked);
                             Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, Screen.BottomEdge), ShotMarkers);
@@ -601,11 +549,7 @@ public class UnicodeWars
                                     HyperdriveMode = eHyperdriveMode.Engaged;
                                     hyperdrivetimer.Start();
                                 }
-                                else
-                                {
-                                    Scroller.NewLine("It's not my fault!");
-                                    Scroller.NewLine("They told me they fixed it!");
-                                }
+                                else { Scroller.Fill(Messages.HyperdriveFailText()); }
                             }
                             break;
                         case ConsoleKey.PageUp:
@@ -658,8 +602,7 @@ public class UnicodeWars
                         ClosingWordsStated = true;
                         if (HyperdriveMode == eHyperdriveMode.Disengaged)
                         {
-                            Scroller.NewLine("Traveling through hyperspace");
-                            Scroller.NewLine("ain't like dusting crops, boy.");
+                            Scroller.Fill(Messages.CropDustingText());
                             hyperbonus.Reset();
                         }
                         else
@@ -682,20 +625,14 @@ public class UnicodeWars
                     if (!ClosingWordsStated)
                     {
                         ClosingWordsStated = true;
-                        Scroller.NewLine("G A M E   O V E R");
-                        Scroller.NewLine(3);
-                        Scroller.NewLine("They came from behind!");
+                        Scroller.Fill(Messages.GameOverText());
                     }
 
                     if (wave.Completed() && !HeroBonusGiven)
                     {
+
                         int deadherobonus = 500;
-                        Scroller.NewLine(3);
-                        Scroller.NewLine("That");
-                        Scroller.NewLine("was");
-                        Scroller.NewLine("awesome.");
-                        Scroller.NewLine(3);
-                        Scroller.NewLine("+" + deadherobonus + " Dead hero bonus.");
+                        Scroller.Fill(Messages.DeadHeroText(deadherobonus));
                         Score += deadherobonus;
                         HeroBonusGiven = true;
                     }

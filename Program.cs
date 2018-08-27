@@ -4,7 +4,7 @@
     {
         static void Main(string[] args)
         {
-            UnicodeWars game = new UnicodeWars();
+            TheGame game = new TheGame();
             int score = 0;
             game.TryPlay(score);
             System.Environment.Exit(0);
