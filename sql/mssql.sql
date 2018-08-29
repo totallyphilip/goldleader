@@ -2,14 +2,57 @@ create database PwrightSandbox;
 
 use PwrightSandbox;
 
---drop table LeaderBoard
-create table LeaderBoard ([Signature] varchar(10), Score int, Saved datetime, GameId tinyint);
 
-create index Leader1 on LeaderBoard (GameId, Score desc, Saved desc);
 
-insert LeaderBoard ([Signature], Score, Saved, GameId) values ('ABN',100,getdate(),1);
 
-select lb.Signature, lb.Score from LeaderBoard lb order by lb.Score desc, lb.Saved desc;
+-- Model New Model
+-- Updated 8/29/2018 2:25:53 PM
+-- DDL Generated 8/29/2018 2:25:55 PM
+--**********************************************************************
+--	Tables
+--**********************************************************************
+-- Table dbo.Game
+create table
+	[dbo].[Game]
+(
+	[GameId] int not null
+	, [GameGuid] uniqueidentifier not null
+,
+constraint [Pk_Game_GameId] primary key clustered
+(
+	[GameId] asc
+)
+,
+constraint [Ak_Game_GameGuid] unique nonclustered
+(
+	[GameGuid] asc
+)
+);
+-- Table dbo.Score
+create table
+	[dbo].[Score]
+(
+	[GameId] int not null
+	, [Signature] char(3) not null
+	, [Points] int not null
+	, [ScoreDate] smalldatetime not null
+);
+--**********************************************************************
+--	Data
+--**********************************************************************
+--**********************************************************************
+--	Relationships
+--**********************************************************************
+-- Relationship Fk_Game_Score_GameId
+alter table [dbo].[Score]
+add constraint [Fk_Game_Score_GameId] foreign key ([GameId]) references [dbo].[Game] ([GameId]);
+
+
+
+
+
+
+
 
 
 CREATE USER [foo] FOR LOGIN [dbTest]
@@ -18,31 +61,35 @@ GO
 
 
 
-
+--drop procedure dbo.AddScore
 CREATE PROCEDURE AddScore
 
-@signature varchar(10)
-,@score int
-,@gameid tinyint
+@GameGuid uniqueidentifier
+,@Signature char(3)
+,@Points int
 as
 begin
 
 insert
-	LeaderBoard
+	Score
 (
-	[Signature]
-	,Score
-	,Saved
-	,GameId
+	[GameId]
+	,[Signature]
+	,[Points]
+	,[ScoreDate]
 )
-values
-(
-	@signature
-	,@score
+select
+	g.GameId
+	,@Signature
+	,@Points
 	,getdate()
-	,@gameid
-);
+from
+	dbo.Game g
+where
+	g.GameGuid = @GameGuid;
 END
+
+go
 
 grant execute on [dbo].AddScore to [foo];
 
@@ -50,27 +97,35 @@ grant execute on [dbo].AddScore to [foo];
 
 
 go
+--drop procedure dbo.GetScores
 CREATE PROCEDURE GetScores
-@gameid tinyint
-,@limit int
+@GameGuid uniqueidentifier
+,@Limit int
 as
 BEGIN
 
 select
-	top (@limit)
-	lb.Signature
-	,lb.Score
+	top (@Limit)
+	sc.[Signature]
+	,sc.[Points]
 from
-	LeaderBoard lb
+	Game g
+join
+	Score sc
+	on sc.GameId = g.GameId
 where
-	lb.GameId = gameid
+	g.GameGuid = @GameGuid
 order by
-	lb.Score desc
-	,lb.Saved desc;
+	sc.Points desc
+	,sc.ScoreDate desc;
 END
+
+
+go
 
 grant execute on [dbo].GetScores to [foo];
 
 
+insert dbo.Game (GameId,GameGuid) values (1,'A6620930-D791-4A03-8AAC-C2943B40E24D');
 exec AddScore 'ABN',5,1;
 exec GetScores 1;

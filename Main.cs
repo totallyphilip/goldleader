@@ -38,6 +38,8 @@ public class TheGame
         // main settings
         AsciiEngine.Application.Title = "GOLD LEADER";
         Leaderboard.SqlConnectionString = "user id=dbTest;password=baMw$CAQ5hnlxjCTYJ0YP;server=sql01\\dev01;Trusted_Connection=no;database=PwrightSandbox;connection timeout=5";
+        AsciiEngine.Application.ID = Guid.Parse("A6620930-D791-4A03-8AAC-C2943B40E24D");
+
 
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
@@ -62,14 +64,6 @@ public class TheGame
         return Score;
     }
 
-    SqlConnection DbConnection()
-    {
-        string constr = "user id=dbTest;password=baMw$CAQ5hnlxjCTYJ0YP;server=sql01\\dev01;Trusted_Connection=no;database=PwrightSandbox;connection timeout=5";
-        //MySqlConnection qConn = new MySqlConnection("server=192.168.242.10;user=foo;database=GameData;password=12345");
-        //MySqlConnection("server=192.168.242.10;user=foo;database=GameData;password=12345");
-        return new SqlConnection(constr);
-    }
-
     void Attract()
     {
         Console.Clear();
@@ -87,7 +81,7 @@ public class TheGame
                 try
                 {
                     Leaderboard lb = new Leaderboard();
-                    lb.SqlLoad(10);
+                    lb.SqlLoadScores(10);
                     Scroller.NewLine(2);
                     Scroller.NewLine("HIGH SCORES");
                     Scroller.NewLine();
@@ -637,26 +631,19 @@ public class TheGame
 
         if (!QuitFast)
         {
-            SqlConnection dbConn = DbConnection();
+
+
+
             try
             {
-                dbConn.Open();
-
-                // don't prompt for input until after we tried to open the database
                 string initials = AsciiEngine.Input.ArcadeInitials(new Point(Screen.Width / 2 - 2.5, Screen.Height / 2), 3);
                 if (string.IsNullOrWhiteSpace(initials)) { initials = "???"; }
 
-                SqlCommand oCommand = new SqlCommand("dbo.AddScore", dbConn);
-                oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                oCommand.Parameters.AddWithValue("@gameid", 1);
-                oCommand.Parameters.AddWithValue("@score", Score);
-                oCommand.Parameters.AddWithValue("@signature", initials);
-
-                oCommand.ExecuteNonQuery();
+                Leaderboard lb = new Leaderboard();
+                lb.SqlSaveScore(initials, Score);
             }
             catch { }
 
-            try { dbConn.Close(); } catch { }
         }
 
         return Score;

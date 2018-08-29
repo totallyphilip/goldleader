@@ -23,25 +23,39 @@ namespace AsciiEngine
         public List<Score> Items = new List<Score>();
         string HighScoreFile { get { return Application.DataPath + "\\highscores.xml"; } }
 
-        public void SqlLoad(int count)
+        public void SqlLoadScores(int count)
         {
             SqlConnection dbConn = new SqlConnection(Leaderboard.SqlConnectionString);
             dbConn.Open();
             SqlCommand oCommand = new SqlCommand("dbo.GetScores", dbConn);
             oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-            oCommand.Parameters.AddWithValue("@gameid", 1);
-            oCommand.Parameters.AddWithValue("@limit", count);
+            oCommand.Parameters.AddWithValue("@GameGuid", Application.ID);
+            oCommand.Parameters.AddWithValue("@Limit", count);
             SqlDataReader dbReader = oCommand.ExecuteReader();
 
             if (dbReader.HasRows)
             {
                 while (dbReader.Read())
                 {
-                    this.Items.Add(new Score(dbReader["Signature"].ToString(), Convert.ToInt32(dbReader["Score"])));
+                    this.Items.Add(new Score(dbReader["Signature"].ToString(), Convert.ToInt32(dbReader["Points"])));
                 }
             }
             dbConn.Close();
         }
+
+        public void SqlSaveScore(string signature, int points)
+        {
+            SqlConnection dbConn = new SqlConnection(Leaderboard.SqlConnectionString);
+            dbConn.Open();
+            SqlCommand oCommand = new SqlCommand("dbo.AddScore", dbConn);
+            oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+            oCommand.Parameters.AddWithValue("@GameGuid", Application.ID);
+            oCommand.Parameters.AddWithValue("@Signature", signature);
+            oCommand.Parameters.AddWithValue("@Points", points);
+            oCommand.ExecuteNonQuery();
+            dbConn.Close();
+        }
+
 
 
 
@@ -50,6 +64,7 @@ namespace AsciiEngine
     internal class Application
     {
         public static string Company { get { return "AsciiMotive"; } }
+        public static Guid ID;
         public static string Title = "Untitled";
         public static bool IsWindowsOS { get { return Environment.OSVersion.VersionString.Contains("Windows"); } }
         public static string DataPath { get { return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\" + Company + "\\" + Title; } }
