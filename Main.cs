@@ -32,7 +32,7 @@ public class TheGame
     public TheGame() { this.PlayAgain = true; }
     public TheGame(bool b) { PlayAgain = b; }
 
-    public int TryPlay(int HighScore)
+    public int TryPlay()
     {
 
         // main settings
@@ -46,20 +46,20 @@ public class TheGame
         Screen.TryInitializeScreen(80, 30, false);
         int Score = 0;
         Stars = new Galaxy();
-        Score = this.MainLoop(HighScore);
+        Score = this.MainLoop();
         Screen.TryInitializeScreen(oldwidth, oldheight, false);
         Console.CursorVisible = true;
         return Score;
     }
 
-    int MainLoop(int HighScore)
+    int MainLoop()
     {
         Easy.Keyboard.EatKeys();
         int Score = 0;
         do
         {
             if (!QuitFast) { Attract(); }
-            if (!QuitFast) { Score = PlayTheGame(HighScore); }
+            if (!QuitFast) { Score = PlayTheGame(); }
         } while (!QuitFast && this.PlayAgain);
         return Score;
     }
@@ -68,6 +68,7 @@ public class TheGame
     {
         Console.Clear();
         Swarm DemoEnemies = new Swarm();
+        Console.Title = AsciiEngine.Application.Title;
 
         Scroller Scroller = new Scroller(2, Screen.Height / 2, .25);
         do
@@ -126,7 +127,7 @@ public class TheGame
 
     enum eHyperdriveMode { Unused, Engaged, Disengaged };
 
-    int PlayTheGame(int HighScore)
+    int PlayTheGame()
     {
 
         Console.Clear();
@@ -278,11 +279,6 @@ public class TheGame
         Scroller Scroller = new Scroller(2, Screen.Height / 3, .25);
         Scroller Instructions = new Scroller(2, Screen.Height / 3, .25, ConsoleColor.Green, ConsoleColor.DarkGray);
         Scroller.Fill(Messages.BeginText());
-        if (HighScore > 0)
-        {
-            Scroller.NewLine("Beat your high score: " + HighScore);
-            Scroller.NewLine();
-        }
 
         foreach (EnemyWave wave in Waves)
         {

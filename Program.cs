@@ -5,8 +5,7 @@
         static void Main(string[] args)
         {
             TheGame game = new TheGame();
-            int score = 0;
-            game.TryPlay(score);
+             game.TryPlay();
             System.Environment.Exit(0);
         }
     }
