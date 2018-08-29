@@ -52,11 +52,12 @@ grant execute on [dbo].AddScore to [foo];
 go
 CREATE PROCEDURE GetScores
 @gameid tinyint
+,@limit int
 as
 BEGIN
 
 select
-	top 20
+	top (@limit)
 	lb.Signature
 	,lb.Score
 from
