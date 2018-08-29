@@ -35,7 +35,9 @@ public class TheGame
     public int TryPlay(int HighScore)
     {
 
+        // main settings
         AsciiEngine.Application.Title = "GOLD LEADER";
+        Leaderboard.SqlConnectionString = "user id=dbTest;password=baMw$CAQ5hnlxjCTYJ0YP;server=sql01\\dev01;Trusted_Connection=no;database=PwrightSandbox;connection timeout=5";
 
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
@@ -73,11 +75,31 @@ public class TheGame
         Console.Clear();
         Swarm DemoEnemies = new Swarm();
 
-        bool leaderboardfound;
         Scroller Scroller = new Scroller(2, Screen.Height / 2, .25);
         do
         {
             Console.CursorVisible = false;
+
+            if (Scroller.Empty)
+            {
+                Scroller.Fill(Messages.DemoText());
+
+                try
+                {
+                    Leaderboard lb = new Leaderboard();
+                    lb.SqlLoad(10);
+                    Scroller.NewLine(2);
+                    Scroller.NewLine("HIGH SCORES");
+                    Scroller.NewLine();
+                    foreach (Leaderboard.Score s in lb.Items) { Scroller.NewLine(s.Points.ToString() + " " + s.Signature); }
+                    Scroller.NewLine();
+                }
+                catch
+                {
+                    Scroller.NewLine("CANNOT CONNECT TO HIGH SCORE SERVER");
+                }
+            }
+
 
             if (DemoEnemies.Empty)
             {
@@ -87,48 +109,8 @@ public class TheGame
                 }
             }
 
-            if (Scroller.Empty)
-            {
 
-                SqlConnection dbConn = DbConnection();
-                try
-                {
-                    dbConn.Open();
-                    SqlCommand oCommand = new SqlCommand("dbo.GetScores", dbConn);
-                    oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                    oCommand.Parameters.AddWithValue("@gameid", 1);
-                    SqlDataReader dbReader = oCommand.ExecuteReader();
 
-                    if (dbReader.HasRows)
-                    {
-                        Scroller.NewLine("TOP 20 SCORES");
-                        Scroller.NewLine();
-                        while (dbReader.Read())
-                        {
-                            Scroller.NewLine(
-                                 dbReader["Score"].ToString()
-                                + " " + dbReader["Signature"].ToString()
-                            );
-                        }
-                        Scroller.NewLine();
-                    }
-                    leaderboardfound = true;
-                }
-                catch
-                {
-                    leaderboardfound = false;
-                }
-
-                try { dbConn.Close(); } catch { }
-
-                 Scroller.Fill(Messages.DemoText());
-
-                if (!leaderboardfound)
-                {
-                    Scroller.NewLine("CANNOT CONNECT TO HIGH SCORE SERVER");
-                }
-
-            }
             Stars.Animate();
             DemoEnemies.Animate();
             AsciiEngine.Sprites.Static.Swarms.Animate();

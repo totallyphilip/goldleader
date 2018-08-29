@@ -2,14 +2,58 @@ using Easy;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Data.SqlClient;
 
 namespace AsciiEngine
 {
+    internal class Leaderboard
+    {
+        static public string SqlConnectionString;
+        internal class Score
+        {
+            public string Signature;
+            public int Points;
+            public Score(string sig, int points)
+            {
+                this.Signature = sig;
+                this.Points = points;
+            }
+        }
+
+        public List<Score> Items = new List<Score>();
+        string HighScoreFile { get { return Application.DataPath + "\\highscores.xml"; } }
+
+        public void SqlLoad(int count)
+        {
+            SqlConnection dbConn = new SqlConnection(Leaderboard.SqlConnectionString);
+            dbConn.Open();
+            SqlCommand oCommand = new SqlCommand("dbo.GetScores", dbConn);
+            oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+            oCommand.Parameters.AddWithValue("@gameid", 1);
+            oCommand.Parameters.AddWithValue("@limit", count);
+            SqlDataReader dbReader = oCommand.ExecuteReader();
+
+            if (dbReader.HasRows)
+            {
+                while (dbReader.Read())
+                {
+                    this.Items.Add(new Score(dbReader["Signature"].ToString(), Convert.ToInt32(dbReader["Score"])));
+                }
+            }
+            dbConn.Close();
+        }
+
+
+
+    }
 
     internal class Application
     {
+        public static string Company { get { return "AsciiMotive"; } }
         public static string Title = "Untitled";
         public static bool IsWindowsOS { get { return Environment.OSVersion.VersionString.Contains("Windows"); } }
+        public static string DataPath { get { return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\" + Company + "\\" + Title; } }
+
     }
     class Symbol
     {
@@ -408,8 +452,8 @@ namespace AsciiEngine
                 // animate squads together
                 this.Leaders().ForEach(delegate (Sprite leader)
                 {
-                    // hide the followers, then animate the leader, then animate the followers without hiding them
-                    this.Items.FindAll(x => x.Alive && x.LeaderEquals(leader)).ForEach(delegate (Sprite follower) { follower.Hide(); });
+                // hide the followers, then animate the leader, then animate the followers without hiding them
+                this.Items.FindAll(x => x.Alive && x.LeaderEquals(leader)).ForEach(delegate (Sprite follower) { follower.Hide(); });
                     leader.Animate();
                     this.Items.FindAll(x => x.Alive && x.LeaderEquals(leader)).ForEach(delegate (Sprite follower) { follower.Animate(false); });
                 });
@@ -767,26 +811,26 @@ namespace AsciiEngine
             List<char> alphabet = new List<char>();
             alphabet.Add(' ');
             for (int i = 65; i <= 90; i++) { alphabet.Add(Convert.ToChar(i)); } // A..Z
-            // alphabet.Add('\u0393'); // Γ
-            // alphabet.Add('\u0394'); // Δ
-            // alphabet.Add('\u0398'); // Θ
-            // alphabet.Add('\u039B'); // Λ
-            // alphabet.Add('\u039E'); // Ξ
-            // alphabet.Add('\u03A0'); // Π
-            // alphabet.Add('\u03A3'); // Σ
-            // alphabet.Add('\u03A6'); // Φ
-            // alphabet.Add('\u03A8'); // Ψ
-            // alphabet.Add('\u03A9'); // Ω
+                                                                                // alphabet.Add('\u0393'); // Γ
+                                                                                // alphabet.Add('\u0394'); // Δ
+                                                                                // alphabet.Add('\u0398'); // Θ
+                                                                                // alphabet.Add('\u039B'); // Λ
+                                                                                // alphabet.Add('\u039E'); // Ξ
+                                                                                // alphabet.Add('\u03A0'); // Π
+                                                                                // alphabet.Add('\u03A3'); // Σ
+                                                                                // alphabet.Add('\u03A6'); // Φ
+                                                                                // alphabet.Add('\u03A8'); // Ψ
+                                                                                // alphabet.Add('\u03A9'); // Ω
             for (int i = 48; i <= 57; i++) { alphabet.Add(Convert.ToChar(i)); } // 0..9
-            // alphabet.Add('\u263a'); // ☺
-            // alphabet.Add('\u263b'); // ☻
-            // alphabet.Add('\u2640'); // ♀
-            // alphabet.Add('\u2642'); // ♂
-            // alphabet.Add('\u2660'); // ♠
-            // alphabet.Add('\u2663'); // ♣
-            // alphabet.Add('\u2665'); // ♥
-            // alphabet.Add('\u2666'); // ♦
-            // alphabet.Add('\u266b'); // ♫
+                                                                                // alphabet.Add('\u263a'); // ☺
+                                                                                // alphabet.Add('\u263b'); // ☻
+                                                                                // alphabet.Add('\u2640'); // ♀
+                                                                                // alphabet.Add('\u2642'); // ♂
+                                                                                // alphabet.Add('\u2660'); // ♠
+                                                                                // alphabet.Add('\u2663'); // ♣
+                                                                                // alphabet.Add('\u2665'); // ♥
+                                                                                // alphabet.Add('\u2666'); // ♦
+                                                                                // alphabet.Add('\u266b'); // ♫
 
             string initials = "";
             int symbol = 1;
