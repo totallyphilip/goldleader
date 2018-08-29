@@ -111,6 +111,8 @@ internal class Messages
         s.Add("");
         s.Add("");
         s.Add("");
+        s.Add("(c) 2018 " + AsciiEngine.Application.Company);
+        s.Add("");
 
         return s;
 
