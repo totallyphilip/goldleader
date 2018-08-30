@@ -79,6 +79,8 @@ namespace AsciiEngine
         public static char DotCenter { get { return '\x00b7'; } }
         public static char BarVerticalLeft { get { return '\x258c'; } }
         public static char BarVerticalRight { get { return '\x2590'; } }
+        public static char FaceWhite { get { return '\x263a'; } }
+        public static char FaceBlack { get { return '\x263b'; } }
     }
     namespace Fx
     {
@@ -248,6 +250,7 @@ namespace AsciiEngine
             public ConsoleColor Color = Console.ForegroundColor;
             bool Terminated = false;
             public int Width { get { return this.Text.Length; } }
+            public bool Blocked = false;
 
             public int CollectScore()
             {
@@ -467,17 +470,20 @@ namespace AsciiEngine
                 // animate squads together
                 this.Leaders().ForEach(delegate (Sprite leader)
                 {
-                // hide the followers, then animate the leader, then animate the followers without hiding them
-                this.Items.FindAll(x => x.Alive && x.LeaderEquals(leader)).ForEach(delegate (Sprite follower) { follower.Hide(); });
+                    // hide the followers, then animate the leader, then animate the followers without hiding them
+                    this.Items.FindAll(x => x.Alive && x.LeaderEquals(leader)).ForEach(delegate (Sprite follower) { follower.Hide(); });
                     leader.Animate();
                     this.Items.FindAll(x => x.Alive && x.LeaderEquals(leader)).ForEach(delegate (Sprite follower) { follower.Animate(false); });
                 });
 
                 // animate everyone else
-                this.Items.FindAll(x => x.Alive && !x.HasLeader && !HasFollowers(x)).ForEach(delegate (Sprite s) { s.Animate(); });
+                this.Items.FindAll(x => x.Alive &&  !x.Blocked &&  !x.HasLeader && !HasFollowers(x)  ).ForEach(delegate (Sprite s) { s.Animate(); });
 
                 // do this for everybody
-                this.Items.FindAll(x => x.Active).ForEach(delegate (Sprite s) { s.Activate(); });
+                this.Items.FindAll(x => x.Active).ForEach(delegate (Sprite s) { 
+                    s.Activate();
+                    s.Blocked = false;
+                });
 
                 OnAnimated();
 
@@ -517,6 +523,17 @@ namespace AsciiEngine
                 }
 
             }
+
+            public void CheckBlocked()
+            {
+                foreach (Sprite thisone in this.Items.FindAll(x => x.Alive))
+                {
+                    Grid.Point p = thisone.XY.Clone(thisone.Trajectory);
+                    if (this.Items.Exists(thatone => !thatone.Equals(thisone) && thatone.XY.iX == p.iX && thatone.XY.iY == p.iY)) { thisone.Blocked = true; }
+                }
+
+            }
+
 
             public void CheckCollisions(Swarm otherswarm)
             {

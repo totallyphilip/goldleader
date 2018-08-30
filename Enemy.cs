@@ -66,7 +66,7 @@ internal class Enemy : Sprite
 
         this.Score = (points * scorefactor);
 
-        if (DemoMode) { TheGame.ScoreUp(this.Score, this.XY); }
+        if (DemoMode) { GoldLeader.ScoreUp(this.Score, this.XY); }
 
     }
 

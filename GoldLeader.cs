@@ -20,7 +20,7 @@ internal class CharSet
     public static char Shrapnel { get { return '*'; } }
 }
 
-public class TheGame
+public class GoldLeader
 {
 
     bool QuitFast = false;
@@ -29,10 +29,10 @@ public class TheGame
     Galaxy Stars;
 
 
-    public TheGame() { this.PlayAgain = true; }
-    public TheGame(bool b) { PlayAgain = b; }
+    public GoldLeader() { this.PlayAgain = true; }
+    public GoldLeader(bool b) { PlayAgain = b; }
 
-    public int TryPlay()
+    public void TryPlay()
     {
 
         // main settings
@@ -44,24 +44,20 @@ public class TheGame
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
         Screen.TryInitializeScreen(80, 30, false);
-        int Score = 0;
         Stars = new Galaxy();
-        Score = this.MainLoop();
+        this.MainLoop();
         Screen.TryInitializeScreen(oldwidth, oldheight, false);
         Console.CursorVisible = true;
-        return Score;
     }
 
-    int MainLoop()
+    void MainLoop()
     {
         Easy.Keyboard.EatKeys();
-        int Score = 0;
         do
         {
             if (!QuitFast) { Attract(); }
-            if (!QuitFast) { Score = PlayTheGame(); }
+            if (!QuitFast) { PlayTheGame(); }
         } while (!QuitFast && this.PlayAgain);
-        return Score;
     }
 
     void Attract()
@@ -127,7 +123,7 @@ public class TheGame
 
     enum eHyperdriveMode { Unused, Engaged, Disengaged };
 
-    int PlayTheGame()
+    void PlayTheGame()
     {
 
         Console.Clear();
@@ -641,8 +637,6 @@ public class TheGame
             catch { }
 
         }
-
-        return Score;
     }
 
     static internal void ScoreUp(int points, Point xy)
