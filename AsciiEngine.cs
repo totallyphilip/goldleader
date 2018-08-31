@@ -283,26 +283,32 @@ namespace AsciiEngine
                 return hit;
             }
 
-            public bool Hit(Sprite thatone)
+            bool HitDetected(Sprite thatone)
             {
                 // Hits are only detected if all conditions met:
+                // * the other sprite is not this sprite (i.e. we're not crashing into ourselves)
                 // * the sprite is still alive
                 // * the sprite is active (i.e. still doing something else even if dead)
                 // * the given coordinate is within the sprite body
-
-                bool HitDetected =
-                    (this.Alive && this.Active)
+                return (!this.Equals(thatone))
+                    && (this.Alive && this.Active)
                     && (thatone.Alive && thatone.Active)
                     && thatone.XY.iY == this.XY.iY
                     && (
-                        (thatone.XY.iX >= this.XY.iX && thatone.XY.iX < this.XY.iX + this.Width) // [(]
-                        || (thatone.XY.iX + thatone.Width >= this.XY.iX && thatone.XY.iX + thatone.Width < this.XY.iX + this.Width) // [)]
-                        || (thatone.XY.iX <= this.XY.iX && thatone.XY.iX + thatone.Width > this.XY.iX + this.Width) // ([])
+                        (thatone.XY.iX >= this.XY.iX && thatone.XY.iX < this.XY.iX + this.Width)
+                        || (thatone.XY.iX + thatone.Width >= this.XY.iX && thatone.XY.iX + thatone.Width < this.XY.iX + this.Width)
+                        || (thatone.XY.iX <= this.XY.iX && thatone.XY.iX + thatone.Width > this.XY.iX + this.Width)
                     );
+            }
 
-                if (HitDetected) { OnHit(thatone.HitEffect); }
+            public bool Hit(Sprite thatone)
+            {
 
-                return HitDetected;
+                bool Collision = this.HitDetected(thatone);
+
+                if (Collision) { OnHit(thatone.HitEffect); }
+
+                return Collision;
             }
 
             public virtual void OnHit(int hiteffect) { this.HitPoints += hiteffect; }
@@ -349,12 +355,44 @@ namespace AsciiEngine
                 Console.ForegroundColor = savecolor;
             }
 
-            public void Animate() { this.Animate(true); }
+            public void Animate(Complex BlockingSwarms) { this.Animate(BlockingSwarms, true); }
 
-            public void Animate(bool hide)
+            public void Animate(Complex BlockingSwarms, bool hide)
             {
                 if (hide) { this.Hide(); }
-                this.Trail.Add(this.NextCoordinate());
+                var NextCoordinate = this.NextCoordinate();
+                this.Trail.Add(NextCoordinate);
+
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                // this is REALLY INEFFICIENT! it loops through every single sprite!
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                if (BlockingSwarms != null)
+                {
+                    foreach (Swarm sw in BlockingSwarms.Items.FindAll(x => x.Alive == true))
+                    {
+                        foreach (Sprite sp in sw.Items.FindAll(x => x.Alive == true))
+                        {
+                            if (this.HitDetected(sp)) { this.Trail.Items.Remove(NextCoordinate); }
+                        }
+                    }
+                }
                 this.Refresh();
             }
 
@@ -438,6 +476,7 @@ namespace AsciiEngine
         {
 
             public List<Sprite> Items = new List<Sprite>();
+            public Complex BlockingSwarms;
 
             bool HasFollowers(Sprite s) { return Leaders().Exists(x => x.Equals(s)); }
             List<Sprite> Followers(Sprite s) { return this.Items.FindAll(x => x.LeaderEquals(s)); }
@@ -472,15 +511,16 @@ namespace AsciiEngine
                 {
                     // hide the followers, then animate the leader, then animate the followers without hiding them
                     this.Items.FindAll(x => x.Alive && x.LeaderEquals(leader)).ForEach(delegate (Sprite follower) { follower.Hide(); });
-                    leader.Animate();
-                    this.Items.FindAll(x => x.Alive && x.LeaderEquals(leader)).ForEach(delegate (Sprite follower) { follower.Animate(false); });
+                    leader.Animate(BlockingSwarms);
+                    this.Items.FindAll(x => x.Alive && x.LeaderEquals(leader)).ForEach(delegate (Sprite follower) { follower.Animate(BlockingSwarms, false); });
                 });
 
                 // animate everyone else
-                this.Items.FindAll(x => x.Alive &&  !x.Blocked &&  !x.HasLeader && !HasFollowers(x)  ).ForEach(delegate (Sprite s) { s.Animate(); });
+                this.Items.FindAll(x => x.Alive && !x.Blocked && !x.HasLeader && !HasFollowers(x)).ForEach(delegate (Sprite s) { s.Animate(BlockingSwarms); });
 
                 // do this for everybody
-                this.Items.FindAll(x => x.Active).ForEach(delegate (Sprite s) { 
+                this.Items.FindAll(x => x.Active).ForEach(delegate (Sprite s)
+                {
                     s.Activate();
                     s.Blocked = false;
                 });

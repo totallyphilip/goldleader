@@ -390,7 +390,7 @@ public class GoldLeader
                         {
 
                             bool hit = Sprite.Collided(player, powerup);
-                            powerup.Animate();
+                            powerup.Animate(null);
                             if (hit || Sprite.Collided(player, powerup))
                             {
                                 int points = powerup.Points;
@@ -460,7 +460,7 @@ public class GoldLeader
 
                     }
 
-                    if (player.Alive) { player.Animate(); }
+                    if (player.Alive) { player.Animate(null); }
                     if (player.Active) { player.Activate(); }
                     Score += wave.CollectScore();
 

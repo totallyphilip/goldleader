@@ -27,13 +27,16 @@ public class Zombie
     {
 
         Console.CursorVisible = false;
-        People people = new People(70);
+        People people = new People(100);
+        Complex blockers = new Complex();
+        blockers.Add(people);
+        people.BlockingSwarms = blockers;
         people.Refresh(); // make sure everybody draws once since they might be initially blocked from moving
         do
         {
-            people.CheckBlocked();
+            //people.CheckBlocked();
             people.Animate();
-            Easy.Clock.FpsThrottle(1);
+            Easy.Clock.FpsThrottle(8);
         } while (!Console.KeyAvailable);
     }
 
@@ -50,7 +53,10 @@ internal class People : Swarm
             if (!this.Items.Exists(x => x.XY.iX == xy.iX && x.XY.iY == xy.iY))
             {
                 Sprite person = new Sprite(new[] { (Abacus.RandomTrue ? Symbol.FaceBlack : Symbol.FaceWhite) }, xy, new Trajectory(0, 0), ConsoleColor.White);
-                person.Trajectory = new Trajectory(-.1, 1);
+                
+                
+                person.Trajectory = new Trajectory(.1, .1);  // this trajectory does something weird. front sprites appear to be stuck.
+                
                 this.Add(person);
             }
 
