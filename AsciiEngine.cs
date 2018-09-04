@@ -296,8 +296,8 @@ namespace AsciiEngine
                     && thatone.XY.iY == this.XY.iY
                     && (
                         (thatone.XY.iX >= this.XY.iX && thatone.XY.iX < this.XY.iX + this.Width)
-                        || (thatone.XY.iX + thatone.Width >= this.XY.iX && thatone.XY.iX + thatone.Width < this.XY.iX + this.Width)
-                        || (thatone.XY.iX <= this.XY.iX && thatone.XY.iX + thatone.Width > this.XY.iX + this.Width)
+                        || (thatone.XY.iX + thatone.Width - 1 >= this.XY.iX && thatone.XY.iX + thatone.Width - 1 < this.XY.iX + this.Width - 1)
+                        || (thatone.XY.iX <= this.XY.iX && thatone.XY.iX + thatone.Width - 1 > this.XY.iX + this.Width - 1)
                     );
             }
 

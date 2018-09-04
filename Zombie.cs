@@ -53,10 +53,10 @@ internal class People : Swarm
             if (!this.Items.Exists(x => x.XY.iX == xy.iX && x.XY.iY == xy.iY))
             {
                 Sprite person = new Sprite(new[] { (Abacus.RandomTrue ? Symbol.FaceBlack : Symbol.FaceWhite) }, xy, new Trajectory(0, 0), ConsoleColor.White);
-                
-                
-                person.Trajectory = new Trajectory(.1, .1);  // this trajectory does something weird. front sprites appear to be stuck.
-                
+
+
+                person.Trajectory = new Trajectory(Abacus.Random.NextDouble() + .1, Abacus.Random.NextDouble() + .1);  // this trajectory does something weird. front sprites appear to be stuck.
+
                 this.Add(person);
             }
 
