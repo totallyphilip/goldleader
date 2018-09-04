@@ -32,10 +32,20 @@ namespace Easy
         {
             // 0 degrees is east
             double radians = degrees * Math.PI / 180;
-            double run = Math.Cos(radians);
             double rise = Math.Sin(radians);
+            double run = Math.Cos(radians);
             return new Slope(rise, run);
         }
+
+        public static Slope SlopeFrom(AsciiEngine.Grid.Point toXY, AsciiEngine.Grid.Point fromXY)
+        {
+            // 0 degrees is east
+            double radians = Math.Atan2(toXY.iY - fromXY.iY, toXY.iX - fromXY.iX);
+            double rise = Math.Sin(radians);
+            double run = Math.Cos(radians);
+            return new Slope(rise, run);
+        }
+
 
         public static double Distance(AsciiEngine.Grid.Point c1, AsciiEngine.Grid.Point c2)
         {

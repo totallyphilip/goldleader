@@ -459,7 +459,7 @@ namespace AsciiEngine
             public Sprite(char[] c, Grid.Point xy, Grid.Trajectory t) { constructor(c, xy, t, ConsoleColor.Gray); }
             public Sprite(char[] c, Grid.Point xy, Grid.Trajectory t, ConsoleColor color) { constructor(c, xy, t, color); }
 
-            void constructor(char[] c, Grid.Point xy, Grid.Trajectory t, ConsoleColor color)
+            protected void constructor(char[] c, Grid.Point xy, Grid.Trajectory t, ConsoleColor color)
             {
                 this.Color = color;
                 this.Text = new List<char>(c).ToArray();
@@ -564,7 +564,7 @@ namespace AsciiEngine
 
             }
 
-            public void CheckBlocked()
+/*             public void CheckBlocked()
             {
                 foreach (Sprite thisone in this.Items.FindAll(x => x.Alive))
                 {
@@ -573,7 +573,7 @@ namespace AsciiEngine
                 }
 
             }
-
+ */
 
             public void CheckCollisions(Swarm otherswarm)
             {
