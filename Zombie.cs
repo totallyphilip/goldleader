@@ -33,7 +33,7 @@ public class Zombie
         Console.Write("Press any key to begin");
         Console.ReadKey();
         Console.Clear();
-        People people = new People(100);
+        People people = new People(314);
         Complex blockers = new Complex();
         blockers.Add(people);
         people.BlockingSwarms = blockers;
@@ -42,19 +42,19 @@ public class Zombie
         do
         {
             people.Animate();
-            //Easy.Clock.FpsThrottle(6);
+            Easy.Clock.FpsThrottle(6);
             if (Console.KeyAvailable)
             {
                 Point newxy = new Point();
                 ConsoleKeyInfo k = Console.ReadKey(true);
-                if (k.Key == ConsoleKey.Home) { newxy = new Point(Screen.LeftEdge,Screen.TopEdge); }
-                else if (k.Key == ConsoleKey.UpArrow) { newxy = new Point(Screen.Width/2, Screen.TopEdge); }
+                if (k.Key == ConsoleKey.Home) { newxy = new Point(Screen.LeftEdge, Screen.TopEdge); }
+                else if (k.Key == ConsoleKey.UpArrow) { newxy = new Point(Screen.Width / 2, Screen.TopEdge); }
                 else if (k.Key == ConsoleKey.PageUp) { newxy = new Point(Screen.RightEdge, Screen.TopEdge); }
-                else if (k.Key == ConsoleKey.LeftArrow) { newxy = new Point(Screen.LeftEdge, Screen.Height/2); }
-                else if (k.Key == ConsoleKey.Clear) { newxy = new Point(Screen.Width/2, Screen.Height/2); }
-                else if (k.Key == ConsoleKey.RightArrow) { newxy = new Point(Screen.RightEdge, Screen.Height/2); }
+                else if (k.Key == ConsoleKey.LeftArrow) { newxy = new Point(Screen.LeftEdge, Screen.Height / 2); }
+                else if (k.Key == ConsoleKey.Clear) { newxy = new Point(Screen.Width / 2, Screen.Height / 2); }
+                else if (k.Key == ConsoleKey.RightArrow) { newxy = new Point(Screen.RightEdge, Screen.Height / 2); }
                 else if (k.Key == ConsoleKey.End) { newxy = new Point(Screen.LeftEdge, Screen.BottomEdge); }
-                else if (k.Key == ConsoleKey.DownArrow) { newxy = new Point(Screen.Width/2, Screen.BottomEdge); }
+                else if (k.Key == ConsoleKey.DownArrow) { newxy = new Point(Screen.Width / 2, Screen.BottomEdge); }
                 else if (k.Key == ConsoleKey.PageDown) { newxy = new Point(Screen.RightEdge, Screen.BottomEdge); }
                 else if (k.Key == ConsoleKey.Escape) { gtfo = true; }
                 else if (k.Key == ConsoleKey.Spacebar) { newxy = people.Items[0].XY; for (int i = 0; i < 10; i++) { people.Items[i].Terminate(); } }
@@ -93,17 +93,15 @@ internal class Person : Sprite
     void GetNewTrajectory()
     {
         Point mynewxy;
-//        if (Abacus.Random.NextDouble() < .25) { mynewxy = this.Target.Clone(Abacus.Random.Next(20) - 10, Abacus.Random.Next(20) - 10); }
-        if (Abacus.Random.NextDouble() < .05) { mynewxy = new Point(Abacus.Random.Next(Screen.Width*2)-Screen.Width, Abacus.Random.Next(Screen.Height*2)-Screen.Height ) ; }
-        else { mynewxy = this.Target.Clone(); }
+        if (Abacus.Random.NextDouble() < .05) { mynewxy = new Point(Abacus.Random.Next(Screen.Width * 3) - Screen.Width, Abacus.Random.Next(Screen.Height * 3) - Screen.Height); }
+        else { mynewxy = this.Target; }
         Abacus.Slope slope = Abacus.SlopeFrom(mynewxy, this.XY);
-        //        this.Trajectory = new Trajectory(slope.Rise+(Abacus.Random.NextDouble()-.5)*this.Speed, slope.Run+ (Abacus.Random.NextDouble() - .5)*this.Speed);
-                this.Trajectory = new Trajectory(slope.Rise*this.Speed, slope.Run*this.Speed);
+        this.Trajectory = new Trajectory(slope.Rise * this.Speed, slope.Run * this.Speed);
     }
 
     public Person(Point xy)
     {
-        this.FlyZone.EdgeMode = Sprite.FlyZoneClass.eEdgeMode.Stop;
+        //this.FlyZone.EdgeMode = Sprite.FlyZoneClass.eEdgeMode.Stop;
         constructor(new[] { (Abacus.RandomTrue ? Symbol.FaceBlack : Symbol.FaceWhite) }, xy, new Trajectory(0, 0), ConsoleColor.White);
         Target = xy;
     }
