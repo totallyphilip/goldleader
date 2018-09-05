@@ -32,7 +32,8 @@ public class Zombie
         Console.WriteLine("Use escape to quit.");
         Console.Write("Press any key to begin");
         Console.ReadKey();
-        People people = new People(300);
+        Console.Clear();
+        People people = new People(100);
         Complex blockers = new Complex();
         blockers.Add(people);
         people.BlockingSwarms = blockers;
@@ -41,7 +42,7 @@ public class Zombie
         do
         {
             people.Animate();
-            Easy.Clock.FpsThrottle(6);
+            //Easy.Clock.FpsThrottle(6);
             if (Console.KeyAvailable)
             {
                 Point newxy = new Point();
@@ -74,7 +75,7 @@ internal class Person : Sprite
 {
 
     public Point Target;
-    double Speed = Abacus.Random.Next(1, 200) / 100;
+    double Speed = Abacus.Random.NextDouble() + .1;
 
     override public void Activate()
     {
@@ -91,9 +92,13 @@ internal class Person : Sprite
 
     void GetNewTrajectory()
     {
-        Point mynewxy = this.Target.Clone(Abacus.Random.Next(8) - 4, Abacus.Random.Next(8) - 4);
+        Point mynewxy;
+//        if (Abacus.Random.NextDouble() < .25) { mynewxy = this.Target.Clone(Abacus.Random.Next(20) - 10, Abacus.Random.Next(20) - 10); }
+        if (Abacus.Random.NextDouble() < .05) { mynewxy = new Point(Abacus.Random.Next(Screen.Width*2)-Screen.Width, Abacus.Random.Next(Screen.Height*2)-Screen.Height ) ; }
+        else { mynewxy = this.Target.Clone(); }
         Abacus.Slope slope = Abacus.SlopeFrom(mynewxy, this.XY);
-        this.Trajectory = new Trajectory(slope.Rise+(Abacus.Random.NextDouble()-.5)*this.Speed, slope.Run+ (Abacus.Random.NextDouble() - .5)*this.Speed);
+        //        this.Trajectory = new Trajectory(slope.Rise+(Abacus.Random.NextDouble()-.5)*this.Speed, slope.Run+ (Abacus.Random.NextDouble() - .5)*this.Speed);
+                this.Trajectory = new Trajectory(slope.Rise*this.Speed, slope.Run*this.Speed);
     }
 
     public Person(Point xy)
