@@ -234,8 +234,11 @@ namespace AsciiEngine
 
             public Grid.Trail Trail;
             public Grid.Trajectory Trajectory;
-
             public Grid.Trajectory OriginalTrajectory;
+            Grid.Point MyTarget;
+            Grid.Point OriginalTarget;
+            public Grid.Point Target { get { return OriginalTarget; } set { MyTarget = value; OriginalTarget = value; } }
+            public Double SpeedFactor = 1; // default multiplier 100%
             public Grid.Point XY { get { return this.Trail.XY; } }
 
             #endregion
@@ -275,6 +278,16 @@ namespace AsciiEngine
 
             protected virtual bool AliveOverride { get { return true; } } // optional additional code in overriding property
 
+            public void Terminate()
+            {
+                this.Terminated = true;
+                this.Hide();
+            }
+
+            #endregion
+
+            #region " Collisions "
+
             public static bool Collided(Sprite s1, Sprite s2)
             {
                 bool hit = false;
@@ -283,7 +296,7 @@ namespace AsciiEngine
                 return hit;
             }
 
-            bool HitDetected(Sprite thatone)
+            bool SpritesOverlapped(Sprite thatone)
             {
                 // Hits are only detected if all conditions met:
                 // * the other sprite is not this sprite (i.e. we're not crashing into ourselves)
@@ -304,7 +317,7 @@ namespace AsciiEngine
             public bool Hit(Sprite thatone)
             {
 
-                bool Collision = this.HitDetected(thatone);
+                bool Collision = this.SpritesOverlapped(thatone);
 
                 if (Collision) { OnHit(thatone.HitEffect); }
 
@@ -312,12 +325,6 @@ namespace AsciiEngine
             }
 
             public virtual void OnHit(int hiteffect) { this.HitPoints += hiteffect; }
-
-            public void Terminate()
-            {
-                this.Terminated = true;
-                this.Hide();
-            }
 
             #endregion
 
@@ -389,7 +396,16 @@ namespace AsciiEngine
                     {
                         foreach (Sprite sp in sw.Items.FindAll(x => x.Alive == true))
                         {
-                            if (this.HitDetected(sp)) { this.Trail.Items.Remove(NextCoordinate); }
+                            if ( !sp.Equals(this) &&   this.SpritesOverlapped(sp))
+                            {
+                                this.Trail.Items.Remove(NextCoordinate);
+                                this.MyTarget = this.XY.Clone(Abacus.Random.Next(3) - 1, Abacus.Random.Next(3) - 1);
+                            }
+                            else
+                            {
+                                // if we got where we're going, make sure it's where we're supposed to go
+                                if (Grid.Point.SamePlace(this.XY, this.MyTarget)) { this.MyTarget = this.OriginalTarget; }
+                            }
                         }
                     }
                 }
@@ -419,6 +435,19 @@ namespace AsciiEngine
                 }
                 else
                 {
+
+                    if (this.Target != null)
+                    {
+                        if (this.MyTarget.iX <= this.FlyZone.LeftEdge
+                            || this.MyTarget.iX >= this.FlyZone.RightEdge
+                            || this.MyTarget.iY <= this.FlyZone.TopEdge
+                            || this.MyTarget.iY >= this.FlyZone.BottomEdge)
+                        { this.MyTarget = this.OriginalTarget; }
+
+                        Abacus.Slope slope = Abacus.SlopeFrom(this.MyTarget, this.XY);
+                        this.Trajectory = new Grid.Trajectory(slope.Rise * this.SpeedFactor, slope.Run * this.SpeedFactor);
+                    }
+
                     if (this.XY.dY + this.Trajectory.Rise < this.FlyZone.TopEdge)
                     {
                         if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Rise = Math.Abs(this.Trajectory.Rise); }
@@ -439,7 +468,7 @@ namespace AsciiEngine
                         else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
                     }
 
-                    if (this.XY.dX + this.Trajectory.Run + this.Width > this.FlyZone.RightEdge)
+                    if (this.XY.dX + this.Trajectory.Run + this.Width-1 > this.FlyZone.RightEdge)
                     {
                         if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run) * (-1); }
                         else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Run = 0; }
@@ -564,16 +593,16 @@ namespace AsciiEngine
 
             }
 
-/*             public void CheckBlocked()
-            {
-                foreach (Sprite thisone in this.Items.FindAll(x => x.Alive))
-                {
-                    Grid.Point p = thisone.XY.Clone(thisone.Trajectory);
-                    if (this.Items.Exists(thatone => !thatone.Equals(thisone) && thatone.XY.iX == p.iX && thatone.XY.iY == p.iY)) { thisone.Blocked = true; }
-                }
+            /*             public void CheckBlocked()
+                        {
+                            foreach (Sprite thisone in this.Items.FindAll(x => x.Alive))
+                            {
+                                Grid.Point p = thisone.XY.Clone(thisone.Trajectory);
+                                if (this.Items.Exists(thatone => !thatone.Equals(thisone) && thatone.XY.iX == p.iX && thatone.XY.iY == p.iY)) { thisone.Blocked = true; }
+                            }
 
-            }
- */
+                        }
+             */
 
             public void CheckCollisions(Swarm otherswarm)
             {
@@ -644,6 +673,11 @@ namespace AsciiEngine
             public double dY;
             public int iX { get { return Easy.Abacus.Round(this.dX); } }
             public int iY { get { return Easy.Abacus.Round(this.dY); } }
+
+            public static bool SamePlace(Point p1, Point p2)
+            {
+                return (p1.iX == p2.iX && p1.iY == p2.iY);
+            }
 
             public Point() : this(0, 0) { }
             public Point(double dx, double dy)

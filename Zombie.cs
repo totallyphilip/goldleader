@@ -41,6 +41,7 @@ public class Zombie
         bool gtfo = false;
         do
         {
+            Console.CursorVisible = false;
             people.Animate();
             Easy.Clock.FpsThrottle(6);
             if (Console.KeyAvailable)
@@ -73,37 +74,14 @@ public class Zombie
 
 internal class Person : Sprite
 {
-
-    public Point Target;
-    double Speed = Abacus.Random.NextDouble() + .1;
-
-    override public void Activate()
-    {
-
-        if (this.Alive)
-        {
-            this.GetNewTrajectory();
-        }
-
-
-        if (!this.Alive) { this.Active = false; }
-
-    }
-
-    void GetNewTrajectory()
-    {
-        Point mynewxy;
-        if (Abacus.Random.NextDouble() < .05) { mynewxy = new Point(Abacus.Random.Next(Screen.Width * 3) - Screen.Width, Abacus.Random.Next(Screen.Height * 3) - Screen.Height); }
-        else { mynewxy = this.Target; }
-        Abacus.Slope slope = Abacus.SlopeFrom(mynewxy, this.XY);
-        this.Trajectory = new Trajectory(slope.Rise * this.Speed, slope.Run * this.Speed);
-    }
-
     public Person(Point xy)
     {
-        //this.FlyZone.EdgeMode = Sprite.FlyZoneClass.eEdgeMode.Stop;
+        this.FlyZone.EdgeMode = Sprite.FlyZoneClass.eEdgeMode.Stop;
         constructor(new[] { (Abacus.RandomTrue ? Symbol.FaceBlack : Symbol.FaceWhite) }, xy, new Trajectory(0, 0), ConsoleColor.White);
-        Target = xy;
+        this.Target = xy;
+        this.SpeedFactor = Abacus.Random.NextDouble();
+        if (this.SpeedFactor < .3) { this.SpeedFactor = .3; }
+
     }
 }
 internal class People : Swarm
@@ -113,7 +91,7 @@ internal class People : Swarm
     {
         do
         {
-            Point xy = new Point(Abacus.Random.Next(Screen.Width), Abacus.Random.Next(Screen.Height));
+            Point xy = new Point(Abacus.Random.Next(Screen.Width-1), Abacus.Random.Next(Screen.Height-1));
             if (!this.Items.Exists(x => x.XY.iX == xy.iX && x.XY.iY == xy.iY))
             {
                 Person person = new Person(xy);
