@@ -235,9 +235,9 @@ namespace AsciiEngine
             public Grid.Trail Trail;
             public Grid.Trajectory Trajectory;
             public Grid.Trajectory OriginalTrajectory;
-            Grid.Point MyTarget;
+            Grid.Point DetourTarget;
             Grid.Point OriginalTarget;
-            public Grid.Point Target { get { return OriginalTarget; } set { MyTarget = value; OriginalTarget = value; } }
+            public Grid.Point Target { get { return OriginalTarget; } set { DetourTarget = value; OriginalTarget = value; } }
             public Double SpeedFactor = 1; // default multiplier 100%
             public Grid.Point XY { get { return this.Trail.XY; } }
 
@@ -370,45 +370,22 @@ namespace AsciiEngine
                 var NextCoordinate = this.NextCoordinate();
                 this.Trail.Add(NextCoordinate);
 
-                //
-                //
-                //
-                //
-                //
-                //
-                //
-                //
-                //
-                // this is REALLY INEFFICIENT! it loops through every single sprite!
-                //
-                //
-                //
-                //
-                //
-                //
-                //
-                //
-                //
-                //
                 if (BlockingSwarms != null)
                 {
-                    foreach (Swarm sw in BlockingSwarms.Items.FindAll(x => x.Alive == true))
+                    // with fractional rise/run, overlap may occur even if sprites are trying to get off of each other
+                    if (BlockingSwarms.AllSprites().Exists(x => !x.Equals(this) && x.Alive && x.SpritesOverlapped(this)))
                     {
-                        foreach (Sprite sp in sw.Items.FindAll(x => x.Alive == true))
-                        {
-                            if ( !sp.Equals(this) &&   this.SpritesOverlapped(sp))
-                            {
-                                this.Trail.Items.Remove(NextCoordinate);
-                                this.MyTarget = this.XY.Clone(Abacus.Random.Next(3) - 1, Abacus.Random.Next(3) - 1);
-                            }
-                            else
-                            {
-                                // if we got where we're going, make sure it's where we're supposed to go
-                                if (Grid.Point.SamePlace(this.XY, this.MyTarget)) { this.MyTarget = this.OriginalTarget; }
-                            }
+                        // if the previous location is the same as the new location, allow the move.
+                        // this way, if moves are fractional but sprites spawned on top of each other, they won't get stuck.
+                        if (!Grid.Point.SamePlace(this.XY, this.Trail.PreviousXY)) {
+                            this.Trail.Items.Remove(NextCoordinate); // undo the move
+                            this.DetourTarget = this.XY.Clone(Abacus.Random.Next(3) - 1, Abacus.Random.Next(3) - 1); // set a random detour
                         }
                     }
+                    else if (Grid.Point.SamePlace(this.XY, this.DetourTarget)) { this.DetourTarget = this.OriginalTarget; }
                 }
+
+
                 this.Refresh();
             }
 
@@ -438,13 +415,13 @@ namespace AsciiEngine
 
                     if (this.Target != null)
                     {
-                        if (this.MyTarget.iX <= this.FlyZone.LeftEdge
-                            || this.MyTarget.iX >= this.FlyZone.RightEdge
-                            || this.MyTarget.iY <= this.FlyZone.TopEdge
-                            || this.MyTarget.iY >= this.FlyZone.BottomEdge)
-                        { this.MyTarget = this.OriginalTarget; }
+                        if (this.DetourTarget.iX <= this.FlyZone.LeftEdge
+                            || this.DetourTarget.iX >= this.FlyZone.RightEdge
+                            || this.DetourTarget.iY <= this.FlyZone.TopEdge
+                            || this.DetourTarget.iY >= this.FlyZone.BottomEdge)
+                        { this.DetourTarget = this.OriginalTarget; }
 
-                        Abacus.Slope slope = Abacus.SlopeFrom(this.MyTarget, this.XY);
+                        Abacus.Slope slope = Abacus.SlopeFrom(this.DetourTarget, this.XY);
                         this.Trajectory = new Grid.Trajectory(slope.Rise * this.SpeedFactor, slope.Run * this.SpeedFactor);
                     }
 
@@ -468,7 +445,7 @@ namespace AsciiEngine
                         else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Ignore) { } // else-if not needed, just here for clarity
                     }
 
-                    if (this.XY.dX + this.Trajectory.Run + this.Width-1 > this.FlyZone.RightEdge)
+                    if (this.XY.dX + this.Trajectory.Run + this.Width - 1 > this.FlyZone.RightEdge)
                     {
                         if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Bounce) { this.Trajectory.Run = Math.Abs(this.Trajectory.Run) * (-1); }
                         else if (this.FlyZone.EdgeMode == FlyZoneClass.eEdgeMode.Stop) { this.Trajectory.Run = 0; }
@@ -651,6 +628,16 @@ namespace AsciiEngine
             }
 
             public void Add(Swarm s) { this.Items.Add(s); }
+
+            public List<Sprite> AllSprites()
+            {
+                IEnumerable<Sprite> all = new List<Sprite>();
+                foreach (Swarm sw in Items)
+                {
+                    all = sw.Items.Concat(all);
+                }
+                return all.ToList();
+            }
 
             public Complex() { }
         }

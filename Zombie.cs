@@ -3,7 +3,7 @@ using AsciiEngine.Grid;
 using AsciiEngine.Sprites;
 using Easy;
 using System;
-public class Zombie
+public class ZombieGame
 {
 
     public void TryPlay()
@@ -33,16 +33,18 @@ public class Zombie
         Console.Write("Press any key to begin");
         Console.ReadKey();
         Console.Clear();
-        People people = new People(314);
-        Complex blockers = new Complex();
-        blockers.Add(people);
-        people.BlockingSwarms = blockers;
-        people.Refresh(); // make sure everybody draws once since they might be initially blocked from moving
+        People people = new People(111);
+        Zombies zombies = new Zombies(10);
+        Complex everybody = new Complex();
+        everybody.Items.Add(people);
+        everybody.Items.Add(zombies);
+        people.BlockingSwarms = everybody;
+        zombies.BlockingSwarms = everybody;
         bool gtfo = false;
         do
         {
             Console.CursorVisible = false;
-            people.Animate();
+            everybody.Animate();
             Easy.Clock.FpsThrottle(6);
             if (Console.KeyAvailable)
             {
@@ -84,15 +86,45 @@ internal class Person : Sprite
 
     }
 }
-internal class People : Swarm
+
+internal class Zombie : Sprite
 {
 
+    public override void Activate() // add more complex code in inherited tasks if needed
+    {
+        if (this.Alive)
+        {
+            // stuff to do if alive
+        }
+
+        // stuff to do regardless
+        
+        if (AsciiEngine.Grid.Point.SamePlace(this.XY, this.Target))
+        {
+            this.Target = new Point(Abacus.Random.Next(Screen.Width), Abacus.Random.Next(Screen.Height));
+        }
+
+        if (!this.Alive) { this.Active = false; } // set false when no more stuff to do
+    }
+
+    public Zombie(Point xy)
+    {
+        this.FlyZone.EdgeMode = Sprite.FlyZoneClass.eEdgeMode.Stop;
+        constructor(new[] {  Symbol.FaceWhite }, xy, new Trajectory(0, 0), ConsoleColor.Green);
+        this.Target = xy;
+        this.SpeedFactor = .1; 
+    }
+}
+
+
+internal class People : Swarm
+{
     public People(int count)
     {
         do
         {
             Point xy = new Point(Abacus.Random.Next(Screen.Width-1), Abacus.Random.Next(Screen.Height-1));
-            if (!this.Items.Exists(x => x.XY.iX == xy.iX && x.XY.iY == xy.iY))
+            //if (!this.Items.Exists(x => x.XY.iX == xy.iX && x.XY.iY == xy.iY))
             {
                 Person person = new Person(xy);
                 person.Target = new Point(Screen.Width / 2, Screen.Height / 2);
@@ -101,9 +133,25 @@ internal class People : Swarm
 
         } while (this.Count < count);
 
-
     }
 
+}
 
+internal class Zombies : Swarm
+{
+    public Zombies(int count)
+    {
+        do
+        {
+            Point xy = new Point(Abacus.Random.Next(Screen.Width - 1), Abacus.Random.Next(Screen.Height - 1));
+            {
+                Zombie zombie = new Zombie(xy);
+                zombie.Target = xy;
+                this.Add(zombie);
+            }
+
+        } while (this.Count < count);
+
+    }
 
 }

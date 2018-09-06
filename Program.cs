@@ -18,7 +18,7 @@ namespace MyProgram
             else if (k.Key == ConsoleKey.D2)
             {
 
-                Zombie z = new Zombie();
+                ZombieGame z = new ZombieGame();
                 z.TryPlay();
             }
 
