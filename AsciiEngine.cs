@@ -91,10 +91,14 @@ namespace AsciiEngine
 
             public Explosion(char[] text, Grid.Point coord, int width, double range, double velocity, bool up, bool down, bool left, bool right)
             {
-                constructor(text, coord, width, range, velocity, up, down, left, right);
+                constructor(text, coord, width, range, velocity, up, down, left, right, ConsoleColor.Gray);
+            }
+            public Explosion(char[] text, Grid.Point coord, int width, double range, double velocity, bool up, bool down, bool left, bool right, ConsoleColor color)
+            {
+                constructor(text, coord, width, range, velocity, up, down, left, right, color);
             }
 
-            void constructor(char[] text, Grid.Point coord, int width, double range, double velocity, bool up, bool down, bool left, bool right)
+            void constructor(char[] text, Grid.Point coord, int width, double range, double velocity, bool up, bool down, bool left, bool right, ConsoleColor color)
             {
 
                 int position = 0;
@@ -120,7 +124,7 @@ namespace AsciiEngine
                     position++;
                     if (position > width) { position = 0; }
 
-                    this.Items.Add(new Sprites.Sprite(new[] { c }, xy, t));
+                    this.Items.Add(new Sprites.Sprite(new[] { c }, xy, t,color));
                 }
 
             }
@@ -375,8 +379,8 @@ namespace AsciiEngine
                     // with fractional rise/run, overlap may occur even if sprites are trying to get off of each other
                     if (BlockingSwarms.AllSprites().Exists(x => !x.Equals(this) && x.Alive && x.SpritesOverlapped(this)))
                     {
-                        // if the previous location is the same as the new location, allow the move.
-                        // this way, if moves are fractional but sprites spawned on top of each other, they won't get stuck.
+                        // if the previous location is the same as the new location, allow the blocked move.
+                        // this way, if sprites spawned on top of each other, they won't get stuck trying to crawl off.
                         if (!Grid.Point.SamePlace(this.XY, this.Trail.PreviousXY)) {
                             this.Trail.Items.Remove(NextCoordinate); // undo the move
                             this.DetourTarget = this.XY.Clone(Abacus.Random.Next(3) - 1, Abacus.Random.Next(3) - 1); // set a random detour
@@ -640,6 +644,7 @@ namespace AsciiEngine
             }
 
             public Complex() { }
+            public Complex(Swarm s) { this.Add(s); }
         }
 
         public class Static
