@@ -5,8 +5,20 @@ using AsciiEngine.Sprites;
 using Easy;
 using System;
 using System.Collections.Generic;
+
+internal class Compass
+{
+    static public int North { get { return Screen.Height / 9; } }
+    static public int South { get { return Screen.Height - North; } }
+    static public int West { get { return Screen.Width / 9; } }
+    static public int East { get { return Screen.Width - West; } }
+    static public int Equator { get { return Screen.Height / 2; } }
+    static public int Meridian { get { return Screen.Width / 2; } }
+}
+
 public class ZombieGame
 {
+
 
     public void TryPlay()
     {
@@ -27,11 +39,11 @@ public class ZombieGame
 
     void MainLoop()
     {
+        int Escaped = 0;
 
         Console.CursorVisible = false;
-        Console.WriteLine("Use numpad keys to move. NumLock is NOT necessary.");
-        Console.WriteLine("Use spacebar to kill 10 people.");
-        Console.WriteLine("Use escape to quit.");
+        Console.WriteLine("Set off flashbangs with numpad keys (numlock unnecessary).");
+        Console.WriteLine("Hit escape to quit.");
         Console.Write("Press any key to begin");
         Console.ReadKey();
         Console.Clear();
@@ -40,12 +52,16 @@ public class ZombieGame
         People people = new People(111, tombstones);
         Zombies zombies = new Zombies(50);
         Complex everybody = new Complex();
+        Gates gates = new Gates(2);
+
+
         everybody.Items.Add(tombstones);
         everybody.Items.Add(zombies);
         everybody.Items.Add(people);
         people.BlockingSwarms = everybody;
         zombies.BlockingSwarms = new Complex(tombstones);
         zombies.BlockingSwarms.Add(zombies);
+        zombies.BlockingSwarms.Add(gates);
         bool gtfo = false;
         do
         {
@@ -54,9 +70,20 @@ public class ZombieGame
             Static.Swarms.Animate();
             everybody.Animate();
             zombies.CheckCollisions(people);
+            gates.Animate();
+            gates.CheckCollisions(people);
+
+            foreach (Person p in people.Items.FindAll(x => x.Alive))
+            {
+                if (p.Escaped)
+                {
+                    p.Terminate();
+                    Escaped++;
+                }
+            }
 
             // hud
-            string hud = " " + people.Count.ToString() + " ";
+            string hud = " " + Escaped + "|" + people.Count.ToString() + " ";
             Point hudxy = new Point(Screen.Width / 2 - hud.Length / 2, Screen.BottomEdge);
             Console.ForegroundColor = ConsoleColor.White;
             Screen.TryWrite(hudxy, hud);
@@ -66,23 +93,27 @@ public class ZombieGame
             {
                 Point newxy = new Point();
                 ConsoleKeyInfo k = Console.ReadKey(true);
-                if (k.Key == ConsoleKey.Home) { newxy = new Point(Screen.LeftEdge, Screen.TopEdge); }
-                else if (k.Key == ConsoleKey.UpArrow) { newxy = new Point(Screen.Width / 2, Screen.TopEdge); }
-                else if (k.Key == ConsoleKey.PageUp) { newxy = new Point(Screen.RightEdge, Screen.TopEdge); }
-                else if (k.Key == ConsoleKey.LeftArrow) { newxy = new Point(Screen.LeftEdge, Screen.Height / 2); }
-                else if (k.Key == ConsoleKey.Clear) { newxy = new Point(Screen.Width / 2, Screen.Height / 2); }
-                else if (k.Key == ConsoleKey.RightArrow) { newxy = new Point(Screen.RightEdge, Screen.Height / 2); }
-                else if (k.Key == ConsoleKey.End) { newxy = new Point(Screen.LeftEdge, Screen.BottomEdge); }
-                else if (k.Key == ConsoleKey.DownArrow) { newxy = new Point(Screen.Width / 2, Screen.BottomEdge); }
-                else if (k.Key == ConsoleKey.PageDown) { newxy = new Point(Screen.RightEdge, Screen.BottomEdge); }
+                if (k.Key == ConsoleKey.Home) { newxy = new Point(Compass.West, Compass.North); }
+                else if (k.Key == ConsoleKey.UpArrow) { newxy = new Point(Compass.Meridian, Compass.North); }
+                else if (k.Key == ConsoleKey.PageUp) { newxy = new Point(Compass.East, Compass.North); }
+                else if (k.Key == ConsoleKey.LeftArrow) { newxy = new Point(Compass.West, Compass.Equator); }
+                else if (k.Key == ConsoleKey.Clear) { newxy = new Point(Compass.Meridian, Compass.Equator); }
+                else if (k.Key == ConsoleKey.RightArrow) { newxy = new Point(Compass.East, Compass.Equator); }
+                else if (k.Key == ConsoleKey.End) { newxy = new Point(Compass.West, Compass.South); }
+                else if (k.Key == ConsoleKey.DownArrow) { newxy = new Point(Compass.Meridian, Compass.South); }
+                else if (k.Key == ConsoleKey.PageDown) { newxy = new Point(Compass.East, Compass.South); }
                 else if (k.Key == ConsoleKey.Escape) { gtfo = true; }
-                else if (k.Key == ConsoleKey.Spacebar) { newxy = people.Items[0].XY; for (int i = 0; i < 10; i++) { people.Items[i].Terminate(); } }
 
-                foreach (Person p in people.Items)                {                     p.Target = newxy;                 }
-                for (int i = 0; i < 5; i++   ) {
-                    zombies.Items[Abacus.Random.Next(zombies.Count)].Target = newxy;
+                foreach (Person p in people.Items) { p.Target = newxy; }
+                for (int i = 0; i < 5; i++)
+                {
+                    int zombieindex = Abacus.Random.Next(zombies.Count);
+                    zombies.Items[zombieindex].Target = newxy;
+                    Static.Swarms.Add(new Explosion(new[] { Symbol.FullBlock, Symbol.SmallBlock }, newxy, 0, 4, 3, true, true, true, true, ConsoleColor.White));
+                    Static.Sprites.Add(new Sprite(new[] { '!' }, zombies.Items[zombieindex].XY.Clone(0, -1), new Trajectory(-.33, 0, 1), ConsoleColor.White));
+
                 }
-                    Easy.Keyboard.EatKeys();
+                Easy.Keyboard.EatKeys();
             }
         } while (!gtfo);
     }
@@ -95,6 +126,7 @@ internal class Person : Sprite
 {
 
     public int FullHealth = 3;
+    public bool Escaped = false;
 
     Swarm Corpses;
 
@@ -131,24 +163,23 @@ internal class Person : Sprite
     }
 
 
-    override public void OnHit(int damage)
+    override public void OnHit(int hiteffect)
     {
-        this.HitPoints += damage;
-        this.Color = ConsoleColor.Red;
-        if (this.Alive)
+        if (hiteffect < 0)
         {
-            /*       Explosion splatter = new Explosion(new string(Symbol.DotCenter, this.FullHealth - this.HitPoints).ToCharArray(), this.XY, this.Width, 1.5, 1, true, true, true, true, ConsoleColor.Red);
-               AsciiEngine.Sprites.Static.Swarms.Add(splatter); */
-            this.Target = new Point(Abacus.Random.Next(Screen.Width), Abacus.Random.Next(Screen.Height));
-            Static.Sprites.Add(new Sprite(new[] { '!' }, this.XY.Clone(0, -1), new Trajectory(-.33, 0, 1), ConsoleColor.Red));
+            this.HitPoints += hiteffect;
+            this.Color = ConsoleColor.Red;
+            if (this.Alive)
+            {
+                this.Target = new Point(Abacus.Random.Next(Screen.Width), Abacus.Random.Next(Screen.Height));
+                Static.Sprites.Add(new Sprite(new[] { '!' }, this.XY.Clone(0, -1), new Trajectory(-.33, 0, 1), ConsoleColor.Red));
+            }
+            else
+            {
+                this.Corpses.Add(new Sprite(new[] { Symbol.FaceOutline }, this.XY.Clone(), new Trajectory(0, 0), ConsoleColor.Gray));
+            }
         }
-        else
-        {
-
-            //Static.Sprites.Add(new Sprite(new[] {'x'}, this.XY.Clone(), new Trajectory(-.001, 0, 1), ConsoleColor.Red));
-            this.Corpses.Add(new Sprite(new[] { Symbol.FaceOutline }, this.XY.Clone(), new Trajectory(0, 0), ConsoleColor.Gray));
-
-        }
+        else if (hiteffect > 0) { this.Escaped = true; }
 
     }
 
@@ -181,7 +212,7 @@ internal class Zombie : Sprite
     {
         this.FlyZone.EdgeMode = Sprite.FlyZoneClass.eEdgeMode.Stop;
         this.FlyZone.BottomMargin = 1;
-        constructor(new[] { Symbol.CrossDiagonal}, xy, new Trajectory(0, 0), ConsoleColor.DarkYellow);
+        constructor(new[] { Symbol.CrossDiagonal }, xy, new Trajectory(0, 0), ConsoleColor.DarkYellow);
         this.Target = xy;
         this.SpeedFactor = .1;
     }
@@ -224,4 +255,78 @@ internal class Zombies : Swarm
 
     }
 
+
+}
+
+internal class Gate : Sprite
+{
+
+    char[] GateText()
+    {
+        return (Symbol.BarVerticalRight + new string(Symbol.ShadeLight, this.HitPoints) + Symbol.BarVerticalLeft + ' ').ToCharArray();
+    }
+
+    public override void Activate() // add more complex code in inherited tasks if needed
+    {
+        if (this.Alive)
+        {
+            // stuff to do if alive
+            this.Text = this.GateText();
+            this.Trajectory = new Trajectory(0, 0);
+        }
+
+        // stuff to do regardless
+
+        if (!this.Alive) { this.Active = false; } // set false when no more stuff to do
+    }
+
+    public override void OnHit(int hiteffect)
+    {
+        this.Hide();
+        this.HitPoints += hiteffect;
+        this.Trail.Add(this.XY.Clone(.5, 0));
+        this.Text = this.GateText();
+        this.Refresh();
+        if (!this.Alive)
+        {
+            Static.Swarms.Add(new Explosion(new string(Symbol.DotCenter, 10).ToCharArray(), this.XY, 0, 5, 1.5, true, true, true, true, ConsoleColor.White));
+        }
+    }
+
+
+
+
+
+    public Gate()
+    {
+        this.HitPoints = 10;
+        this.Text = this.GateText();
+        this.Trail = new Trail(new Point(Abacus.Random.Next(Compass.West, Compass.East - this.Width), Abacus.Random.Next(Compass.North, Compass.South)));
+        this.Trajectory = new Trajectory(0, 0);
+        this.OriginalTrajectory = this.Trajectory.Clone();
+        this.HitEffect = 1;
+        this.Color = ConsoleColor.Blue;
+    }
+}
+
+internal class Gates : Swarm
+{
+
+    public int Maximum;
+
+    protected override void Spawn()
+    {
+
+        while (this.Count < this.Maximum)
+        {
+            this.Items.Add(new Gate());
+        }
+
+
+    }
+
+    public Gates(int max)
+    {
+        this.Maximum = max;
+    }
 }
