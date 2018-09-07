@@ -79,8 +79,9 @@ namespace AsciiEngine
         public static char DotCenter { get { return '\x00b7'; } }
         public static char BarVerticalLeft { get { return '\x258c'; } }
         public static char BarVerticalRight { get { return '\x2590'; } }
-        public static char FaceWhite { get { return '\x263a'; } }
-        public static char FaceBlack { get { return '\x263b'; } }
+        public static char FaceOutline { get { return '\x263a'; } }
+        public static char FaceSolid { get { return '\x263b'; } }
+        public static char CrossDiagonal { get { return '\x2573'; } }
     }
     namespace Fx
     {
@@ -124,7 +125,7 @@ namespace AsciiEngine
                     position++;
                     if (position > width) { position = 0; }
 
-                    this.Items.Add(new Sprites.Sprite(new[] { c }, xy, t,color));
+                    this.Items.Add(new Sprites.Sprite(new[] { c }, xy, t, color));
                 }
 
             }
@@ -257,7 +258,6 @@ namespace AsciiEngine
             public ConsoleColor Color = Console.ForegroundColor;
             bool Terminated = false;
             public int Width { get { return this.Text.Length; } }
-            public bool Blocked = false;
 
             public int CollectScore()
             {
@@ -349,11 +349,12 @@ namespace AsciiEngine
 
             public char[] Text;
 
-            public void Hide()
+            public void Hide() { this.Hide(true); }
+            public void Hide(bool UseCurrentLocation)
             {
                 if (this.Shown)
                 {
-                    Screen.TryWrite(this.XY, new String(' ', this.Width));
+                    Screen.TryWrite((UseCurrentLocation ? this.XY : this.Trail.PreviousXY), new String(' ', this.Width));
                     this.Shown = false;
                 }
             }
@@ -370,7 +371,7 @@ namespace AsciiEngine
 
             public void Animate(Complex BlockingSwarms, bool hide)
             {
-                if (hide) { this.Hide(); }
+
                 var NextCoordinate = this.NextCoordinate();
                 this.Trail.Add(NextCoordinate);
 
@@ -381,7 +382,8 @@ namespace AsciiEngine
                     {
                         // if the previous location is the same as the new location, allow the blocked move.
                         // this way, if sprites spawned on top of each other, they won't get stuck trying to crawl off.
-                        if (!Grid.Point.SamePlace(this.XY, this.Trail.PreviousXY)) {
+                        if (!Grid.Point.SamePlace(this.XY, this.Trail.PreviousXY))
+                        {
                             this.Trail.Items.Remove(NextCoordinate); // undo the move
                             this.DetourTarget = this.XY.Clone(Abacus.Random.Next(3) - 1, Abacus.Random.Next(3) - 1); // set a random detour
                         }
@@ -389,8 +391,20 @@ namespace AsciiEngine
                     else if (Grid.Point.SamePlace(this.XY, this.DetourTarget)) { this.DetourTarget = this.OriginalTarget; }
                 }
 
+                if (hide)
+                {
+                    if (this.Trail.Items.Count > 1)
+                    {
+                        // only erase the previous position if the sprite moved
+                        if (!Grid.Point.SamePlace(this.XY, this.Trail.PreviousXY)) { this.Hide(false); }
+                    }
+                    else
+                    {
+                        this.Hide();
+                    }
+                }
 
-                this.Refresh();
+                this.Refresh(); // always redraw the current position
             }
 
             public virtual void Activate() // add more complex code in inherited tasks if needed
@@ -487,6 +501,8 @@ namespace AsciiEngine
 
             public List<Sprite> Items = new List<Sprite>();
             public Complex BlockingSwarms;
+            public Complex LayeredSwarms;
+            public bool AlwaysAlive = false;
 
             bool HasFollowers(Sprite s) { return Leaders().Exists(x => x.Equals(s)); }
             List<Sprite> Followers(Sprite s) { return this.Items.FindAll(x => x.LeaderEquals(s)); }
@@ -526,13 +542,12 @@ namespace AsciiEngine
                 });
 
                 // animate everyone else
-                this.Items.FindAll(x => x.Alive && !x.Blocked && !x.HasLeader && !HasFollowers(x)).ForEach(delegate (Sprite s) { s.Animate(BlockingSwarms); });
+                this.Items.FindAll(x => x.Alive && !x.HasLeader && !HasFollowers(x)).ForEach(delegate (Sprite s) { s.Animate(BlockingSwarms); });
 
                 // do this for everybody
                 this.Items.FindAll(x => x.Active).ForEach(delegate (Sprite s)
                 {
                     s.Activate();
-                    s.Blocked = false;
                 });
 
                 OnAnimated();
@@ -623,10 +638,10 @@ namespace AsciiEngine
             {
 
                 // remove dead swarms
-                this.Items.FindAll(x => !x.Alive).ForEach(delegate (Swarm s)
-              {
-                  this.Items.Remove(s);
-              });
+                this.Items.FindAll(x => !x.Alive && !x.AlwaysAlive).ForEach(delegate (Swarm s)
+             {
+                 this.Items.Remove(s);
+             });
 
                 foreach (Swarm s in Items) { s.Animate(); }
             }
@@ -668,7 +683,8 @@ namespace AsciiEngine
 
             public static bool SamePlace(Point p1, Point p2)
             {
-                return (p1.iX == p2.iX && p1.iY == p2.iY);
+                try { return (p1.iX == p2.iX && p1.iY == p2.iY); }
+                catch { return false; }
             }
 
             public Point() : this(0, 0) { }
