@@ -40,6 +40,8 @@ public class ZombieGame
     void MainLoop()
     {
         int Escaped = 0;
+        bool GaveOver = false;
+        int FrameCounter = 0;
 
         Console.CursorVisible = false;
         Console.WriteLine("Set off flashbangs with numpad keys (numlock unnecessary).");
@@ -47,18 +49,16 @@ public class ZombieGame
         Console.Write("Press any key to begin");
         Console.ReadKey();
         Console.Clear();
+        Scroller scroller = new Scroller(1, Screen.Height / 2, .33, ConsoleColor.Red, ConsoleColor.DarkRed);
         Swarm tombstones = new Swarm();
         tombstones.AlwaysAlive = true;
-        People people = new People(111, tombstones);
-        Zombies zombies = new Zombies(50);
-        Complex everybody = new Complex();
+        People people = new People(20, tombstones);
+        Zombies zombies = new Zombies(5);
         Gates gates = new Gates(2);
 
-
-        everybody.Items.Add(tombstones);
-        everybody.Items.Add(zombies);
-        everybody.Items.Add(people);
-        people.BlockingSwarms = everybody;
+        people.BlockingSwarms = new Complex(tombstones);
+        people.BlockingSwarms.Add(zombies);
+        people.BlockingSwarms.Add(people);
         zombies.BlockingSwarms = new Complex(tombstones);
         zombies.BlockingSwarms.Add(zombies);
         zombies.BlockingSwarms.Add(gates);
@@ -66,12 +66,24 @@ public class ZombieGame
         do
         {
             Console.CursorVisible = false;
+
+            FrameCounter++;
+            if (FrameCounter > 100)
+            {
+                //people.MakePeople(5, tombstones, people);
+                FrameCounter = 0;
+                zombies.MakeMonsters(1);
+            }
+
             Static.Sprites.Animate();
             Static.Swarms.Animate();
-            everybody.Animate();
+            tombstones.Animate();
+            zombies.Animate();
+            people.Animate();
             zombies.CheckCollisions(people);
             gates.Animate();
             gates.CheckCollisions(people);
+            scroller.Animate();
 
             foreach (Person p in people.Items.FindAll(x => x.Alive))
             {
@@ -81,6 +93,7 @@ public class ZombieGame
                     Escaped++;
                 }
             }
+
 
             // hud
             string hud = " " + Escaped + "|" + people.Count.ToString() + " ";
@@ -104,26 +117,33 @@ public class ZombieGame
                 else if (k.Key == ConsoleKey.PageDown) { newxy = new Point(Compass.East, Compass.South); }
                 else if (k.Key == ConsoleKey.Escape) { gtfo = true; }
 
-                foreach (Person p in people.Items) { p.Target = newxy; }
+                foreach (Person p in people.Items) { p.Target = newxy; p.Color = ConsoleColor.White; }
                 for (int i = 0; i < 5; i++)
                 {
                     int zombieindex = Abacus.Random.Next(zombies.Count);
                     zombies.Items[zombieindex].Target = newxy;
                     Static.Swarms.Add(new Explosion(new[] { Symbol.FullBlock, Symbol.SmallBlock }, newxy, 0, 4, 3, true, true, true, true, ConsoleColor.White));
-                    Static.Sprites.Add(new Sprite(new[] { '!' }, zombies.Items[zombieindex].XY.Clone(0, -1), new Trajectory(-.33, 0, 1), ConsoleColor.White));
+                    Static.Sprites.Add(new Sprite(new[] { '!' }, zombies.Items[zombieindex].XY.Clone(0, -1), new Trajectory(-.33, 0, 2), ConsoleColor.Red));
 
                 }
                 Easy.Keyboard.EatKeys();
+            }
+
+            if (people.AliveCount < 1 && !GaveOver)
+            {
+                scroller.NewLine(Textify.Fluffer("GAME OVER", " "));
+                GaveOver = true;
             }
         } while (!gtfo);
     }
 
 }
 
-
+#region " People "
 
 internal class Person : Sprite
 {
+    People parent;
 
     public int FullHealth = 3;
     public bool Escaped = false;
@@ -150,7 +170,7 @@ internal class Person : Sprite
         if (!this.Alive) { this.Active = false; } // set false when no more stuff to do
     }
 
-    public Person(Point xy, Swarm corpses)
+    public Person(Point xy, Swarm corpses, People parent)
     {
         this.FlyZone.EdgeMode = Sprite.FlyZoneClass.eEdgeMode.Stop;
         this.FlyZone.BottomMargin = 1;
@@ -160,8 +180,8 @@ internal class Person : Sprite
         if (this.SpeedFactor < .3) { this.SpeedFactor = .3; }
         this.HitPoints = this.FullHealth;
         this.Corpses = corpses;
+        this.parent = parent;
     }
-
 
     override public void OnHit(int hiteffect)
     {
@@ -172,19 +192,50 @@ internal class Person : Sprite
             if (this.Alive)
             {
                 this.Target = new Point(Abacus.Random.Next(Screen.Width), Abacus.Random.Next(Screen.Height));
-                Static.Sprites.Add(new Sprite(new[] { '!' }, this.XY.Clone(0, -1), new Trajectory(-.33, 0, 1), ConsoleColor.Red));
+                //Static.Sprites.Add(new Sprite(new[] { '!' }, this.XY.Clone(0, -1), new Trajectory(-.33, 0, 1), ConsoleColor.Red));
             }
             else
             {
                 this.Corpses.Add(new Sprite(new[] { Symbol.FaceOutline }, this.XY.Clone(), new Trajectory(0, 0), ConsoleColor.Gray));
             }
         }
-        else if (hiteffect > 0) { this.Escaped = true; }
+        else if (hiteffect > 0)
+        {
+            this.Escaped = true;
+            Static.Swarms.Add(new Explosion(new string(Symbol.DotCenter, 2).ToCharArray(), this.XY, 0, 5, 1.5, true, true, true, true, ConsoleColor.Cyan));
+            parent.MakePeople(1, Corpses, parent);
+        }
 
     }
 
 
 }
+
+
+internal class People : Swarm
+{
+
+    public void MakePeople(int count, Swarm corpses, People parent)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            Point xy = new Point(Screen.LeftEdge + 1, Screen.Height / 2);
+            Person person = new Person(xy, corpses, this);
+            person.Target = new Point(Screen.Width / 2, Screen.Height / 2);
+            this.Add(person);
+        }
+    }
+
+    public People(int count, Swarm corpses)
+    {
+        this.MakePeople(count, corpses, this);
+    }
+
+}
+
+#endregion
+
+#region " Monsters "
 
 internal class Zombie : Sprite
 {
@@ -218,52 +269,44 @@ internal class Zombie : Sprite
     }
 }
 
-
-internal class People : Swarm
-{
-    public People(int count, Swarm corpses)
-    {
-        do
-        {
-            Point xy = new Point(Screen.LeftEdge + 1, Screen.Height / 2);
-            {
-                Person person = new Person(xy, corpses);
-                person.Target = new Point(Screen.Width / 2, Screen.Height / 2);
-                this.Add(person);
-            }
-
-        } while (this.Count < count);
-
-    }
-
-}
-
 internal class Zombies : Swarm
 {
-    public Zombies(int count)
+
+    public void MakeMonsters(int count)
     {
-        do
+        for (int i = 0; i < count; i++)
         {
             Point xy = new Point(Screen.RightEdge - 1, Screen.Height / 2);
-            {
-                Zombie zombie = new Zombie(xy);
-                zombie.Target = xy;
-                this.Add(zombie);
-            }
 
-        } while (this.Count < count);
+            Zombie zombie = new Zombie(xy);
+            zombie.Target = xy;
+            this.Add(zombie);
+        }
+    }
 
+    public Zombies(int count)
+    {
+        this.MakeMonsters(count);
     }
 
 
 }
 
+#endregion
+
+#region " Gates "
 internal class Gate : Sprite
 {
+    int FrameCounter = 0;
 
     char[] GateText()
     {
         return (Symbol.BarVerticalRight + new string(Symbol.ShadeLight, this.HitPoints) + Symbol.BarVerticalLeft + ' ').ToCharArray();
+    }
+
+    void GoBoom()
+    {
+        Static.Swarms.Add(new Explosion(new string(Symbol.DotCenter, 20).ToCharArray(), this.XY, 0, 5, 1.5, true, true, true, true, ConsoleColor.Yellow));
     }
 
     public override void Activate() // add more complex code in inherited tasks if needed
@@ -273,6 +316,8 @@ internal class Gate : Sprite
             // stuff to do if alive
             this.Text = this.GateText();
             this.Trajectory = new Trajectory(0, 0);
+            FrameCounter++;
+            if (FrameCounter > 10) { this.OnHit(-1); this.FrameCounter = 0; }
         }
 
         // stuff to do regardless
@@ -289,17 +334,13 @@ internal class Gate : Sprite
         this.Refresh();
         if (!this.Alive)
         {
-            Static.Swarms.Add(new Explosion(new string(Symbol.DotCenter, 10).ToCharArray(), this.XY, 0, 5, 1.5, true, true, true, true, ConsoleColor.White));
+            this.GoBoom();
         }
     }
 
-
-
-
-
     public Gate()
     {
-        this.HitPoints = 10;
+        this.HitPoints = 20;
         this.Text = this.GateText();
         this.Trail = new Trail(new Point(Abacus.Random.Next(Compass.West, Compass.East - this.Width), Abacus.Random.Next(Compass.North, Compass.South)));
         this.Trajectory = new Trajectory(0, 0);
@@ -330,3 +371,5 @@ internal class Gates : Swarm
         this.Maximum = max;
     }
 }
+
+#endregion

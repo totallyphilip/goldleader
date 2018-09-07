@@ -613,6 +613,7 @@ namespace AsciiEngine
             #region " Shortcuts "
 
             public int Count { get { return this.Items.Count; } }
+            public int AliveCount { get { return this.Items.FindAll(x => x.Alive).Count; } }
 
             public bool Empty { get { return this.Items.Count < 1; } }
 
