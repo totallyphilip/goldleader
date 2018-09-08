@@ -42,11 +42,13 @@ public class ZombieGame
         int Escaped = 0;
         bool GaveOver = false;
         int FrameCounter = 0;
+        int FlashbangCounter = 0;
+        int FlashbangWaitCycles = 30;
 
         Console.CursorVisible = false;
         Console.WriteLine("Set off flashbangs with numpad keys (numlock unnecessary).");
         Console.WriteLine("Hit escape to quit.");
-        Console.Write("Press any key to begin");
+        Console.Write("Press any key to begin.");
         Console.ReadKey();
         Console.Clear();
         Scroller scroller = new Scroller(1, Screen.Height / 2, .33, ConsoleColor.Red, ConsoleColor.DarkRed);
@@ -62,15 +64,17 @@ public class ZombieGame
         zombies.BlockingSwarms = new Complex(tombstones);
         zombies.BlockingSwarms.Add(zombies);
         zombies.BlockingSwarms.Add(gates);
+
+        scroller.NewLine(Textify.Fluffer("READY PLAYER ONE", " "));
+
         bool gtfo = false;
         do
         {
             Console.CursorVisible = false;
-
+            FlashbangCounter++;
             FrameCounter++;
             if (FrameCounter > 100)
             {
-                //people.MakePeople(5, tombstones, people);
                 FrameCounter = 0;
                 zombies.MakeMonsters(1);
             }
@@ -96,7 +100,7 @@ public class ZombieGame
 
 
             // hud
-            string hud = " " + Escaped + "|" + people.Count.ToString() + " ";
+            string hud = " " + (FlashbangCounter < FlashbangWaitCycles ? new string(Symbol.ShadeLight, 5) : new string(Symbol.FullBlock, 5)) + " " + Escaped + "|" + people.Count.ToString() + " " + (FlashbangCounter < FlashbangWaitCycles ? new string(Symbol.ShadeLight, 5) : new string(Symbol.FullBlock, 5)) + " ";
             Point hudxy = new Point(Screen.Width / 2 - hud.Length / 2, Screen.BottomEdge);
             Console.ForegroundColor = ConsoleColor.White;
             Screen.TryWrite(hudxy, hud);
@@ -117,14 +121,19 @@ public class ZombieGame
                 else if (k.Key == ConsoleKey.PageDown) { newxy = new Point(Compass.East, Compass.South); }
                 else if (k.Key == ConsoleKey.Escape) { gtfo = true; }
 
-                foreach (Person p in people.Items) { p.Target = newxy; p.Color = ConsoleColor.White; }
-                for (int i = 0; i < 5; i++)
+                if (FlashbangCounter > FlashbangWaitCycles)
                 {
-                    int zombieindex = Abacus.Random.Next(zombies.Count);
-                    zombies.Items[zombieindex].Target = newxy;
-                    Static.Swarms.Add(new Explosion(new[] { Symbol.FullBlock, Symbol.SmallBlock }, newxy, 0, 4, 3, true, true, true, true, ConsoleColor.White));
-                    Static.Sprites.Add(new Sprite(new[] { '!' }, zombies.Items[zombieindex].XY.Clone(0, -1), new Trajectory(-.33, 0, 2), ConsoleColor.Red));
+                    FlashbangCounter = 0;
 
+                    foreach (Person p in people.Items) { p.Target = newxy; p.Color = ConsoleColor.White; }
+                    for (int i = 0; i < 5; i++)
+                    {
+                        int zombieindex = Abacus.Random.Next(zombies.Count);
+                        zombies.Items[zombieindex].Target = newxy;
+                        Static.Swarms.Add(new Explosion(new[] { Symbol.FullBlock, Symbol.SmallBlock }, newxy, 0, 4, 3, true, true, true, true, ConsoleColor.White));
+                        Static.Sprites.Add(new Sprite(new[] { '!' }, zombies.Items[zombieindex].XY.Clone(0, -1), new Trajectory(-.33, 0, 2), ConsoleColor.Red));
+
+                    }
                 }
                 Easy.Keyboard.EatKeys();
             }
