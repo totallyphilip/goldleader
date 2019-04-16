@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldLeader", "GoldLeader\GoldLeader.csproj", "{44EF6D70-BABB-423E-A85A-F47A32037AC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{BEC1152B-EF6D-4897-ACE2-E1E8B5BD1C17}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{44EF6D70-BABB-423E-A85A-F47A32037AC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44EF6D70-BABB-423E-A85A-F47A32037AC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44EF6D70-BABB-423E-A85A-F47A32037AC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44EF6D70-BABB-423E-A85A-F47A32037AC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEC1152B-EF6D-4897-ACE2-E1E8B5BD1C17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEC1152B-EF6D-4897-ACE2-E1E8B5BD1C17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEC1152B-EF6D-4897-ACE2-E1E8B5BD1C17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEC1152B-EF6D-4897-ACE2-E1E8B5BD1C17}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

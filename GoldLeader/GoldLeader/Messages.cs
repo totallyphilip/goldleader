@@ -5,20 +5,17 @@ internal class Messages
 
     public static string[] HelpText()
     {
-        string TorpedoKey;
-        if (AsciiEngine.Application.IsWindowsOS) { TorpedoKey = "Ctrl-Space"; }
-        else { TorpedoKey = "Tab       "; }
-
         return new[] {
             "GAME PAUSED"
             ,"Press Enter to resume."
             ,""
             ,"<< Ship controls >>"
-            ,"Blasters       - Space           "
-            ,"Torpedo        - " + TorpedoKey + "      "
-            ,"Move           - Left/Right Arrow"
-            ,"Hyperdrive     - Up Arrow        "
-            ,"Toggle S-foils - Down Arrow      "
+            ,"Blasters        - Space           "
+            ,"Torpedo         - Tab             "
+            ,"Detonate Shield - Ctrl-Space      "
+            ,"Move            - Left/Right Arrow"
+            ,"Hyperdrive      - Up Arrow        "
+            ,"Toggle S-foils  - Down Arrow      "
             ,""
             ,"<< System controls >>"
             ,"Pause  - Enter    "
@@ -30,6 +27,8 @@ internal class Messages
             ,"divert power from thrusters to blasters."
             ,""
             ,"Defeat all enemies for navicomputer bonus."
+            ,""
+            ,"Each power up is worth " + PowerUp.Step + " more points."
             ,""
             ,"Hit = 1 point X altitude factor"
             ,"Kill = 2 points X altitude factor"
@@ -43,13 +42,16 @@ internal class Messages
             ""
             ,""
             ,""
+            ,"Wave cleared!"
+            ,""
             ,"That"
             ,"was"
+            ,"totally"
             ,"awesome."
             ,""
             ,""
             ,""
-            ,"(" +  + points + " Dead hero bonus."
+            ,"+" + points + " Dead Hero bonus."
         };
 
     }
@@ -87,11 +89,12 @@ internal class Messages
     {
         return new[] {
             "Instructions - Enter"
-            ,"Quit        - Escape"
+            ,"Quit         - Escape"
             ,""
         };
 
     }
+
 
     public static List<string> DemoText()
     {

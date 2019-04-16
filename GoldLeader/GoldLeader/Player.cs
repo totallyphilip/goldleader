@@ -89,6 +89,10 @@ internal class Player : Sprite
 
     #endregion
 
+    public void Chatter(string s) {
+        Static.Sprites.Add(new Sprite((s).ToCharArray(), this.XY.Clone(0-s.Length/2, -1), new Trajectory(-.33, 0, 4), System.ConsoleColor.White));
+    }
+
     override public void OnHit(int hiteffect)
     {
         this.HitPoints += hiteffect;
@@ -101,11 +105,13 @@ internal class Player : Sprite
         {
             if (this.HitPoints > 0) { AsciiEngine.Sprites.Static.Swarms.Add(new AsciiEngine.Fx.Explosion(new string(CharSet.Debris, this.Width).ToCharArray(), this.XY, this.Width, 3, 1, true, false, true, true)); }
             else { AsciiEngine.Sprites.Static.Swarms.Add(new AsciiEngine.Fx.Explosion(new string(CharSet.Debris, 50).ToCharArray(), this.XY, this.Width, 20, 2, true, false, true, true)); }
+            if (this.HitPoints == 1) { this.Chatter("I've lost R2!"); }
         }
         else
         {
             AsciiEngine.Sprites.Static.Swarms.Add(new AsciiEngine.Fx.Explosion(new string('+', 3).ToCharArray(), this.XY.Clone(this.Width / 2, 0), 0, 3, 1, true, false, true, true));
         }
+
 
     }
     public Player()
@@ -125,10 +131,34 @@ internal class Player : Sprite
         Missiles.Animate();
         foreach (PlayerTorpedo t in Torpedos.Items)
         {
-            if (!t.Alive) { this.MakeTorpedoShrapnel(t.XY); }
+            if (!t.Alive) { this.MakeTorpedoShrapnel(t.XY, 12, 1); }
         }
         if (!this.Alive && this.Missiles.Empty && this.Torpedos.Empty) { this.Active = false; }
     }
+
+
+    #region " Detonate "
+
+    public void Detonate()
+    {
+        if (this.Alive)
+        {
+            if (this.HitPoints > 1) { MakeTorpedoShrapnel(this.XY, this.HitPoints*8, 1); }
+            else
+            {
+                double velocity = 1;
+                int maxrange = Easy.Abacus.GreaterOf(Screen.Width, Screen.Height);
+                for (int range = maxrange; range > 0; range -= maxrange/10)
+                {
+                    MakeTorpedoShrapnel(this.XY, range, velocity);
+                    velocity *= .8;
+                }
+            }
+            this.HitPoints -= 1;
+        }
+    }
+
+    #endregion
 
     #region  " Torpedo "
 
@@ -141,13 +171,13 @@ internal class Player : Sprite
         }
     }
 
-    void MakeTorpedoShrapnel(AsciiEngine.Grid.Point xy)
+    void MakeTorpedoShrapnel(AsciiEngine.Grid.Point xy, int range, double velocity)
     {
         for (int i = 0; i < 40; i++)
         {
-            double velocity = 1; // velocity too high was skipping shrapnel right over targets
+            // double velocity = 1; // velocity too high was skipping shrapnel right over targets
             Easy.Abacus.Slope slope = Abacus.SlopeFrom(Abacus.RandomDegrees);
-            PlayerMissile missile = new PlayerMissile(xy, new Trajectory(slope.Rise * velocity, slope.Run * velocity, 12), CharSet.Shrapnel);
+            PlayerMissile missile = new PlayerMissile(xy, new Trajectory(slope.Rise * velocity, slope.Run * velocity, range), CharSet.Shrapnel);
             missile.HitPoints = 1;
             this.Missiles.Items.Add(missile);
         }

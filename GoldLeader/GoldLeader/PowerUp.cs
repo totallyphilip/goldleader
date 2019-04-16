@@ -6,6 +6,9 @@ using AsciiEngine.Sprites;
 internal class PowerUp : Sprite
 {
 
+    public static int Step = 5;
+    public static int FrameDelay = 150;
+
     public enum ePowerUpType
     {
         Points
@@ -14,46 +17,43 @@ internal class PowerUp : Sprite
         , Airstrike
         , Jump
         , Torpedo
+        , Force
     }
     public ePowerUpType PowerUpType;
 
-    public int Points = 0;
-
-
     public PowerUp(ePowerUpType type)
     {
-        char Symbol = '?'; // init value to eliminate warnings
+        string Symbol = "?"; // init value to eliminate warnings
 
         this.HitEffect = 0;
 
         switch (type)
         {
             case ePowerUpType.Points: // extra points
-                Symbol = '+';
+                Symbol = "Score"; //'+';
                 break;
             case ePowerUpType.Shields: // deflector shield increase
-                Symbol = CharSet.Shield;
+                Symbol = CharSet.Shield.ToString();
                 this.HitEffect = 1;
                 break;
             case ePowerUpType.Missiles: // fire an arc of missiles
-                Symbol = CharSet.Missile;
-                this.Points = 5;
+                Symbol = "Arc"; //CharSet.Missile;
                 break;
             case ePowerUpType.Airstrike: // rain down missiles
-                Symbol = CharSet.AirStrike;
-                this.Points = 5;
+                Symbol = "Strike"; //CharSet.AirStrike;
                 break;
             case ePowerUpType.Jump: // fly up
-                Symbol = CharSet.Jump;
-                this.Points = 5;
+                Symbol = "Jump"; // CharSet.Jump;
                 break;
             case ePowerUpType.Torpedo: // launch explosive
-                Symbol = CharSet.Torpedo;
-                this.Points = 5;
+                Symbol = CharSet.Torpedo.ToString();
+                break;
+            case ePowerUpType.Force: // freeze enemies
+                Symbol = "Force";
                 break;
         }
 
-        this.Text = new[] { AsciiEngine.Symbol.BarVerticalLeft, Symbol, AsciiEngine.Symbol.BarVerticalRight };
+        this.Text = (AsciiEngine.Symbol.BarVerticalLeft + Symbol + AsciiEngine.Symbol.BarVerticalRight).ToCharArray();
         this.Color = System.ConsoleColor.Cyan;
         this.FlyZone.EdgeMode = FlyZoneClass.eEdgeMode.Ignore;
         this.Trail = new Trail(new Point(Abacus.Random.Next(Screen.LeftEdge + this.Width, Screen.RightEdge - this.Width), Screen.TopEdge));

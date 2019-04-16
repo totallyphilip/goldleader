@@ -30,7 +30,7 @@ internal class EnemyWave : AsciiEngine.Sprites.Swarm
     string WelcomeMessage;
     public string VictoryMessage;
     public int AirTrafficMax;
-    bool AttackRunStarted = false;
+    public bool AttackRunStarted = false;
     public void StartAttackRun() { this.AttackRunStarted = true; }
     public List<EnemyDefinition> Generator = new List<EnemyDefinition>();
     public bool WeaponsUpgrade = false;

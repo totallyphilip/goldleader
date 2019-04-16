@@ -40,14 +40,16 @@ public class GoldLeader
         Leaderboard.SqlConnectionString = "user id=dbTest;password=baMw$CAQ5hnlxjCTYJ0YP;server=sql01\\dev01;Trusted_Connection=no;database=PwrightSandbox;connection timeout=5";
         AsciiEngine.Application.ID = Guid.Parse("A6620930-D791-4A03-8AAC-C2943B40E24D");
 
-
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
-        Screen.TryInitializeScreen(80, 30, false);
-        Stars = new Galaxy();
-        this.MainLoop();
-        Screen.TryInitializeScreen(oldwidth, oldheight, false);
-        Console.CursorVisible = true;
+        if (Screen.TryInitializeScreen(80, 30, false))
+        {
+            Stars = new Galaxy();
+            this.MainLoop();
+            Screen.TryInitializeScreen(oldwidth, oldheight, false);
+            Console.CursorVisible = true;
+        }
+        else { Console.WriteLine("Error: Failed to initialize screen."); }
     }
 
     void MainLoop()
@@ -121,7 +123,7 @@ public class GoldLeader
 
     }
 
-    enum eHyperdriveMode { Unused, Engaged, Disengaged };
+    enum eHyperdriveMode { NotReady, Ready, Engaged, Disengaged, Disabled };
 
     void PlayTheGame()
     {
@@ -135,11 +137,12 @@ public class GoldLeader
         // power ups
         PowerUp powerup = null;
         int BonusPoints = 0;
-        int FrameCounter = 0;
 
         // hyperdrive
-        eHyperdriveMode HyperdriveMode = eHyperdriveMode.Unused;
+        eHyperdriveMode HyperdriveMode = eHyperdriveMode.NotReady;
         Easy.Abacus.Fibonacci hyperbonus = new Easy.Abacus.Fibonacci();
+        int HyperdriveCalculator = 0;
+        int HyperdriveReadyCycles = 500;
 
         // misc
         bool Paused = false;
@@ -280,6 +283,9 @@ public class GoldLeader
         {
 
             bool ClosingWordsStated = false;
+            int FramesElapsed = 0;
+            bool CropDustingTaunted = false;
+            int ForceInEffect = 0;
 
             if (Waves.IndexOf(wave) == Waves.Count - 1)
             {
@@ -287,16 +293,20 @@ public class GoldLeader
                 Scroller.NewLine("Final wave!");
                 Scroller.NewLine("Deflector shield boosted.");
                 Scroller.NewLine("May the force be with you.");
+                HyperdriveMode = eHyperdriveMode.Disabled;
             }
             else
             {
                 Scroller.NewLine("Wave " + (Waves.IndexOf(wave) + 1));
                 Scroller.NewLine("Deflector shield " + (Convert.ToDouble(player.HitPoints - 1) / (player.DefaultHitPoints - 1)) * 100 + "% charged.");
-                if (HyperdriveMode == eHyperdriveMode.Disengaged) { Scroller.NewLine("Navicomputer coordinates recalculated."); }
             }
             if (wave.HasWelcomeMessage) { Scroller.NewLine(wave.PopWelcomeMessage()); }
 
-            HyperdriveMode = eHyperdriveMode.Unused;
+            if (HyperdriveMode == eHyperdriveMode.Disengaged)
+            {
+                HyperdriveMode = eHyperdriveMode.NotReady;
+                HyperdriveCalculator = 0;
+            }
 
 
 
@@ -311,8 +321,6 @@ public class GoldLeader
 
             // keyboard buffer
             List<ConsoleKeyInfo> keybuffer = new List<ConsoleKeyInfo>();
-
-            int FramesUntilPowerup = Easy.Abacus.Random.Next(100, 150);
 
             bool AttackRunStarted = false;
 
@@ -339,18 +347,22 @@ public class GoldLeader
                 Console.CursorVisible = false; // windows turns the cursor back on when restoring from minimized window
 
                 // power ups
-                if (FrameCounter > FramesUntilPowerup && powerup == null && !wave.Completed())
+                if (FramesElapsed > PowerUp.FrameDelay && powerup == null && !wavetimer.Expired && !wave.Completed())
                 {
                     PowerUp.ePowerUpType pt = Easy.Abacus.RandomEnumValue<PowerUp.ePowerUpType>();
-                    powerup = new PowerUp(pt);
-                    //powerup = new PowerUp(PowerUp.ePowerUpType.Missiles); // to force a powerup choice
-                    FramesUntilPowerup = Easy.Abacus.Random.Next(200, 300);
-                    FrameCounter = 0;
+                     powerup = new PowerUp(pt);
+                    //powerup = new PowerUp(PowerUp.ePowerUpType.Force);
+                    FramesElapsed = 0;
+                }
+
+                // hyperdrive
+                if (HyperdriveMode == eHyperdriveMode.NotReady && HyperdriveCalculator++ > HyperdriveReadyCycles && player.Alive && !wave.Completed())
+                {
+                    HyperdriveMode = eHyperdriveMode.Ready;
                 }
 
                 // animate
                 Stars.Animate();
-                FrameCounter++;
 
 
 
@@ -368,13 +380,14 @@ public class GoldLeader
                 }
                 else
                 {
-
+                    if (wave.AttackRunStarted) { FramesElapsed++; }
                     AsciiEngine.Sprites.Static.Swarms.Animate();
                     AsciiEngine.Sprites.Static.Sprites.Animate();
 
                     if (HyperdriveMode == eHyperdriveMode.Engaged)
                     {
                         Stars.Animate();
+                        player.Refresh();
                         if (hyperdrivetimer.Expired)
                         {
                             HyperdriveMode = eHyperdriveMode.Disengaged;
@@ -382,9 +395,10 @@ public class GoldLeader
                             Stars.SetHyperspace(false);
                         }
                     }
-                    else if (HyperdriveMode == eHyperdriveMode.Unused)
+                    else if (HyperdriveMode != eHyperdriveMode.Disengaged)
                     {
 
+                        #region " Power Ups "
                         // power ups
                         if (powerup != null)
                         {
@@ -393,12 +407,13 @@ public class GoldLeader
                             powerup.Animate(null);
                             if (hit || Sprite.Collided(player, powerup))
                             {
-                                int points = powerup.Points;
+                                BonusPoints += PowerUp.Step;
+                                Score += BonusPoints;
+                                ScoreUp(BonusPoints, player.XY);
                                 switch (powerup.PowerUpType)
                                 {
                                     case PowerUp.ePowerUpType.Points:
-                                        BonusPoints += 10;
-                                        points = BonusPoints;
+                                        // does nothing; points only
                                         break;
                                     case PowerUp.ePowerUpType.Shields:
                                         break;
@@ -414,29 +429,41 @@ public class GoldLeader
                                     case PowerUp.ePowerUpType.Torpedo:
                                         player.TorpedosLocked += 1;
                                         break;
+                                    case PowerUp.ePowerUpType.Force:
+                                        ForceInEffect = 60;
+                                        break;
                                 }
-                                Score += points;
-                                ScoreUp(points, player.XY);
                             }
 
                             if (!powerup.Alive) { powerup = null; }
 
                         }
 
-                        // check if anybody shot anybody
-                        wave.CheckCollisions(player.Missiles);
-                        wave.Animate();
-                        wave.CheckCollisions(player.Missiles);
+                        #endregion
 
-                        // give the player a break by not checking if they ran into a missile
-                        foreach (Enemy bg in wave.Items) { bg.Missiles.CheckCollision(player); }
+                        #region  " Animate Ships, Check Collisions "
 
-                        // hud
+                        wave.CheckCollisions(player.Missiles);
+                        foreach (Enemy badguy in wave.Items) { badguy.Missiles.CheckCollision(player); }
+
+                        if (ForceInEffect-- < 1) { wave.Animate(); } else { wave.Refresh(); }
+                        if (player.Alive) { player.Animate(null); }
+
+                        wave.CheckCollisions(player.Missiles);
+                        foreach (Enemy badguy in wave.Items) { badguy.Missiles.CheckCollision(player); }
+
+                        Score += wave.CollectScore();
+
+                        #endregion
+
+                        if (player.Active) { player.Activate(); }
+
+                        #region  " HUD "
                         Console.ForegroundColor = ConsoleColor.White;
                         string ShieldMarkers = "";
                         if (player.HitPoints > 0) { ShieldMarkers = new String(CharSet.Shield, player.HitPoints - 1); }
                         Screen.TryWrite(new Point(1, Screen.BottomEdge), ShieldMarkers + ' ');
-
+                    
                         try // this fails if the missile powerup is used
                         {
                             string ShotMarkers = new string(' ', player.Missiles.Count + player.Torpedos.Count) + new String('|', player.MissileCapacity - player.Missiles.Items.Count) + new string(CharSet.Torpedo, player.TorpedosLocked);
@@ -448,6 +475,12 @@ public class GoldLeader
                             Screen.TryWrite(new Point(Screen.Width - ShotMarkers.Length - 1, Screen.BottomEdge), ShotMarkers);
                         }
 
+                        string computermessage;
+                        if (HyperdriveMode == eHyperdriveMode.Disabled) { computermessage = "OFFLINE"; Console.ForegroundColor = ConsoleColor.Red; }
+                        else if (HyperdriveMode == eHyperdriveMode.Ready) { computermessage = "NAV SET"; Console.ForegroundColor = ConsoleColor.White; }
+                        else { computermessage = (Easy.Abacus.Random.NextDouble() * 1000).ToString().Substring(0, 7); Console.ForegroundColor = ConsoleColor.DarkGreen; }
+                        { Screen.TryWrite(new Point((Screen.Width * .25) - computermessage.Length / 2, Screen.BottomEdge), computermessage); }
+
                         if (AttackRunStarted)
                         {
 
@@ -458,15 +491,13 @@ public class GoldLeader
                             Screen.TryWrite(new Point((Screen.Width - secondsremaining.Length) / 2, Screen.BottomEdge), secondsremaining);
                         }
 
-                    }
+                        #endregion
 
-                    if (player.Alive) { player.Animate(null); }
-                    if (player.Active) { player.Activate(); }
-                    Score += wave.CollectScore();
+                    }
 
                 }
 
-
+                #region " Fetch Input "
                 // check input keys and prioritize some keys
                 while (Console.KeyAvailable)
                 {
@@ -497,6 +528,10 @@ public class GoldLeader
                     }
                 }
 
+                #endregion
+
+                #region " Do Commands "
+
                 if (keybuffer.Count > 0)
                 {
 
@@ -505,19 +540,27 @@ public class GoldLeader
                     switch (k.Key)
                     {
                         case ConsoleKey.UpArrow:
-
-                            if (HyperdriveMode == eHyperdriveMode.Unused && !wave.Completed() && player.Alive)
+                            if (!wave.Completed() && player.Alive && HyperdriveMode != eHyperdriveMode.Engaged && wave.AttackRunStarted)
                             {
-                                if (Waves.IndexOf(wave) < Waves.Count - 1)
+                                if (HyperdriveMode == eHyperdriveMode.NotReady)
+                                {
+                                    if (!CropDustingTaunted)
+                                    {
+                                        Scroller.Fill(Messages.CropDustingText());
+                                        CropDustingTaunted = true;
+                                    }
+                                }
+                                else if (HyperdriveMode == eHyperdriveMode.Disabled) { Scroller.Fill(Messages.HyperdriveFailText()); }
+                                else if (HyperdriveMode == eHyperdriveMode.Ready)
                                 {
                                     Stars.SetHyperspace(true);
                                     powerup = null;
+                                    hyperbonus.Reset();
                                     player.Trajectory.Run = 0;
                                     player.Missiles.TerminateAll();
                                     HyperdriveMode = eHyperdriveMode.Engaged;
                                     hyperdrivetimer.Start();
                                 }
-                                else { Scroller.Fill(Messages.HyperdriveFailText()); }
                             }
                             break;
                         case ConsoleKey.PageUp:
@@ -543,10 +586,9 @@ public class GoldLeader
                         case ConsoleKey.Spacebar:
                             if (HyperdriveMode != eHyperdriveMode.Engaged)
                             {
-                                if (k.Modifiers.HasFlag(ConsoleModifiers.Control)) { player.FireTorpedo(); }
+                                if (k.Modifiers.HasFlag(ConsoleModifiers.Control)) { player.Detonate(); }
                                 else { player.Fire(); }
                             }
-
                             break;
                         case ConsoleKey.Escape:
                             QuitFast = true;
@@ -560,6 +602,8 @@ public class GoldLeader
 
                 }
 
+                #endregion
+
                 // display messages
                 if (!Instructions.Empty) { Instructions.Animate(); } else { Scroller.Animate(); }
                 if (player.Alive)
@@ -568,24 +612,24 @@ public class GoldLeader
                     {
                         wavetimer.Pause();
                         ClosingWordsStated = true;
-                        if (HyperdriveMode == eHyperdriveMode.Disengaged)
-                        {
-                            Scroller.Fill(Messages.CropDustingText());
-                            hyperbonus.Reset();
-                        }
-                        else
+                        if (HyperdriveMode != eHyperdriveMode.Disengaged)
                         {
                             if (wave.VictoryMessage == "") { Scroller.NewLine("Wave cleared."); }
                             else { Scroller.NewLine(wave.VictoryMessage); }
-                            Scroller.NewLine("+" + (hyperbonus.Value * 10) + " navicomputer Fibonacci bonus.");
-                            Score += hyperbonus.Value * 10;
-                            hyperbonus.Increment();
+
+                            if (HyperdriveMode == eHyperdriveMode.Ready)
+                            {
+                                Scroller.NewLine(hyperbonus.Value + " X 10 = +" + hyperbonus.Value * 10 + " navicomputer Fibonacci bonus.");
+                                Score += hyperbonus.Value * 10;
+                                hyperbonus.Increment();
+                            }
+
                             if (!wavetimer.Expired)
                             {
-                                Scroller.NewLine("+" + wavetimer.TimeLeft + " time bonus.");
-                                Score += wavetimer.TimeLeft;
+                                Scroller.NewLine(wavetimer.TimeLeft + " X 10 = +" + wavetimer.TimeLeft * 10 + " time bonus.");
+                                Score += wavetimer.TimeLeft * 10;
                             }
-                        };
+                        }
                     }
                 }
                 else
@@ -621,6 +665,7 @@ public class GoldLeader
 
         }
 
+        #region " Save High Score "
         if (!QuitFast)
         {
 
@@ -637,6 +682,7 @@ public class GoldLeader
             catch { }
 
         }
+        #endregion
     }
 
     static internal void ScoreUp(int points, Point xy)
