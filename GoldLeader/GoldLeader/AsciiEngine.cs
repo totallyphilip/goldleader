@@ -784,65 +784,28 @@ namespace AsciiEngine
             return new Grid.Point(Easy.Abacus.Round(Screen.Width / 2), Easy.Abacus.Round(Screen.Height / 2));
         }
 
+        //public static bool TryInitializeScreen(int targetwidth, int targetheight)
+        //{
+        //    return TryInitializeScreen(targetwidth, targetheight, true);
+        //}
+
         public static bool TryInitializeScreen(int targetwidth, int targetheight)
         {
-            return TryInitializeScreen(targetwidth, targetheight, true);
-        }
 
-        public static bool TryInitializeScreen(int targetwidth, int targetheight, bool adjustmanually)
-        {
+            Console.Clear(); // this fixes an annoying failure when the window has been resized manually and contains text
 
-            try
-            {
-                // make sure the buffer is never smaller than the window, otherwise the window resize operation will fail
-                Console.SetBufferSize(Easy.Abacus.GreaterOf(targetwidth, Console.WindowWidth), Easy.Abacus.GreaterOf(targetheight, Console.WindowHeight));
-                // now it's safe to resize everything
-                Console.SetWindowSize(targetwidth, targetheight);
-                Console.SetBufferSize(targetwidth, targetheight);
-                System.Console.OutputEncoding = System.Text.Encoding.Unicode;
-            }
-            catch
-            {
+            // make sure the buffer is never smaller than the window, otherwise the window resize operation will fail
+            Console.SetBufferSize(Easy.Abacus.GreaterOf(targetwidth, Console.WindowWidth), Easy.Abacus.GreaterOf(targetheight, Console.WindowHeight));
+            // now it's safe to resize everything
+            Console.SetWindowSize(targetwidth, targetheight);
+            Console.SetBufferSize(targetwidth, targetheight);
+            System.Console.OutputEncoding = System.Text.Encoding.Unicode;
 
-                while ((Console.WindowWidth != targetwidth || Console.WindowHeight != targetheight || !Console.KeyAvailable) && !Console.KeyAvailable && adjustmanually)
-                {
-
-                    Console.Clear();
-
-                    if (Console.WindowWidth == targetwidth && Console.WindowHeight == targetheight)
-                    {
-                        Console.Write("Perfect size!\nPress ENTER to continue.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Resize windown to");
-                        Console.WriteLine(targetwidth + " X " + targetheight);
-                        Console.WriteLine("or keypress to quit.");
-                        Console.WriteLine();
-
-                        char leftarrow = '<'; // \x2190
-                        char rightarrow = '>'; // \x2192
-                        char uparrow = '^'; // \x2191
-                        char downarrow = 'v'; // \x2193
-
-                        Console.WriteLine(Console.WindowWidth + " X " + Console.WindowHeight);
-
-                        Console.Write("resize: " + Console.WindowWidth + " ");
-                        if (Console.WindowWidth > targetwidth) { Console.WriteLine(new String(leftarrow, Console.WindowWidth - targetwidth)); }
-                        else if (Console.WindowWidth < targetwidth) { Console.WriteLine(new String(rightarrow, targetwidth - Console.WindowWidth)); }
-                        else { Console.WriteLine("Perfect!"); }
-
-                        Console.Write("resize: " + Console.WindowHeight + " ");
-                        if (Console.WindowHeight > targetheight) { Console.Write(new String(uparrow, Console.WindowHeight - targetheight)); }
-                        else if (Console.WindowHeight < targetheight) { Console.Write(new String(downarrow, targetheight - Console.WindowHeight)); }
-                        else { Console.Write("Perfect!"); }
-                    }
-
-                    System.Threading.Thread.Sleep(200); // good enough so the CPU doesn't go crazy
-
-                }
-
-            }
+            //if (showresults)
+            //{
+            //    Console.WriteLine("Width: " + Console.WindowWidth + ", Height: " + Console.WindowHeight + "\nPress ENTER to continue.");
+            //    Console.ReadLine();
+            //}
 
             return (Console.WindowHeight == targetheight && Console.WindowWidth == targetwidth);
 

@@ -42,14 +42,14 @@ public class GoldLeader
 
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
-        if (Screen.TryInitializeScreen(80, 30, false))
+        if (Screen.TryInitializeScreen(80, 30))
         {
             Stars = new Galaxy();
             this.MainLoop();
-            Screen.TryInitializeScreen(oldwidth, oldheight, false);
+            Screen.TryInitializeScreen(oldwidth, oldheight);
             Console.CursorVisible = true;
         }
-        else { Console.WriteLine("Error: Failed to initialize screen."); }
+        else { Console.WriteLine("Error: Failed to set screen dimensions."); }
     }
 
     void MainLoop()

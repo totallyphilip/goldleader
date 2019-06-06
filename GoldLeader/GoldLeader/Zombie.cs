@@ -31,9 +31,9 @@ public class ZombieGame
 
         int oldwidth = Console.WindowWidth;
         int oldheight = Console.WindowHeight;
-        Screen.TryInitializeScreen(80, 30, false);
+        Screen.TryInitializeScreen(80, 30);
         this.MainLoop();
-        Screen.TryInitializeScreen(oldwidth, oldheight, false);
+        Screen.TryInitializeScreen(oldwidth, oldheight);
         Console.CursorVisible = true;
     }
 
