@@ -32,12 +32,13 @@ public class GoldLeader
     public GoldLeader() { this.PlayAgain = true; }
     public GoldLeader(bool b) { PlayAgain = b; }
 
-    public void TryPlay()
+    public void TryPlay(string cs)
     {
 
         // main settings
         AsciiEngine.Application.Title = "GOLD LEADER";
-        Leaderboard.SqlConnectionString = "user id=dbTest;password=baMw$CAQ5hnlxjCTYJ0YP;server=sql01\\dev01;Trusted_Connection=no;database=PwrightSandbox;connection timeout=5";
+        //        Leaderboard.SqlConnectionString = "user id=dbTest;password=baMw$CAQ5hnlxjCTYJ0YP;server=sql01\\dev01;Trusted_Connection=no;database=PwrightSandbox;connection timeout=5";
+        Leaderboard.SqlConnectionString = cs;
         AsciiEngine.Application.ID = Guid.Parse("A6620930-D791-4A03-8AAC-C2943B40E24D");
 
         int oldwidth = Console.WindowWidth;
@@ -75,8 +76,6 @@ public class GoldLeader
 
             if (Scroller.Empty)
             {
-                Scroller.Fill(Messages.DemoText());
-
                 try
                 {
                     Leaderboard lb = new Leaderboard();
@@ -89,8 +88,9 @@ public class GoldLeader
                 }
                 catch
                 {
-                    Scroller.NewLine("CANNOT CONNECT TO HIGH SCORE SERVER");
+                    Scroller.NewLine("CANNOT CONNECT TO LEADERBOARD");
                 }
+                Scroller.Fill(Messages.DemoText());
             }
 
 

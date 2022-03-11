@@ -13,7 +13,7 @@ namespace MyProgram
             ConsoleKeyInfo k = Console.ReadKey(true);
             if (k.Key == ConsoleKey.D1) {
                 GoldLeader game = new GoldLeader();
-                game.TryPlay();
+                game.TryPlay("");
             }
             else if (k.Key == ConsoleKey.D2)
             {

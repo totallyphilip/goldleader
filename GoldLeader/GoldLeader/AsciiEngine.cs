@@ -27,9 +27,8 @@ namespace AsciiEngine
         {
             SqlConnection dbConn = new SqlConnection(Leaderboard.SqlConnectionString);
             dbConn.Open();
-            SqlCommand oCommand = new SqlCommand("dbo.GetScores", dbConn);
+            SqlCommand oCommand = new SqlCommand("dbo.LeaderboardRead", dbConn);
             oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-            oCommand.Parameters.AddWithValue("@GameGuid", Application.ID);
             oCommand.Parameters.AddWithValue("@Limit", count);
             SqlDataReader dbReader = oCommand.ExecuteReader();
 
@@ -47,9 +46,8 @@ namespace AsciiEngine
         {
             SqlConnection dbConn = new SqlConnection(Leaderboard.SqlConnectionString);
             dbConn.Open();
-            SqlCommand oCommand = new SqlCommand("dbo.AddScore", dbConn);
+            SqlCommand oCommand = new SqlCommand("dbo.LeaderboardAdd", dbConn);
             oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-            oCommand.Parameters.AddWithValue("@GameGuid", Application.ID);
             oCommand.Parameters.AddWithValue("@Signature", signature);
             oCommand.Parameters.AddWithValue("@Points", points);
             oCommand.ExecuteNonQuery();
