@@ -25,7 +25,6 @@ public class ZombieGame
 
         // main settings
         AsciiEngine.Application.Title = "BRAINS";
-        Leaderboard.SqlConnectionString = "user id=dbTest;password=baMw$CAQ5hnlxjCTYJ0YP;server=sql01\\dev01;Trusted_Connection=no;database=PwrightSandbox;connection timeout=5";
         AsciiEngine.Application.ID = Guid.Parse("E52D66E9-25BC-44B6-8DAE-23CDBBA5CDA4");
 
 

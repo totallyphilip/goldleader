@@ -38,7 +38,6 @@ public class GoldLeader
         // main settings
         AsciiEngine.Application.Title = "GOLD LEADER";
         //        Leaderboard.SqlConnectionString = "user id=dbTest;password=baMw$CAQ5hnlxjCTYJ0YP;server=sql01\\dev01;Trusted_Connection=no;database=PwrightSandbox;connection timeout=5";
-        Leaderboard.SqlConnectionString = cs;
         AsciiEngine.Application.ID = Guid.Parse("A6620930-D791-4A03-8AAC-C2943B40E24D");
 
         int oldwidth = Console.WindowWidth;
@@ -46,24 +45,24 @@ public class GoldLeader
         if (Screen.TryInitializeScreen(80, 30))
         {
             Stars = new Galaxy();
-            this.MainLoop();
+            this.MainLoop(cs);
             Screen.TryInitializeScreen(oldwidth, oldheight);
             Console.CursorVisible = true;
         }
         else { Console.WriteLine("Error: Failed to set screen dimensions."); }
     }
 
-    void MainLoop()
+    void MainLoop(string cs)
     {
         Easy.Keyboard.EatKeys();
         do
         {
-            if (!QuitFast) { Attract(); }
+            if (!QuitFast) { Attract(cs); }
             if (!QuitFast) { PlayTheGame(); }
         } while (!QuitFast && this.PlayAgain);
     }
 
-    void Attract()
+    void Attract(string cs)
     {
         Console.Clear();
         Swarm DemoEnemies = new Swarm();
@@ -79,6 +78,7 @@ public class GoldLeader
                 try
                 {
                     Leaderboard lb = new Leaderboard();
+                    lb.SqlConnectionString = cs;
                     lb.SqlLoadScores(10);
                     Scroller.NewLine(2);
                     Scroller.NewLine("HIGH SCORES");

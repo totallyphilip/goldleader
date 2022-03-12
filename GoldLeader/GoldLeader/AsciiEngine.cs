@@ -6,10 +6,10 @@ using System.Data.SqlClient;
 
 namespace AsciiEngine
 {
-    internal class Leaderboard
+    public class Leaderboard
     {
-        static public string SqlConnectionString;
-        internal class Score
+        public string SqlConnectionString;
+        public class Score
         {
             public string Signature;
             public int Points;
@@ -25,33 +25,45 @@ namespace AsciiEngine
 
         public void SqlLoadScores(int count)
         {
-            SqlConnection dbConn = new SqlConnection(Leaderboard.SqlConnectionString);
-            dbConn.Open();
-            SqlCommand oCommand = new SqlCommand("dbo.LeaderboardRead", dbConn);
-            oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-            oCommand.Parameters.AddWithValue("@Limit", count);
-            SqlDataReader dbReader = oCommand.ExecuteReader();
-
-            if (dbReader.HasRows)
+            if (this.SqlConnectionString=="")
             {
-                while (dbReader.Read())
-                {
-                    this.Items.Add(new Score(dbReader["Signature"].ToString(), Convert.ToInt32(dbReader["Points"])));
-                }
+                this.Items.Add(new Score("???", 0));
+                this.Items.Add(new Score("???", 0));
+                this.Items.Add(new Score("???", 0));
             }
-            dbConn.Close();
+            else
+            {
+                SqlConnection dbConn = new SqlConnection(this.SqlConnectionString);
+                dbConn.Open();
+                SqlCommand oCommand = new SqlCommand("dbo.LeaderboardRead", dbConn);
+                oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                oCommand.Parameters.AddWithValue("@Limit", count);
+                SqlDataReader dbReader = oCommand.ExecuteReader();
+
+                if (dbReader.HasRows)
+                {
+                    while (dbReader.Read())
+                    {
+                        this.Items.Add(new Score(dbReader["Signature"].ToString(), Convert.ToInt32(dbReader["Points"])));
+                    }
+                }
+                dbConn.Close();
+            }
         }
 
         public void SqlSaveScore(string signature, int points)
         {
-            SqlConnection dbConn = new SqlConnection(Leaderboard.SqlConnectionString);
-            dbConn.Open();
-            SqlCommand oCommand = new SqlCommand("dbo.LeaderboardAdd", dbConn);
-            oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-            oCommand.Parameters.AddWithValue("@Signature", signature);
-            oCommand.Parameters.AddWithValue("@Points", points);
-            oCommand.ExecuteNonQuery();
-            dbConn.Close();
+            if (this.SqlConnectionString != "")
+            {
+                SqlConnection dbConn = new SqlConnection(this.SqlConnectionString);
+                dbConn.Open();
+                SqlCommand oCommand = new SqlCommand("dbo.LeaderboardAdd", dbConn);
+                oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                oCommand.Parameters.AddWithValue("@Signature", signature);
+                oCommand.Parameters.AddWithValue("@Points", points);
+                oCommand.ExecuteNonQuery();
+                dbConn.Close();
+            }
         }
 
 
