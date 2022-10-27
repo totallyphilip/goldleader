@@ -11,7 +11,7 @@ namespace Test
         static void Main(string[] args)
         {
             GoldLeader game = new GoldLeader(false);
-            game.TryPlay();
+            game.TryPlay("");
         }
     }
 }
